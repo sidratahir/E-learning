@@ -1,0 +1,787 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 21: Link Analysis
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-06-18
+
+1 / 80
+
+Overview
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+2 / 80
+
+Outline
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+3 / 80
+
+Applications of clustering in IR
+Application Search result clustering What is Bene?t clustered? search more e?ective inforresults mation presentation to user (subsets alternative user interof) col- face: ?search without lection typing? collection e?ective information presentation for exploratory browsing collection higher e?ciency: faster search Example
+
+Scatter-Gather
+
+Collection clustering
+
+McKeown et al. 2002, news.google.com
+
+Cluster-based retrieval
+
+Salton 1971
+
+4 / 80
+
+K -means algorithm
+K -means({x1 , . . . , xN }, K ) 1 (s1 , s2 , . . . , sK ) ? SelectRandomSeeds({x1 , . . . , xN }, K ) 2 for k ? 1 to K 3 do ?k ? sk 4 while stopping criterion has not been met 5 do for k ? 1 to K 6 do ?k ? {} 7 for n ? 1 to N 8 do j ? arg minj ? |?j ? ? xn | 9 ?j ? ?j ? {xn } (reassignment of vectors) 10 for k ? 1 to K 1 11 do ?k ? |?k | x??k x (recomputation of centroids) 12 return {?1 , . . . , ?K }
+
+5 / 80
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better heuristics:
+Select seeds not randomly, but using some heuristic (e.g., ?lter out outliers or ?nd a set of seeds that has ?good coverage? of the document space) Use hierarchical clustering to ?nd good seeds (next class) Select i (e.g., i = 10) di?erent sets of seeds, do a K -means clustering for each, select the clustering with lowest RSS
+
+6 / 80
+
+Take-away today
+
+Anchor text: What exactly are links on the web and why are they important for IR? Citation analysis: the mathematical foundation of PageRank and link-based ranking PageRank: the original algorithm that was used for link-based ranking on the web Hubs & Authorities: an alternative link-based ranking algorithm
+
+7 / 80
+
+Outline
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+8 / 80
+
+The web as a directed graph
+
+hyperlink page d1 anchor text
+
+page d2
+
+Assumption 1: A hyperlink is a quality signal.
+The hyperlink d1 ? d2 indicates that d1 ?s author deems d2 high-quality and relevant.
+
+Assumption 2: The anchor text describes the content of d2 .
+We use anchor text somewhat loosely here for: the text surrounding the hyperlink. Example: ?You can ?nd cheap cars <a href=http://...>here</a>.? Anchor text: ?You can ?nd cheap cars here?
+9 / 80
+
+[text of d2 ] only vs. [text of d2] + [anchor text ? d2 ]
+
+Searching on [text of d2 ] + [anchor text ? d2 ] is often more e?ective than searching on [text of d2 ] only. Example: Query IBM
+Matches IBM?s copyright page Matches many spam pages Matches IBM wikipedia article May not match IBM home page! . . . if IBM home page is mostly graphics
+
+Searching on [anchor text ? d2 ] is better for the query IBM.
+In this representation, the page with the most occurrences of IBM is www.ibm.com.
+
+10 / 80
+
+Anchor text containing IBM pointing to www.ibm.com
+
+www.nytimes.com: ?IBM acquires Webify?
+
+www.slashdot.org: ?New IBM optical chip?
+
+www.stanford.edu: ?IBM faculty award recipients?
+
+wwww.ibm.com
+
+11 / 80
+
+Indexing anchor text
+
+Thus: Anchor text is often a better description of a page?s content than the page itself. Anchor text can be weighted more highly than document text. (based on Assumptions 1&2)
+
+12 / 80
+
+Exercise: Assumptions underlying PageRank
+
+Assumption 1: A link on the web is a quality signal ? the author of the link thinks that the linked-to page is high-quality. Assumption 2: The anchor text describes the content of the linked-to page. Is assumption 1 true in general? Is assumption 2 true in general?
+
+13 / 80
+
+Google bombs
+
+A Google bomb is a search with ?bad? results due to maliciously manipulated anchor text. Google introduced a new weighting function in 2007 that ?xed many Google bombs. Still some remnants: [dangerous cult] on Google, Bing, Yahoo
+Coordinated link creation by those who dislike the Church of Scientology
+
+Defused Google bombs: [dumb motherf....], [who is a failure?], [evil empire]
+
+14 / 80
+
+Outline
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+15 / 80
+
+Origins of PageRank: Citation analysis (1)
+Citation analysis: analysis of citations in the scienti?c literature Example citation: ?Miller (2001) has shown that physical activity alters the metabolism of estrogens.? We can view ?Miller (2001)? as a hyperlink linking two scienti?c articles. One application of these ?hyperlinks? in the scienti?c literature:
+Measure the similarity of two articles by the overlap of other articles citing them. This is called cocitation similarity. Cocitation similarity on the web: Google?s ?related:? operator, e.g. [related:www.ford.com]
+
+16 / 80
+
+Origins of PageRank: Citation analysis (2)
+
+Another application: Citation frequency can be used to measure the impact of a scienti?c article.
+Simplest measure: Each citation gets one vote. On the web: citation frequency = inlink count
+
+However: A high inlink count does not necessarily mean high quality . . . . . . mainly because of link spam. Better measure: weighted citation frequency or citation rank
+An citation?s vote is weighted according to its citation impact. Circular? No: can be formalized in a well-de?ned way.
+
+17 / 80
+
+Origins of PageRank: Citation analysis (3)
+
+Better measure: weighted citation frequency or citation rank This is basically PageRank. PageRank was invented in the context of citation analysis by Pinsker and Narin in the 1960s. Citation analysis is a big deal: The budget and salary of this lecturer are / will be determined by the impact of his publications!
+
+18 / 80
+
+Origins of PageRank: Summary
+
+We can use the same formal representation for
+citations in the scienti?c literature hyperlinks on the web
+
+Appropriately weighted citation frequency is an excellent measure of quality . . .
+. . . both for web pages and for scienti?c publications.
+
+Next: PageRank algorithm for computing weighted citation frequency on the web
+
+19 / 80
+
+Outline
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+20 / 80
+
+Model behind PageRank: Random walk
+
+Imagine a web surfer doing a random walk on the web
+Start at a random page At each step, go out of the current page along one of the links on that page, equiprobably
+
+In the steady state, each page has a long-term visit rate. This long-term visit rate is the page?s PageRank. PageRank = long-term visit rate = steady state probability
+
+21 / 80
+
+Formalization of random walk: Markov chains
+
+A Markov chain consists of N states, plus an N ? N transition probability matrix P. state = page At each step, we are on exactly one of the pages. For 1 ? i , j ? N, the matrix entry Pij tells us the probability of j being the next page, given we are currently on page i . Clearly, for all i,
+N j=1 Pij
+
+=1
+
+Pij
+di
+
+dj
+
+22 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+23 / 80
+
+Link matrix for example
+
+d0 d1 d2 d3 d4 d5 d6
+
+d0 0 0 1 0 0 0 0
+
+d1 0 1 0 0 0 0 0
+
+d2 1 1 1 0 0 0 0
+
+d3 0 0 1 1 0 0 1
+
+d4 0 0 0 1 0 0 1
+
+d5 0 0 0 0 0 1 0
+
+d6 0 0 0 0 1 1 1
+
+24 / 80
+
+Transition probability matrix P for example
+
+d0 d1 d2 d3 d4 d5 d6
+
+d0 0.00 0.00 0.33 0.00 0.00 0.00 0.00
+
+d1 0.00 0.50 0.00 0.00 0.00 0.00 0.00
+
+d2 1.00 0.50 0.33 0.00 0.00 0.00 0.00
+
+d3 0.00 0.00 0.33 0.50 0.00 0.00 0.33
+
+d4 0.00 0.00 0.00 0.50 0.00 0.00 0.33
+
+d5 0.00 0.00 0.00 0.00 0.00 0.50 0.00
+
+d6 0.00 0.00 0.00 0.00 1.00 0.50 0.33
+
+25 / 80
+
+Long-term visit rate
+
+Recall: PageRank = long-term visit rate Long-term visit rate of page d is the probability that a web surfer is at page d at a given point in time. Next: what properties must hold of the web graph for the long-term visit rate to be well de?ned? The web graph must correspond to an ergodic Markov chain. First a special case: The web graph must not contain dead ends.
+
+26 / 80
+
+Dead ends
+
+??
+
+The web is full of dead ends. Random walk can get stuck in dead ends. If there are dead ends, long-term visit rates are not well-de?ned (or non-sensical).
+
+27 / 80
+
+Teleporting ? to get us out of dead ends
+
+At a dead end, jump to a random web page with prob. 1/N. At a non-dead end, with probability 10%, jump to a random web page (to each with a probability of 0.1/N). With remaining probability (90%), go out on a random hyperlink.
+For example, if the page has 4 outgoing links: randomly choose one with probability (1-0.10)/4=0.225
+
+10% is a parameter, the teleportation rate. Note: ?jumping? from dead end is independent of teleportation rate.
+
+28 / 80
+
+Result of teleporting
+
+With teleporting, we cannot get stuck in a dead end. But even without dead ends, a graph may not have well-de?ned long-term visit rates. More generally, we require that the Markov chain be ergodic.
+
+29 / 80
+
+Ergodic Markov chains
+
+A Markov chain is ergodic i? it is irreducible and aperiodic. Irreducibility. Roughly: there is a path from any page to any other page. Aperiodicity. Roughly: The pages cannot be partitioned such that the random walker visits the partitions sequentially. 1.0 1.0 A non-ergodic Markov chain:
+
+30 / 80
+
+Ergodic Markov chains
+
+Theorem: For any ergodic Markov chain, there is a unique long-term visit rate for each state. This is the steady-state probability distribution. Over a long time period, we visit each state in proportion to this rate. It doesn?t matter where we start. Teleporting makes the web graph ergodic. ? Web-graph+teleporting has a steady-state probability distribution. ? Each page in the web-graph+teleporting has a PageRank.
+
+31 / 80
+
+Where we are
+
+We now know what to do to make sure we have a well-de?ned PageRank for each page. Next: how to compute PageRank
+
+32 / 80
+
+Formalization of ?visit?: Probability vector
+
+A probability (row) vector x = (x1 , . . . , xN ) tells us where the random walk is at any point. ( 0 0 0 ... 1 ... 0 0 0) Example: 1 2 3 . . . i . . . N-2 N-1 N More generally: the random walk is on page i with probability xi . Example: ( 0.05 1 xi = 1 0.01 2 0.0 3 ... ... 0.2 i ... ... 0.01 N-2 0.05 N-1 0.03 N )
+
+33 / 80
+
+Change in probability vector
+
+If the probability vector is x = (x1 , . . . , xN ) at this step, what is it at the next step? Recall that row i of the transition probability matrix P tells us where we go next from state i . So from x, our next state is distributed as xP.
+
+34 / 80
+
+Steady state in vector notation
+
+The steady state in vector notation is simply a vector ? = (?1 , ?2 , . . . , ?N ) of probabilities. (We use ? to distinguish it from the notation for the probability vector x.) ?i is the long-term visit rate (or PageRank) of page i . So we can think of PageRank as a very long vector ? one entry per page.
+
+35 / 80
+
+Steady-state distribution: Example
+
+What is the PageRank / steady state in this example? d1 0.25 d2 0.75 0.75 0.25
+
+36 / 80
+
+Steady-state distribution: Example
+
+x1 Pt (d1 )
+
+x2 Pt (d2 ) P11 = 0.25 P12 = 0.75 P21 = 0.25 P22 = 0.75 0.25 0.75 (convergence) PageRank
+
+t0 t1
+
+0.25 0.25
+
+0.75 0.75
+
+vector = ? = (?1 , ?2 ) = (0.25, 0.75) Pt (d1 ) = Pt?1 (d1 ) ? P11 + Pt?1 (d2 ) ? P21 Pt (d2 ) = Pt?1 (d1 ) ? P12 + Pt?1 (d2 ) ? P22
+
+37 / 80
+
+How do we compute the steady state vector?
+In other words: how do we compute PageRank? Recall: ? = (?1 , ?2 , . . . , ?N ) is the PageRank vector, the vector of steady-state probabilities . . . . . . and if the distribution in this step is x, then the distribution in the next step is xP. But ? is the steady state! So: ? = ?P Solving this matrix equation gives us ?. ? is the principal left eigenvector for P . . . . . . that is, ? is the left eigenvector with the largest eigenvalue. All transition probability matrices have largest eigenvalue 1.
+
+38 / 80
+
+One way of computing the PageRank ?
+
+Start with any distribution x, e.g., uniform distribution After one step, we?re at xP. After two steps, we?re at xP 2 . After k steps, we?re at xP k . Algorithm: multiply x by increasing powers of P until convergence. This is called the power method. Recall: regardless of where we start, we eventually reach the steady state ?. Thus: we will eventually (in asymptotia) reach the steady state.
+
+39 / 80
+
+Power method: Example
+
+What is the PageRank / steady state in this example? 0.9 d1 0.3 The steady state distribution (= the PageRanks) in this example are 0.25 for d1 and 0.75 for d2 . d2 0.7 0.1
+
+40 / 80
+
+Computing PageRank: Power method
+x1 Pt (d1 ) x2 Pt (d2 ) P11 = 0.1 P12 = 0.9 P21 = 0.3 P22 = 0.7 0.3 0.7 0.24 0.76 0.252 0.748 0.2496 0.7504 ... 0.25 0.75 = (?1 , ?2 ) = (0.25, 0.75)
+
+t0 t1 t2 t3
+
+0 0.3 0.24 0.252
+
+1 0.7 0.76 0.748
+
+0.75 t? 0.25 PageRank vector = ?
+
+= xP = xP 2 = xP 3 = xP 4 ... = xP ?
+
+Pt (d1 ) = Pt?1 (d1 ) ? P11 + Pt?1 (d2 ) ? P21 Pt (d2 ) = Pt?1 (d1 ) ? P12 + Pt?1 (d2 ) ? P22
+41 / 80
+
+Power method: Example
+
+What is the PageRank / steady state in this example? 0.9 d1 0.3 The steady state distribution (= the PageRanks) in this example are 0.25 for d1 and 0.75 for d2 . d2 0.7 0.1
+
+42 / 80
+
+Exercise: Compute PageRank using power method
+
+0.3 d1 0.2 d2 0.8
+
+0.7
+
+43 / 80
+
+Solution
+x1 Pt (d1 ) x2 Pt (d2 ) P11 = 0.7 P21 = 0.2 0.2 0.3 0.35 0.375 0.4 P12 = 0.3 P22 = 0.8 0.8 0.7 0.65 0.625 ... 0.6
+
+t0 t1 t2 t3 t?
+
+0 0.2 0.3 0.35 0.4
+
+1 0.8 0.7 0.65 0.6
+
+PageRank
+
+vector = ? = (?1 , ?2 ) = (0.4, 0.6) Pt (d1 ) = Pt?1 (d1 ) ? P11 + Pt?1 (d2 ) ? P21 Pt (d2 ) = Pt?1 (d1 ) ? P12 + Pt?1 (d2 ) ? P22
+44 / 80
+
+PageRank summary
+
+Preprocessing
+Given graph of links, build matrix P Apply teleportation From modi?ed matrix, compute ? ?i is the PageRank of page i.
+
+Query processing
+Retrieve pages satisfying the query Rank them by their PageRank Return reranked list to the user
+
+45 / 80
+
+PageRank issues
+Real surfers are not random surfers.
+Examples of nonrandom sur?ng: back button, short vs. long paths, bookmarks, directories ? and search! ? Markov model is not a good model of sur?ng. But it?s good enough as a model for our purposes.
+
+Simple PageRank ranking (as described on previous slide) produces bad results for many pages.
+Consider the query [video service] The Yahoo home page (i) has a very high PageRank and (ii) contains both video and service. If we rank all Boolean hits according to PageRank, then the Yahoo home page would be top-ranked. Clearly not desirable
+
+In practice: rank according to weighted combination of raw text match, anchor text match, PageRank & other factors ? see lecture on Learning to Rank
+46 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+47 / 80
+
+Transition (probability) matrix
+
+d0 d1 d2 d3 d4 d5 d6
+
+d0 0.00 0.00 0.33 0.00 0.00 0.00 0.00
+
+d1 0.00 0.50 0.00 0.00 0.00 0.00 0.00
+
+d2 1.00 0.50 0.33 0.00 0.00 0.00 0.00
+
+d3 0.00 0.00 0.33 0.50 0.00 0.00 0.33
+
+d4 0.00 0.00 0.00 0.50 0.00 0.00 0.33
+
+d5 0.00 0.00 0.00 0.00 0.00 0.50 0.00
+
+d6 0.00 0.00 0.00 0.00 1.00 0.50 0.33
+
+48 / 80
+
+Transition matrix with teleporting
+
+d0 d1 d2 d3 d4 d5 d6
+
+d0 0.02 0.02 0.31 0.02 0.02 0.02 0.02
+
+d1 0.02 0.45 0.02 0.02 0.02 0.02 0.02
+
+d2 0.88 0.45 0.31 0.02 0.02 0.02 0.02
+
+d3 0.02 0.02 0.31 0.45 0.02 0.02 0.31
+
+d4 0.02 0.02 0.02 0.45 0.02 0.02 0.31
+
+d5 0.02 0.02 0.02 0.02 0.02 0.45 0.02
+
+d6 0.02 0.02 0.02 0.02 0.88 0.45 0.31
+
+49 / 80
+
+Power method vectors xP k
+d0 d1 d2 d3 d4 d5 d6 x 0.14 0.14 0.14 0.14 0.14 0.14 0.14 xP 1 0.06 0.08 0.25 0.16 0.12 0.08 0.25 xP 2 0.09 0.06 0.18 0.23 0.16 0.06 0.23 xP 3 0.07 0.04 0.17 0.24 0.19 0.04 0.25 xP 4 0.07 0.04 0.15 0.24 0.19 0.04 0.27 xP 5 0.06 0.04 0.14 0.24 0.20 0.04 0.28 xP 6 0.06 0.04 0.13 0.24 0.21 0.04 0.29 xP 7 0.06 0.04 0.12 0.25 0.21 0.04 0.29 xP 8 0.06 0.04 0.12 0.25 0.21 0.04 0.30 xP 9 0.05 0.04 0.12 0.25 0.21 0.04 0.30 xP 10 0.05 0.04 0.12 0.25 0.21 0.04 0.30 xP 11 0.05 0.04 0.11 0.25 0.21 0.04 0.30 xP 12 0.05 0.04 0.11 0.25 0.21 0.04 0.31 xP 13 0.05 0.04 0.11 0.25 0.21 0.04 0.31
+
+50 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+51 / 80
+
+How important is PageRank?
+
+Frequent claim: PageRank is the most important component of web ranking. The reality:
+There are several components that are at least as important: e.g., anchor text, phrases, proximity, tiered indexes . . . Rumor has it that PageRank in its original form (as presented here) now has a negligible impact on ranking! However, variants of a page?s PageRank are still an essential part of ranking. Adressing link spam is di?cult and crucial.
+
+52 / 80
+
+Outline
+
+1
+
+Recap Anchor text Citation analysis PageRank HITS: Hubs & Authorities
+
+2
+
+3
+
+4
+
+5
+
+53 / 80
+
+HITS ? Hyperlink-Induced Topic Search
+Premise: there are two di?erent types of relevance on the web. Relevance type 1: Hubs. A hub page is a good list of [links to pages answering the information need].
+E.g., for query [chicago bulls]: Bob?s list of recommended resources on the Chicago Bulls sports team
+
+Relevance type 2: Authorities. An authority page is a direct answer to the information need.
+The home page of the Chicago Bulls sports team By de?nition: Links to authority pages occur repeatedly on hub pages.
+
+Most approaches to search (including PageRank ranking) don?t make the distinction between these two very di?erent types of relevance.
+
+54 / 80
+
+Hubs and authorities: De?nition
+
+A good hub page for a topic links to many authority pages for that topic. A good authority page for a topic is linked to by many hub pages for that topic. Circular de?nition ? we will turn this into an iterative computation.
+
+55 / 80
+
+Example for hubs and authorities
+hubs www.bestfares.com www.aa.com www.airlinesquality.com www.delta.com blogs.usatoday.com/sky www.united.com aviationblog.dallasnews.com authorities
+
+56 / 80
+
+How to compute hub and authority scores
+
+Do a regular web search ?rst Call the search result the root set Find all pages that are linked to or link to pages in the root set Call this larger set the base set Finally, compute hubs and authorities for the base set (which we?ll view as a small web graph)
+
+57 / 80
+
+Root set and base set (1)
+base set
+
+root set
+
+The root set Nodes that root set nodes link to Nodes that link to root set nodes The base set
+58 / 80
+
+Root set and base set (2)
+
+Root set typically has 200?1000 nodes. Base set may have up to 5000 nodes. Computation of base set, as shown on previous slide:
+Follow outlinks by parsing the pages in the root set Find d?s inlinks by searching for all pages containing a link to d
+
+59 / 80
+
+Hub and authority scores
+
+Compute for each page d in the base set a hub score h(d) and an authority score a(d) Initialization: for all d: h(d) = 1, a(d) = 1 Iteratively update all h(d), a(d) After convergence:
+Output pages with highest h scores as top hubs Output pages with highest a scores as top authorities So we output two ranked lists
+
+60 / 80
+
+Iterative update
+
+y1 d y2 y3 y1 y2 d
+
+For all d: h(d) =
+
+d?y
+
+a(y )
+
+For all d: a(d) =
+
+y ?d
+
+h(y )
+
+y3
+
+Iterate these two steps until convergence
+
+61 / 80
+
+Details
+
+Scaling
+To prevent the a() and h() values from getting too big, can scale down after each iteration Scaling factor doesn?t really matter. We care about the relative (as opposed to absolute) values of the scores.
+
+In most cases, the algorithm converges after a few iterations.
+
+62 / 80
+
+Authorities for query [Chicago Bulls]
+
+www.nba.com/bulls www.essex1.com/people/jmiller/bulls.htm ?da Bulls? 0.20 www.nando.net/SportServer/basketball/nba/chi.html ?The Chicago Bulls? 0.15 users.aol.com/rynocub/bulls.htm ?The Chicago Bulls Home Page? 0.13 www.geocities.com/Colosseum/6095 ?Chicago Bulls? (Ben-Shaul et al, WWW8)
+
+0.85 0.25
+
+63 / 80
+
+The authority page for [Chicago Bulls]
+
+64 / 80
+
+Hubs for query [Chicago Bulls]
+
+www.geocities.com/Colosseum/1778 ?Unbelieveabulls!!!!!? 1.24 www.webring.org/cgi-bin/webring?ring=chbulls ?Erin?s Chicago Bulls Page? 0.74 www.geocities.com/Hollywood/Lot/3330/Bulls.html ?Chicago Bulls? 0.52 www.nobull.net/web position/kw-search-15-M2.htm ?Excite Search Results: bulls? 0.52 www.halcyon.com/wordsltd/bball/bulls.htm ?Chicago Bulls Links? (Ben-Shaul et al, WWW8)
+
+1.62
+
+65 / 80
+
+A hub page for [Chicago Bulls]
+
+66 / 80
+
+Hubs & Authorities: Comments
+
+HITS can pull together good pages regardless of page content. Once the base set is assembled, we only do link analysis, no text matching. Pages in the base set often do not contain any of the query words. In theory, an English query can retrieve Japanese-language pages!
+If supported by the link structure between English and Japanese pages
+
+Danger: topic drift ? the pages found by following links may not be related to the original query.
+
+67 / 80
+
+Proof of convergence
+
+We de?ne an N ? N adjacency matrix A. (We called this the link matrix earlier. For 1 ? i , j ? N, the matrix entry Aij tells us whether there is a link from page i to page j (Aij = 1) or not (Aij = 0). Example: d1 d2 d1 d2 d3 d1 0 1 1 d2 1 1 0 d3 0 1 0
+
+d3
+
+68 / 80
+
+Write update rules as matrix operations
+
+De?ne the hub vector h = (h1 , . . . , hN ) as the vector of hub scores. hi is the hub score of page di . Similarly for a, the vector of authority scores Now we can write h(d) = h = Aa . . . . . . and we can write a(d) = y ?d h(y ) as a = AT h HITS algorithm in matrix notation:
+Compute h = Aa Compute a = AT h Iterate until convergence
+d?y
+
+a(y ) as a matrix operation:
+
+69 / 80
+
+HITS as eigenvector problem
+
+HITS algorithm in matrix notation. Iterate:
+Compute h = Aa Compute a = AT h
+
+By substitution we get: h = AAT h and a = AT Aa Thus, h is an eigenvector of AAT and a is an eigenvector of AT A. So the HITS algorithm is actually a special case of the power method and hub and authority scores are eigenvector values. HITS and PageRank both formalize link analysis as eigenvector problems.
+
+70 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+71 / 80
+
+Raw matrix A for HITS
+
+d0 d1 d2 d3 d4 d5 d6
+
+d0 0 0 1 0 0 0 0
+
+d1 0 1 0 0 0 0 0
+
+d2 1 1 1 0 0 0 0
+
+d3 0 0 2 1 0 0 2
+
+d4 0 0 0 1 0 0 1
+
+d5 0 0 0 0 0 1 0
+
+d6 0 0 0 0 1 1 1
+
+72 / 80
+
+Hub vectors h0 ,hi =
+
+1 di A
+
+? ai , i ? 1
+
+d0 d1 d2 d3 d4 d5 d6
+
+h0 0.14 0.14 0.14 0.14 0.14 0.14 0.14
+
+h1 0.06 0.08 0.28 0.14 0.06 0.08 0.30
+
+h2 0.04 0.05 0.32 0.17 0.04 0.05 0.33
+
+h3 0.04 0.04 0.33 0.18 0.04 0.04 0.34
+
+h4 0.03 0.04 0.33 0.18 0.04 0.04 0.35
+
+h5 0.03 0.04 0.33 0.18 0.04 0.04 0.35
+
+73 / 80
+
+1 Authority vectors ai = ci AT ? hi?1, i ? 1
+
+d0 d1 d2 d3 d4 d5 d6
+
+a1 0.06 0.06 0.19 0.31 0.13 0.06 0.19
+
+a2 0.09 0.03 0.14 0.43 0.14 0.03 0.14
+
+a3 0.10 0.01 0.13 0.46 0.16 0.02 0.13
+
+a4 0.10 0.01 0.12 0.46 0.16 0.01 0.13
+
+a5 0.10 0.01 0.12 0.46 0.16 0.01 0.13
+
+a6 0.10 0.01 0.12 0.47 0.16 0.01 0.13
+
+a7 0.10 0.01 0.12 0.47 0.16 0.01 0.13
+
+74 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+75 / 80
+
+Example web graph
+d0 gm d2 honda jaguar jag d3 jaguar speed cat d4 d5 tiger d6 lion cheetah car ford benz d1 leopard
+
+PageRank d0 0.05 d1 0.04 d2 0.11 d3 0.25 0.21 d4 d5 0.04 d6 0.31 PageRank(d2)< PageRank(d6): why? a h d0 0.10 0.03 d1 0.01 0.04 d2 0.12 0.33 d3 0.47 0.18
+
+76 / 80
+
+PageRank vs. HITS: Discussion
+PageRank can be precomputed, HITS has to be computed at query time.
+HITS is too expensive in most application scenarios.
+
+PageRank and HITS make two di?erent design choices concerning (i) the eigenproblem formalization (ii) the set of pages to apply the formalization to. These two are orthogonal.
+We could also apply HITS to the entire web and PageRank to a small base set.
+
+Claim: On the web, a good hub almost always is also a good authority. The actual di?erence between PageRank ranking and HITS ranking is therefore not as large as one might expect.
+
+77 / 80
+
+Exercise
+
+Why is a good hub almost always also a good authority?
+
+78 / 80
+
+Take-away today
+
+Anchor text: What exactly are links on the web and why are they important for IR? Citation analysis: the mathematical foundation of PageRank and link-based ranking PageRank: the original algorithm that was used for link-based ranking on the web Hubs & Authorities: an alternative link-based ranking algorithm
+
+79 / 80
+
+Resources
+
+Chapter 21 of IIR Resources at http://cislmu.org
+American Mathematical Society article on PageRank (popular science style) Jon Kleinberg?s home page (main person behind HITS) A Google bomb and its defusing Google?s o?cial description of PageRank: PageRank re?ects our view of the importance of web pages by considering more than 500 million variables and 2 billion terms. Pages that we believe are important pages receive a higher PageRank and are more likely to appear at the top of the search results.
+
+80 / 80
+
+

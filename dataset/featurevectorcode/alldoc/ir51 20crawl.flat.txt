@@ -1,0 +1,466 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 20: Crawling
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2009.07.14
+
+1 / 36
+
+Outline
+
+1
+
+Recap
+
+2
+
+A simple crawler
+
+3
+
+A real crawler
+
+2 / 36
+
+Search engines rank content pages and ads
+
+3 / 36
+
+Google?s second price auction
+advertiser bid A $4.00 B $3.00 C $2.00 D $1.00 bid: maximum CTR 0.01 0.03 0.06 0.08 bid for ad rank 0.04 0.09 0.12 0.08 a click by rank paid 4 (minimum) 2 $2.68 1 $1.51 3 $0.51 advertiser
+
+CTR: click-through rate: when an ad is displayed, what percentage of time do users click on it? CTR is a measure of relevance. ad rank: bid ? CTR: this trades o? (i) how much money the advertiser is willing to pay against (ii) how relevant the ad is paid: Second price auction: The advertiser pays the minimum amount necessary to maintain their position in the auction (plus 1 cent).
+4 / 36
+
+What?s great about search ads
+
+Users only click if they are interested. The advertiser only pays when a user clicks on an ad. Searching for something indicates that you are more likely to buy it . . . . . . in contrast to radio and newpaper ads.
+
+5 / 36
+
+Near duplicate detection: Minimum of permutation
+document 1: {sk } 1
+? ss s1 s2 ss s3 s4 ? 2m
+
+document 2: {sk } 1
+? s s1 s s ss s5 s3 s4 ? s? s s x1 x4 ?? x1 x5 ? 2m
+
+xk = ?(sk )
+
+1x 3
+? x3 ? x3
+
+s s? ? s s? x1 x4 x2 ?? x1 x4
+
+xk = ?(sk )
+
+? 2m
+
+1x 3
+? x3
+
+?? m 2 x5 ?? m 2 x2
+
+xk
+
+1
+
+? x2
+
+xk
+
+?
+
+2m
+
+1
+
+minsk ?(sk ) 1
+? 2m
+
+minsk ?(sk )
+
+? 2m 1 x? 3 Roughly: We use mins?d1 ?(s) = mins?d2 ?(s) as a test for: are d1
+
+and d2 near-duplicates?
+6 / 36
+
+Outline
+
+1
+
+Recap
+
+2
+
+A simple crawler
+
+3
+
+A real crawler
+
+7 / 36
+
+How hard can crawling be?
+
+Web search engines must crawl their documents. Getting the content of the documents is easier for many other IR systems.
+E.g., indexing all ?les on your hard disk: just do a recursive descent on your ?le system
+
+Ok: for web IR, getting the content of the documents takes longer . . . . . . because of latency. But is that really a design/systems challenge?
+
+8 / 36
+
+Basic crawler operation
+
+Initialize queue with URLs of known seed pages Repeat
+Take URL from queue Fetch and parse page Extract URLs from page Add URLs to queue
+
+Fundamental assumption: The web is well linked.
+
+9 / 36
+
+Exercise: What?s wrong with this crawler?
+
+urlqueue := (some carefully selected set of seed urls) while urlqueue is not empty: myurl := urlqueue.getlastanddelete() mypage := myurl.fetch() fetchedurls.add(myurl) newurls := mypage.extracturls() for myurl in newurls: if myurl not in fetchedurls and not in urlqueue: urlqueue.add(myurl) addtoinvertedindex(mypage)
+
+10 / 36
+
+What?s wrong with the simple crawler
+
+Scale: we need to distribute. We can?t index everything: we need to subselect. How? Duplicates: need to integrate duplicate detection Spam and spider traps: need to integrate spam detection Politeness: we need to be ?nice? and space out all requests for a site over a longer period (hours, days) Freshness: we need to recrawl periodically.
+Because of the size of the web, we can do frequent recrawls only for a small subset. Again, subselection problem or prioritization
+
+11 / 36
+
+Magnitude of the crawling problem
+
+To fetch 20,000,000,000 pages in one month . . . . . . we need to fetch almost 8000 pages per second! Actually: many more since many of the pages we attempt to crawl will be duplicates, unfetchable, spam etc.
+
+12 / 36
+
+What a crawler must do
+
+Be polite
+Don?t hit a site too often Only crawl pages you are allowed to crawl: robots.txt
+
+Be robust
+Be immune to spider traps, duplicates, very large pages, very large websites, dynamic pages etc
+
+13 / 36
+
+Robots.txt
+
+Protocol for giving crawlers (?robots?) limited access to a website, originally from 1994 Examples:
+User-agent: * Disallow: /yoursite/temp/ User-agent: searchengine Disallow: /
+
+Important: cache the robots.txt ?le of each site we are crawling
+
+14 / 36
+
+Example of a robots.txt (nih.gov)
+User-agent: PicoSearch/1.0 Disallow: /news/information/knight/ Disallow: /nidcd/ ... Disallow: /news/research_matters/secure/ Disallow: /od/ocpl/wag/ User-agent: * Disallow: /news/information/knight/ Disallow: /nidcd/ ... Disallow: /news/research_matters/secure/ Disallow: /od/ocpl/wag/ Disallow: /ddir/ Disallow: /sdminutes/
+15 / 36
+
+What any crawler should do
+
+Be capable of distributed operation Be scalable: need to be able to increase crawl rate by adding more machines Fetch pages of higher quality ?rst Continuous operation: get fresh version of already crawled pages
+
+16 / 36
+
+Outline
+
+1
+
+Recap
+
+2
+
+A simple crawler
+
+3
+
+A real crawler
+
+17 / 36
+
+URL frontier
+
+URLs crawled and parsed
+
+URL frontier: found, but not yet crawled
+
+unseen URLs
+
+18 / 36
+
+URL frontier
+
+The URL frontier is the data structure that holds and manages URLs we?ve seen, but that have not been crawled yet. Can include multiple pages from the same host Must avoid trying to fetch them all at the same time Must keep all crawling threads busy
+
+19 / 36
+
+Basic crawl architecture
+robots templates
+
+? ? DNS ? ?
+www ?
+
+?? ?? ?? ?? ?? ?? ? ? ? ? ? ? ? ? ? dup ?
+parse content seen?
+
+??
+
+doc FPs
+
+??
+
+??
+
+URL set
+
+? fetch
+
+URL ?lter
+
+URL elim
+
+?
+URL frontier
+
+?
+
+20 / 36
+
+URL normalization
+
+Some URLs extracted from a document are relative URLs. E.g., at http://mit.edu, we may have aboutsite.html
+This is the same as: http://mit.edu/aboutsite.html
+
+During parsing, we must normalize (expand) all relative URLs.
+
+21 / 36
+
+Content seen
+
+For each page fetched: check if the content is already in the index Check this using document ?ngerprints or shingles Skip documents whose content has already been indexed
+
+22 / 36
+
+Distributing the crawler
+
+Run multiple crawl threads, potentially at di?erent nodes
+Usually geographically distributed nodes
+
+Partition hosts being crawled into nodes
+
+23 / 36
+
+Google data centers (wayfaring.com)
+
+24 / 36
+
+Distributed crawler
+
+?? DNS ? ?
+www ?
+parse
+
+?? ?? ? ? ? ? ?
+content seen?
+
+??
+
+doc FPs
+
+to other nodes
+
+??
+
+URL set
+
+???
+URL ?lter
+
+?
+
+? fetch
+
+host splitter
+
+? dup ? URL ? ? elim
+from other nodes
+
+?? ?? ? ?
+
+?
+URL frontier
+
+?
+
+25 / 36
+
+URL frontier: Two main considerations
+
+Politeness: Don?t hit a web server too frequently
+E.g., insert a time gap between successive requests to the same server
+
+Freshness: Crawl some pages (e.g., news sites) more often than others Not an easy problem: simple priority queue fails.
+
+26 / 36
+
+Mercator URL frontier
+? ? 1????? ?? ? ???? ?
+prioritizer
+
+?? ?? F ? q
+
+F front queues ? ?
+
+?? ???? ???? ?? ? 1 ? ???? ?? ?? ?
+
+? ?? ? ??
+
+URLs ?ow in from the top into the frontier. Front queues manage prioritization. Back queues enforce politeness. Each queue is FIFO.
+
+f. queue selector & b. queue router B back queues: single host on each ? ? ?
+
+??????? ??? B ?
+
+????? ?? ? ?? ??
+b. queue
+
+??? ?? ?? selector ? heap
+
+?
+27 / 36
+
+Mercator URL frontier: Front queues
+? ?? ?? ?? ?? ?? 1? ? ?? ?? q q
+prioritizer
+
+?? ?? ?? F q ?
+
+Prioritizer assigns to URL an integer priority between 1 and F . Then appends URL to corresponding queue Heuristics for assigning priority: refresh rate, PageRank etc Selection from front queues is initiated by back queues
+28 Pick a front queue/ 36
+
+F front queues q q
+
+?? ?? ?? ?? ?? ?? ?? ??
+
+?? ? ? ?? ? ?
+
+f. queue selector & b. queue router
+
+Mercator URL frontier: Back queues
+??? ?????? ? ?? ?? ??? 1 ? ?? ? ?? ?? ? ?
+B back queues f. queue selector & b. queue router
+
+B
+
+q
+
+qSingle host on each q q ? ?? ?? ? ?? ? b. queue selector ? heap ?
+
+?? ?? ? ??? ?? ?? ?? ??
+
+29 / 36
+
+Mercator URL frontier: Back queues
+??? ?????? ? ?? ?? ??? 1 ? ?? ? ?? ?? ? ?
+B back queues f. queue selector & b. queue router
+
+B
+
+Invariant 1. Each back queue is kept non-empty while the crawl is in progress. Invariant 2. Each back queue only contains URLs from a single host. Maintain a table from hosts to back queues.
+
+q
+
+qSingle host on each q q ? ?? ?? ? ?? ? b. queue selector ? heap ?
+
+?? ?? ? ??? ?? ?? ?? ??
+
+30 / 36
+
+Mercator URL frontier: Back queues
+??? ?????? ? ?? ?? ??? 1 ? ?? ? ?? ?? ? ?
+B back queues f. queue selector & b. queue router
+
+In the heap: B One entry for each back queue The entry is the earliest time te at which the host corresponding to the back queue can be hit again. The earliest time te is determined by (i) last access to that host (ii) time gap heuristic
+
+q
+
+qSingle host on each q q ? ?? ?? ? ?? ? b. queue selector ? heap ?
+
+?? ?? ? ??? ?? ?? ?? ??
+
+31 / 36
+
+Mercator URL frontier: Back queues
+??? ?????? ? ?? ?? ??? 1 ? ?? ? ?? ?? ? ? q
+B back queues qSingle host on each q q f. queue selector & b. queue router
+
+How fetcher interacts with back queue: B Repeat (i) extract current root q of the heap (q is a back queue) and (ii) fetch URL u at head of q . . . . . . until we empty the q we get. (i.e.: u was the last URL in q)
+
+?? ?? ? ??? ?? ?? ?? ??
+
+? ?? ?? ? ?? ? b. queue selector ? heap ?
+
+32 / 36
+
+Mercator URL frontier: Back queues
+??? ?????? ? ?? ?? ??? 1 ? ?? ? ?? ?? ? ?
+B back queues f. queue selector & b. queue router
+
+B
+
+When we have emptied a back queue q: Repeat (i) pull URLs u from front queues and (ii) add u to its corresponding back queue . . . . . . until we get a u whose host does not have a back queue. Then put u in q and create heap entry for it.
+
+q
+
+qSingle host on each q q ? ?? ?? ? ?? ? b. queue selector ? heap ?
+
+?? ?? ? ??? ?? ?? ?? ??
+
+33 / 36
+
+Mercator URL frontier
+? ? 1????? ?? ? ???? ?
+prioritizer
+
+?? ?? F ? q
+
+F front queues ? ?
+
+?? ???? ???? ?? ? 1 ? ???? ?? ?? ?
+
+? ?? ? ??
+
+URLs ?ow in from the top into the frontier. Front queues manage prioritization. Back queues enforce politeness. Each queue is FIFO.
+
+f. queue selector & b. queue router B back queues: single host on each ? ? ?
+
+??????? ??? B ?
+
+????? ?? ? ?? ??
+b. queue
+
+??? ?? ?? selector ? heap
+
+?
+34 / 36
+
+Spider trap
+
+Malicious server that generates an in?nite sequence of linked pages Sophisticated spider traps generate pages that are not easily identi?ed as dynamic.
+
+35 / 36
+
+Resources
+
+Chapter 20 of IIR Resources at http://cislmu.org
+Paper on Mercator by Heydon et al. Robot exclusion standard
+
+36 / 36
+
+

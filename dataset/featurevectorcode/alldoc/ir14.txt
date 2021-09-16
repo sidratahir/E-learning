@@ -1,0 +1,317 @@
+Introduction	to Information	Retrieval
+CS276:	Information	Retrieval	and	Web	Search Christopher	Manning	and	Pandu	Nayak
+Lecture	13:	Support	vector	machines	and	machine	learning	on	documents
+[Borrows slides from Ray Mooney]
+Introduction	to	Information	Retrieval
+2
+Text	classification § Last	lecture:	Basic	algorithms	for	text	classification § Naive	Bayes	classifier § Simple,	cheap,	high	bias,	linear § K	Nearest	Neighbor	classification § Simple,	expensive	at	test	time,	high	variance,	non-linear § Vector	space	classification:	Rocchio § Simple	linear	discriminant	classifier;	perhaps	too	simple* § Today § Support	Vector	Machines	(SVMs) § Including	soft	margin	SVMs	and	kernels	for	non-linear	classifiers § Some	empirical	evaluation	and	comparison § Text-specific	issues	in	classification
+Introduction	to	Information	Retrieval
+3
+Linear	classifiers A	hyperplane	decision	boundary
+§ Lots	of	possible	choices	for	a,	b,	c. § Some	methods	find	a	separating	hyperplane,	but	not	the	optimal	one	[according	to	some	criterion	of	expected	goodness] § E.g.,	perceptron § A	Support	Vector	Machine	(SVM)	finds	an	optimal*solution. § Maximizes	the	distance	between	the	hyperplaneand	the	“difficult	points”	close	to	decision	boundary § One	intuition:	if	there	are	no	points	near	the	decision	surface,	then	there	are	no	very	uncertain	classification	decisions § The	decision	boundary	has	a	“margin”
+This line represents the decision boundary: ax + by - c = 0
+Ch. 15
+Introduction	to	Information	Retrieval
+4
+Another	intuition § If	you	have	to	place	a	fat	separator	between	classes,	you	have	less	choices,	and	so		the	capacity	of	the	model	has	been	decreased
+Sec. 15.1
+Introduction	to	Information	Retrieval
+5
+Support	Vector	Machine	(SVM)
+Support	vectors
+Maximizes margin
+§ SVMs	maximize	the	marginaround	the	separating	hyperplane. § A.k.a.	large	margin	classifiers § The	decision	function	is	fully	specified	by	a	subset	of	training	samples,	the	support	vectors. § Solving	SVMs	is	a	quadratic	programmingproblem § Seen	by	many	as	the	most	successful	current	text	classification	method*
+*but other discriminative methods often perform very similarly
+Sec. 15.1
+Narrower margin
+Introduction	to	Information	Retrieval
+6
+§ w:	decision	hyperplanenormal	vector § xi:	data	point	i § yi:	class	of	data	point	i(+1	or	-1)					NB:	Not	1/0 § Classifier	is: f(xi)	=	sign(wTxi +	b) § Functional	margin	of	xiis: yi(wTxi +	b) § The	functional	margin	of	a	dataset	is	twice	the	minimum	functional	margin	for	any	point § The	factor	of	2	comes	from	measuring	the	whole	width	of	the	margin § Problem:	we	can	increase	this	margin	simply	by	scaling	w,	b…. Maximum	Margin:	Formalization
+Sec. 15.1
+Introduction	to	Information	Retrieval
+7
+Geometric	Margin
+§ Distance	from	example	to	the	separator	is	§ Examples	closest	to	the	hyperplane	are	support	vectors.	§ Margin?of	the	separator	is	the	width	of	separation	between	support	vectors	of	classes. w xw byr T + =
+r ?x x'
+w
+Derivation	of	finding	r: Dotted	line	x’	-	xis	perpendicular	to decision	boundary	so	parallel	to	w. Unit	vector	is	w/|w|,	so	line	is	rw/|w|. x’=	x–yrw/|w|.	x’satisfies	wTx’	+	b	=	0. So	wT(x–yrw/|w|)	+	b	=	0 Recall	that	|w|	=	sqrt(wTw). So	wTx–yr|w|	+	b	=	0 So,	solving	for	r	gives: r	=	y(wTx+	b)/|w|
+Sec. 15.1
+Introduction	to	Information	Retrieval
+8
+Linear	SVM	Mathematically A	different	way	of	looking	at	things	–constrain	functional	margin § Assume	that	the	functional	margin	of	each	data	item	is	at	least	1,	then	the	following	two	constraints	follow	for	a	training	set	{(xi ,yi)}	
+§ For	support	vectors,	the	inequality	becomes	an	equality § Then,	since	each	example’s	distance	from	the	hyperplane	is
+§ The	margin	is:
+wTxi + b= 1    if yi= 1 wTxi + b= -1   if yi= -1
+w 2
+=
+?
+w xw byr T + =
+Sec. 15.1
+Introduction	to	Information	Retrieval
+9
+Linear	Support	Vector	Machine	(SVM)
+§ Hyperplane wTx+	b	=	0
+§ Extra	scale	constraint: mini=1,…,n|wTxi+	b|	=	1
+§ This	implies: wT(xa–xb)	=	2 ?=	?xa–xb?2=	2/?w?2 wT x + b = 0
+wTxa + b = 1
+wTxb + b = -1
+?
+Sec. 15.1
+Introduction	to	Information	Retrieval Worked	example:	Geometric	margin
+10
+Extra	margin
+§ Maximum	margin	weight	vector	is	parallel	to	line	from	(1,	1)	to	(2,	3).	So	weight	vector	is	(1,	2). § Decision	boundary	is	normal	(“perpendicular”)	to	it	halfway	between. § It	passes	through	(1.5,	2) § So	y=	x1 +2x2 -	5.5 § Geometric	margin	is	v5
+Introduction	to	Information	Retrieval Worked	example:	Functional	margin
+11
+§ Let’s	minimize	wgiven	that yi(wTxi +	b)	=	1 § Constraint	has	=	at	SVs; w=	(a,	2a)	for	some	a § a+2a+b=	-1						2a+6a+b=	1 § So,	a=	2/5	and	b=	-11/5 Optimal	hyperplane	is: w=	(2/5,	4/5)	and	b=	-11/5 § Margin	?	is	2/|w|	=	2/v(4/25+16/25) =	2/(2v5/5)	=	v5
+Introduction	to	Information	Retrieval
+12
+Linear	SVMs	Mathematically	(cont.) § We	can	therefore	formulate	the	quadratic	optimization	problem:	
+§ A	better	formulation	(min	?w?=	max	1/?w?):	
+Find wand bsuch that is maximized; and for all {(xi , yi)} wTxi + b= 1 if yi=1;   wTxi + b= -1   if yi= -1 w 2 = ?
+Find wand bsuch that F(w)=½ wTw is minimized; and for all {(xi ,yi)}:    yi (wTxi + b)= 1
+Sec. 15.1
+Introduction	to	Information	Retrieval
+13
+Solving	the	Optimization	Problem
+§ This	is	now	optimizing	a	quadratic	function	subject	to	linear	constraints § Quadratic	optimization	problems	are	a	well-known	class	of	mathematical	programming	problem,	and	many	(intricate)	algorithms	exist	for	solving	them	(with	many	special	ones	built	for	SVMs:	SMO,	Pegasos,	…) § The	solution	usually	involves	constructing	a	dual	problem	where	a	Lagrange	multiplieraiis	associated	with	every	constraint	in	the	primary	problem:
+Find wand bsuch that F(w)=½ wTw is minimized; and for all {(xi ,yi)}:  yi (wTxi + b)= 1
+Find a1…aNsuch that Q(a)=Sai -½SSaiajyiyjxiTxj is maximized and (1) Saiyi= 0 (2) ai = 0 for all ai
+Sec. 15.1
+Introduction	to	Information	Retrieval
+14
+The	Optimization	Problem	Solution § The	solution	has	the	form:	
+§ Each	non-zero	ai indicates	that	corresponding	xi is	a	support	vector. § Then	the	classifying	function	will	have	the	form:
+§ Notice	that	it	relies	on	an	inner	productbetween	the	test	point	xand	the	support	vectors	xi § We	will	return	to	this	later. § Also	keep	in	mind	that	solving	the	optimization	problem	involved	computing	the	inner	products	xiTxj	between	all	pairs	of	training	points.
+w = Saiyixi b = yk-wTxk for any xk such that ak ? 0
+f(x) = SaiyixiTx + b
+Sec. 15.1
+Introduction	to	Information	Retrieval Three	dimensions	…	almost	separating
+15
+Introduction	to	Information	Retrieval
+16
+Soft	Margin	Classification		
+§ If	the	training	data	is	not	linearly	separable,	slack	variables?i can	be	added	to	allow	misclassification	of	difficult	or	noisy	examples. § Allow	some	errors § Let	some	points	be	moved	to	where	they	belong,	at	a	cost § Still,	try	to	minimize	training	set	errors,	and	to	place	hyperplane	“far”	from	each	class	(large	margin)
+?j
+?i
+Sec. 15.2.1
+Introduction	to	Information	Retrieval
+17
+Soft	Margin	Classification	Mathematically § The	old	formulation:
+§ The	new	formulation	incorporating	slack	variables:
+§ Parameter	Ccan	be	viewed	as	a	way	to	control	overfitting § A	regularization	term
+Find wand bsuch that F(w)=½ wTw is minimized and for all {(xi ,yi)} yi (wTxi + b)= 1
+Find wand bsuch that F(w)=½ wTw+ CS?i is minimized and for all {(xi ,yi)} yi (wTxi + b)= 1 - ?i and    ?i= 0 for all i
+Sec. 15.2.1
+Introduction	to	Information	Retrieval
+18
+Soft	Margin	Classification	–Solution
+§ The	dual	problem	for	soft	margin	classification:
+§ Neither	slack	variables	?i nor	their	Lagrange	multipliers	appear	in	the	dual	problem! § Again,	xi	with	non-zero	ai will	be	support	vectors. § Solution	to	the	dual	problem	is:
+Find a1…aNsuch that Q(a)=Sai -½SSaiajyiyjxiTxj is maximized and (1) Saiyi= 0 (2)  0 =ai= Cfor all ai
+w = Saiyixi             b = yk(1-?k) -wTxk where k= argmax ak ’ k ’
+f(x) = SaiyixiTx + b
+w is not needed explicitly for classification!
+Sec. 15.2.1
+Introduction	to	Information	Retrieval
+19
+Classification	with	SVMs § Given	a	new	point	x,	we	can	score	its	projection	onto	the	hyperplane	normal: § I.e.,	compute	score:	wTx+	b=	SaiyixiTx+	b § Decide	class	based	on	whether	<	or	>	0
+§ Can	set	confidence	threshold	t.
+-1
+0
+1
+Score > t : yes Score < t : no Else: don’t know
+Sec. 15.1
+Introduction	to	Information	Retrieval
+20
+Linear	SVMs:		Summary § The	classifier	is	a	separating	hyperplane. § The	“important”	training	points	are	the	support	vectors;	they	define	the	hyperplane. § Quadratic	optimization	algorithms	can	identify	which	training	points	xi	are	support	vectors	with	non-zero	Lagrangianmultipliers	ai. § Both	in	the	dual	formulation	of	the	problem	and	in	the	solution,	training	points	appear	only	inside	inner	products:	
+Find a1…aNsuch that Q(a)=Sai -½SSaiajyiyjxiTxj is maximized and (1) Saiyi= 0 (2)  0 =ai= Cfor all ai
+f(x) = SaiyixiTx + b
+Sec. 15.2.1
+Introduction	to	Information	Retrieval
+21
+Non-linear	SVMs § Datasets	that	are	linearly	separable	(with	some	noise)	work	out	great:
+§ But	what	are	we	going	to	do	if	the	dataset	is	just	too	hard?	
+§ How	about	…	mapping	data	to	a	higher-dimensional	space:
+0
+x2
+x
+0 x
+0 x
+Sec. 15.2.3
+Introduction	to	Information	Retrieval
+22
+Non-linear	SVMs:		Feature	spaces § General	idea:			the	original	feature	space	can	be	mapped	to	some	higher-dimensional	feature	space	where	the	training	set	is	separable:
+F:  x?f(x)
+Sec. 15.2.3
+Introduction	to	Information	Retrieval
+23
+The	“Kernel	Trick”
+§ The	linear	classifier	relies	on	an	inner	product	between	vectors	K(xi,xj)=xiTxj § If	every	datapointis	mapped	into	a	high-dimensional	space	via	some	transformation	F:		x?f(x),	the	inner	product	becomes: K(xi,xj)=	f(xi)Tf(xj) § A	kernel	functionis	some	function	K	that	corresponds	to	an	inner	product	in	some	expanded	feature	space. § Example:	2-dimensional	vectors	x=[x1			x2];		let	K(xi,xj)=(1	+	xiTxj)2, Need	to	show	that	K(xi,xj)=	f(xi)Tf(xj): K(xi,xj)	=	(1	+	xiTxj)2,=	1+	xi12xj12	+	2	xi1xj1xi2xj2+	xi22xj22	+	2xi1xj1	+	2xi2xj2	= =	[1		xi12		v2	xi1xi2		xi22		v2xi1		v2xi2]T	[1		xj12		v2	xj1xj2		xj22		v2xj1		v2xj2]	=	f(xi)Tf(xj)				where	f(x)	=	[1		x12		v2	x1x2		x22			v2x1		v2x2]
+Sec. 15.2.3
+Introduction	to	Information	Retrieval Kernels § Why	use	kernels? § Make	non-separable	problem	separable. § Map	data	into	a	better	representational	space § Common	kernels § Linear § Polynomial	K(x,z)	=	(1+xTz)d § Gives	feature	conjunctions § Radial	basis	function	(balls	–infinite	dimensional	space)
+§ Haven’t	been	very	useful	in	text	classification
+24
+Sec. 15.2.3
+Introduction	to	Information	Retrieval
+25
+§ Most	(over)used	data	set § 21578	documents § 9603	training,	3299	test	articles	(ModApte/Lewis	split) § 118	categories § An	article	can	be	in	more	than	one	category § Learn	118	binary	category	distinctions § Average	document:	about	90	types,	200	tokens § Average	number	of	classes	assigned § 1.24	for	docs	with	at	least	one	category § Only	about	10	out	of	118	categories	are	large Common categories (#train, #test)
+Text	Classification	Evaluation:	Classic	Reuters-21578	Data	Set	
+• Earn (2877, 1087) • Acquisitions (1650, 179) • Money-fx (538, 179) • Grain (433, 149) • Crude (389, 189)
+• Trade (369,119) • Interest (347, 131) • Ship (197, 89) • Wheat (212, 71) • Corn (182, 56)
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+26
+Reuters	Text	Categorization	data	set	(Reuters-21578)	document
+<REUTERS TOPICS="YES" LEWISSPLIT="TRAIN" CGISPLIT="TRAINING-SET" OLDID="12981" NEWID="798"> <DATE> 2-MAR-1987 16:51:43.42</DATE> <TOPICS><D>livestock</D><D>hog</D></TOPICS> <TITLE>AMERICAN PORK CONGRESS KICKS OFF TOMORROW</TITLE> <DATELINE>    CHICAGO, March 2 -</DATELINE><BODY>The American Pork Congress kicks off tomorrow, March 3, in Indianapolis with 160 of the nations pork producers from 44 member states determining industry positions on a number of issues, according to the National Pork Producers Council, NPPC. Delegates to the three day Congress will be considering 26 resolutions concerning various issues, including the future direction of farm policy and the tax law as it applies to the agriculture sector. The delegates will also debate whether to endorse concepts of a national PRV (pseudorabies virus) control and eradication program, the NPPC said. A large trade show, in conjunction with the congress, will feature the latest in technology in all areas of the industry, the NPPC added. Reuter &#3;</BODY></TEXT></REUTERS>
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+27
+Per	class	evaluation	measures
+§ Recall:	Fraction	of	docs	in	class	i classified	correctly:
+§ Precision:	Fraction	of	docs	assigned	class	ithat	are	actually	about	class	i:
+§ Accuracy:	(1	-error	rate)	Fraction	of	docs	classified	correctly:
+€ 
+cii
+i ?
+cij
+i ?
+j ?
+€ 
+cii cji j ?
+€ 
+cii cij j ?
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+28
+Micro-vs.	Macro-Averaging § If	we	have	more	than	one	class,	how	do	we	combine	multiple	performance	measures	into	one	quantity? § Macroaveraging:	Compute	performance	for	each	class,	then	average. § Microaveraging:	Collect	decisions	for	all	classes,	compute	contingency	table,	evaluate.
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+29
+Micro-vs.	Macro-Averaging:	Example
+Truth: yes
+Truth: no
+Classifi er: yes
+10 10
+Classifi er: no
+10 970
+Truth: yes
+Truth: no
+Classifi er: yes
+90 10
+Classifi er: no
+10 890
+Truth: yes
+Truth: no
+Classifier: yes
+100 20
+Classifier: no
+20 1860
+Class 1 Class 2 Micro Ave. Table
+n Macroaveraged precision: (0.5 + 0.9)/2 = 0.7 n Microaveraged precision: 100/120 = .83
+n Microaveraged score is dominated by score on common classes
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+30
+Sec. 15.2.4
+Introduction	to	Information	Retrieval Precision-recall	for	category:	Crude
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+0 0.2 0.4 0.6 0.8 1
+LSVM Decision Tree Naïve Bayes Rocchio
+Precision
+Recall
+Dumais (1998)
+Introduction	to	Information	Retrieval
+32
+Precision-recall	for	category:	Ship
+Precision
+Recall
+Sec. 15.2.4
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+0 0.2 0.4 0.6 0.8 1
+LSVM Decision Tree Naïve Bayes Rocchio
+Dumais (1998)
+Introduction	to	Information	Retrieval
+33
+Yang&Liu:	SVM	vs.	Other	Methods
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+34
+Good	practice	department: Make	a	confusion	matrix
+§ In	a	perfect	classification,	only	the	diagonal	has	non-zero	entries § Look	at	common	confusions	and	how	they	might	be	addressed
+53
+Class assigned by classifier
+Actual Class
+This (i, j) entry means 53 of the docs actually in class i were put in class j by the classifier.
+Sec. 15.2.4
+Introduction	to	Information	Retrieval
+35
+The	Real	World
+P.	Jackson	and	I.	Moulinier.	2002.	Natural	Language	Processing	for	Online	Applications § “There	is	no	question	concerning	the	commercial	value	of	being	able	to	classify	documents	automatically	by	content.	There	are	myriad	potential	applications	of	such	a	capability	for	corporate	intranets,	government	departments,	and	Internet	publishers”
+§ “Understanding	the	data	is	one	of	the	keys	to	successful	categorization,	yet	this	is	an	area	in	which	most	categorization	tool	vendors	are	extremely	weak.	Many	of	the	‘one	size	fits	all’	tools	on	the	market	have	not	been	tested	on	a	wide	range	of	content	types.”
+Sec. 15.3
+Introduction	to	Information	Retrieval
+36
+The	Real	World § Gee,	I’m	building	a	text	classifier	for	real,	now! § What	should	I	do?
+§ How	much	training	data	do	you	have? § None § Very	little § Quite	a	lot § A	huge	amount	and	its	growing
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+37
+Manually	written	rules § No	training	data,	adequate	editorial	staff? § Never	forget	the	hand-written	rules	solution! § If	(wheat	or	grain)	and	not	(whole	or	bread)	then § Categorize	as	grain § In	practice,	rules	get	a	lot	bigger	than	this § Can	also	be	phrased	using	tfor	tf.idfweights § With	careful	crafting	(human	tuning	on	development	data)	performance	is	high: § Construe:	94%	recall,	84%	precision	over	675	categories	(Hayes	and	Weinstein	IAAI	1990) § Amount	of	work	required	is	huge § Estimate	2	days	per	class	…	plus	maintenance
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+38
+Very	little	data? § If	you’re	just	doing	supervised	classification,	you	should	stick	to	something	high	bias § There	are	theoretical	results	that	Naïve	Bayes	should	do	well	in	such	circumstances	(Ng	and	Jordan	2002	NIPS) § The	interesting	theoretical	answer	is	to	explore	semisupervised	training	methods: § Bootstrapping,	EM	over	unlabeled	documents,	… § The	practical	answer	is	to	get	more	labeled	data	as	soon	as	you	can § How	can	you	insert	yourself	into	a	process	where	humans	will	be	willing	to	label	data	for	you??
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+39
+A	reasonable	amount	of	data? § Perfect! § We	can	use	all	our	clever	classifiers § Roll	out	the	SVM!
+§ But	if	you	are	using	an	SVM/NB	etc.,	you	should	probably	be	prepared	with	the	“hybrid”	solution	where	there	is	a	Boolean	overlay § Or	else	to	use	user-interpretable	Boolean-like	models	like	decision	trees § Users	like	to	hack,	and	management	likes	to	be	able	to	implement	quick	fixes	immediately
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+40
+A	huge	amount	of	data? § This	is	great	in	theory	for	doing	accurate	classification… § But	it	could	easily	mean	that	expensive	methods	like	SVMs	(train	time)	or	kNN(test	time)	are	less	practical
+§ Naïve	Bayes	can	come	back	into	its	own	again! § Or	other	methods	with	linear	training/test	complexity	like	(regularized)	logistic	regression	(though	much	more	expensive	to	train)
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+41
+Accuracy	as	a	function	of	data	size
+§ With	enough	data	the	choice	of	classifier	may	not	matter	much,	and	the	best	choice	may	be	unclear § Data:	Brill	and	Banko	on	context-sensitive	spelling	correction
+§ But	the	fact	that	you	have	to	keep	doubling	your	data	to	improve	performance	is	a	little	unpleasant
+Sec. 15.3.1
+Introduction	to	Information	Retrieval
+42
+How	many	categories? § A	few	(well	separated	ones)? § Easy! § A	zillion	closely	related	ones? § Think:	Yahoo!	Directory,	Library	of	Congress	classification,	legal	applications § Quickly	gets	difficult! § Classifier	combination	is	always	a	useful	technique § Voting,	bagging,	or	boosting	multiple	classifiers § Much	literature	on	hierarchical	classification § Mileage	fairly	unclear,	but	helps	a	bit	(Tie-Yan	Liu	et	al.	2005) § Definitely	helps	for	scalability,	even	if	not	in	accuracy § May	need	a	hybrid	automatic/manual	solution
+Sec. 15.3.2
+Introduction	to	Information	Retrieval
+43
+How	can	one	tweak	performance? § Aim	to	exploit	any	domain-specific	useful	features	that	give	special	meanings	or	that	zone	the	data § E.g.,	an	author	byline	or	mail	headers § Aim	to	collapse	things	that	would	be	treated	as	different	but	shouldn’t	be. § E.g.,	part	numbers,	chemical	formulas
+§ Does	putting	in	“hacks”	help? § You	bet! § Feature	design	and	non-linear	weighting	is	very	important	in	the	performance	of	real-world	systems
+Sec. 15.3.2
+Introduction	to	Information	Retrieval
+44
+Upweighting § You	can	get	a	lot	of	value	by	differentially	weighting	contributions	from	different	document	zones: § That	is,	you	count	as	two	instances	of	a	word	when	you	see	it	in,	say,	the	abstract § Upweighting	title	words	helps		(Cohen	&	Singer	1996) § Doubling	the	weighting	on	the	title	words	is	a	good	rule	of	thumb § Upweighting	the	first	sentence	of	each	paragraph	helps	(Murata,	1999) § Upweighting	sentences	that	contain	title	words	helps	(Ko	et	al,2002)
+Sec. 15.3.2
+Introduction	to	Information	Retrieval
+45
+Two	techniques	for	zones 1. Have	a	completely	separate	set	of	features/parameters	for	different	zones	like	the	title 2. Use	the	same	features	(pooling/tying	their	parameters)	across	zones,	but	upweight	the	contribution	of	different	zones § Commonly	the	second	method	is	more	successful:	it	costs	you	nothing	in	terms	of	sparsifying	the	data,	but	can	give	a	very	useful	performance	boost § Which	is	best	is	a	contingent	fact	about	the	data
+Sec. 15.3.2
+Introduction	to	Information	Retrieval
+46
+Text	Summarization	techniques	in	text	classification § Text	Summarization:	Process	of	extracting	key	pieces	from	text,	normally	by	features	on	sentences	reflecting	position	and	content § Much	of	this	work	can	be	used	to	suggest	weightings	for	terms	in	text	categorization § See:	Kolcz,	Prabakarmurthi,	and	Kalita,	CIKM	2001:	Summarization	as	feature	selection	for	text	categorization	§ Categorizing	with	title, § Categorizing	with	first	paragraph	only § Categorizing	with	paragraph	with	most	keywords § Categorizing	with	first	and	last	paragraphs,	etc. Sec. 15.3.2
+Introduction	to	Information	Retrieval
+47
+Does	stemming/lowercasing/…	help? § As	always,	it’s	hard	to	tell,	and	empirical	evaluation	is	normally	the	gold	standard § But	note	that	the	role	of	tools	like	stemming	is	rather	different	for	TextCat	vs.	IR: § For	IR,	you	often	want	to	collapse	forms	of	the	verb	oxygenateand	oxygenation,	since	all	of	those	documents	will	be	relevant	to	a	query	for	oxygenation § For	TextCat,	with	sufficient	training	data,	stemming	does	no	good.	It	only	helps	in	compensating	for	data	sparseness	(which	can	be	severe	in	TextCat	applications).	Overly	aggressive	stemming	can	easily	degrade	performance.
+Sec. 15.3.2
+Introduction	to	Information	Retrieval
+48
+Measuring	Classification Figures	of	Merit § Not	just	accuracy;	in	the	real	world,	there	are	economic	measures: § Your	choices	are: § Do	no	classification § That	has	a	cost	(hard	to	compute) § Do	it	all	manually § Has	an	easy-to-compute	cost	if	you’re	doing	it	like	that	now § Do	it	all	with	an	automatic	classifier § Mistakes	have	a	cost § Do	it	with	a	combination	of	automatic	classification	and	manual	review	of	uncertain/difficult/”new”	cases § Commonly	the	last	method	is	cost	efficient	and	is	adopted § With	more	theory	and	Turkers:	Werling,	Chaganty,	Liang,	and	Manning	(2015).	On-the-Job	Learning	with	Bayesian	Decision	Theory.	http://arxiv.org/abs/1506.03140
+Introduction	to	Information	Retrieval
+49
+A	common	problem:	Concept	Drift § Categories	change	over	time § Example:	“president	of	the	united	states” § 1999:	clinton	is	great	feature § 2010:	clinton	is	bad	feature § One	measure	of	a	text	classification	system	is	how	well	it	protects	against	concept	drift. § Favors	simpler	models	like	Naïve	Bayes § Feature	selection:	can	be	bad	in	protecting	against	concept	drift
+Introduction	to	Information	Retrieval
+50
+Summary
+§ Support	vector	machines	(SVM) § Choose	hyperplanebased	on	support	vectors § Support	vector	=	“critical”	point	close	to	decision	boundary § (Degree-1)	SVMs	are	linear	classifiers. § Kernels:	powerful	and	elegant	way	to	define	similarity	metric § Perhaps	best	performing	text	classifier § But	there	are	other	methods	that	perform	about	as	well	as	SVM,	such	as	regularized	logistic	regression	(Zhang	&	Oles2001) § Partly	popular	due	to	availability	of	good	software § SVMlightis	accurate	and	fast	–and	free	(for	research) § Now	lots	of	good	software:	libsvm,	TinySVM,	scikit-learn,	…. § Comparative	evaluation	of	methods § Real	world:	exploit	domain	specific	structure!
+Introduction	to	Information	Retrieval Resources	for	today’s	lecture
+§ Christopher	J.	C.	Burges.	1998.	A	Tutorial	on	Support	Vector	Machines	for	Pattern	Recognition § S.	T.	Dumais.	1998.	Using	SVMs	for	text	categorization,	IEEE	Intelligent	Systems,	13(4) § YimingYang,	XinLiu.	1999.	A	re-examination	of	text	categorization	methods.	22nd	Annual	International	SIGIR § Tong	Zhang,	Frank	J.	Oles.	2001.	Text	Categorization	Based	on	Regularized	Linear	Classification	Methods.	Information	Retrieval	4(1):	5-31	§ Trevor	Hastie,	Robert	Tibshiraniand	Jerome	Friedman.	Elements	of	Statistical	Learning:	Data	Mining,	Inference	and	Prediction.Springer-Verlag,	New	York.	§ T.	Joachims,	Learning	to	Classify	Text	using	Support	Vector	Machines.	Kluwer,	2002. § Fan	Li,	YimingYang.	2003.	A	Loss	Function	Analysis	for	Classification	Methods	in	Text	Categorization.	ICML	2003:	472-479. § Tie-Yan	Liu,	YimingYang,	HaoWan,	et	al.	2005.	Support	Vector	Machines	Classification	with	Very	Large	Scale	Taxonomy,	SIGKDD	Explorations,	7(1):	36-43. § ‘Classic’	Reuters-21578	data	set:	http://www.daviddlewis.com/resources/testcollections/reuters21578/

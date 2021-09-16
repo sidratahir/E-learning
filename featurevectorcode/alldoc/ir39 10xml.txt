@@ -1,0 +1,2283 @@
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 10: XML Retrieval
+Hinrich Sch?tze, Christina Lioma u
+Center for Information and Language Processing, University of Munich
+
+2010-07-12
+
+Sch?tze, Lioma: XML retrieval u
+
+1 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Overview
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+2 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Outline
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+3 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+IR and relational databases
+IR systems are often contrasted with relational databases (RDB).
+
+Sch?tze, Lioma: XML retrieval u
+
+4 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+IR and relational databases
+IR systems are often contrasted with relational databases (RDB). Traditionally, IR systems retrieve information from unstructured text (?raw? text without markup). RDB systems are used for querying relational data: sets of records that have values for prede?ned attributes such as employee number, title and salary.
+
+Sch?tze, Lioma: XML retrieval u
+
+4 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+IR and relational databases
+IR systems are often contrasted with relational databases (RDB). Traditionally, IR systems retrieve information from unstructured text (?raw? text without markup). RDB systems are used for querying relational data: sets of records that have values for prede?ned attributes such as employee number, title and salary.
+objects main data structure model queries RDB search records table relational model SQL unstructured IR unstructured docs inverted index vector space & others free text queries
+
+Sch?tze, Lioma: XML retrieval u
+
+4 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+IR and relational databases
+IR systems are often contrasted with relational databases (RDB). Traditionally, IR systems retrieve information from unstructured text (?raw? text without markup). RDB systems are used for querying relational data: sets of records that have values for prede?ned attributes such as employee number, title and salary.
+objects main data structure model queries RDB search records table relational model SQL unstructured IR unstructured docs inverted index vector space & others free text queries
+
+Some structured data sources containing text are best modeled as structured documents rather than relational data (Structured retrieval).
+Sch?tze, Lioma: XML retrieval u 4 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured retrieval
+Basic setting: queries are structured or unstructured; documents are structured.
+
+Sch?tze, Lioma: XML retrieval u
+
+5 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured retrieval
+Basic setting: queries are structured or unstructured; documents are structured.
+
+Applications of structured retrieval
+Digital libraries, patent databases, blogs, tagged text with entities like persons and locations (named entity tagging).
+
+Sch?tze, Lioma: XML retrieval u
+
+5 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured retrieval
+Basic setting: queries are structured or unstructured; documents are structured.
+
+Applications of structured retrieval
+Digital libraries, patent databases, blogs, tagged text with entities like persons and locations (named entity tagging).
+
+Example
+Digital libraries: give me a full-length article on fast fourier transforms Patents: give me patents whose claims mention RSA public key encryption and that cite US patent 4,405,829 Entity-tagged text: give me articles about sightseeing tours of the Vatican and the Coliseum
+Sch?tze, Lioma: XML retrieval u 5 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Why RDB is not suitable in this case
+Three main problems
+
+Sch?tze, Lioma: XML retrieval u
+
+6 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Why RDB is not suitable in this case
+Three main problems 1 An unranked system (DB) would return a potentially large number of articles that mention the Vatican, the Coliseum and sightseeing tours without ranking them by relevance to the query.
+
+Sch?tze, Lioma: XML retrieval u
+
+6 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Why RDB is not suitable in this case
+Three main problems 1 An unranked system (DB) would return a potentially large number of articles that mention the Vatican, the Coliseum and sightseeing tours without ranking them by relevance to the query. 2 Di?cult for users to precisely state structural constraints may not know which structured elements are supported by the system. tours AND(COUNTRY:Vatican OR LANDMARK:Coliseum) ? tours AND (STATE:Vatican OR BUILDING:Coliseum) ?
+
+Sch?tze, Lioma: XML retrieval u
+
+6 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Why RDB is not suitable in this case
+Three main problems 1 An unranked system (DB) would return a potentially large number of articles that mention the Vatican, the Coliseum and sightseeing tours without ranking them by relevance to the query. 2 Di?cult for users to precisely state structural constraints may not know which structured elements are supported by the system. tours AND(COUNTRY:Vatican OR LANDMARK:Coliseum) ? tours AND (STATE:Vatican OR BUILDING:Coliseum) ?
+3
+
+Users may be completely unfamiliar with structured search and advanced search interfaces or unwilling to use them.
+
+Sch?tze, Lioma: XML retrieval u
+
+6 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Why RDB is not suitable in this case
+Three main problems 1 An unranked system (DB) would return a potentially large number of articles that mention the Vatican, the Coliseum and sightseeing tours without ranking them by relevance to the query. 2 Di?cult for users to precisely state structural constraints may not know which structured elements are supported by the system. tours AND(COUNTRY:Vatican OR LANDMARK:Coliseum) ? tours AND (STATE:Vatican OR BUILDING:Coliseum) ? Users may be completely unfamiliar with structured search and advanced search interfaces or unwilling to use them. Solution: adapt ranked retrieval to structured documents to address these problems.
+3 Sch?tze, Lioma: XML retrieval u 6 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured Retrieval
+
+RDB search, Unstructured IR, Structured IR
+objects main data structure model queries RDB search records table relational model SQL unstructured retrieval unstructured docs inverted index vector space & others free text queries structured retrieval trees with text at leaves ? ? ?
+
+Sch?tze, Lioma: XML retrieval u
+
+7 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured Retrieval
+
+RDB search, Unstructured IR, Structured IR
+objects main data structure model queries RDB search records table relational model SQL unstructured retrieval unstructured docs inverted index vector space & others free text queries structured retrieval trees with text at leaves ? ? ?
+
+Standard for encoding structured documents: Extensible Markup Language (XML)
+
+Sch?tze, Lioma: XML retrieval u
+
+7 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured Retrieval
+
+RDB search, Unstructured IR, Structured IR
+objects main data structure model queries RDB search records table relational model SQL unstructured retrieval unstructured docs inverted index vector space & others free text queries structured retrieval trees with text at leaves ? ? ?
+
+Standard for encoding structured documents: Extensible Markup Language (XML) structured IR ? XML IR also applicable to other types of markup (HTML, SGML, ...)
+
+Sch?tze, Lioma: XML retrieval u
+
+7 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Outline
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+8 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+Ordered, labeled tree
+
+Sch?tze, Lioma: XML retrieval u
+
+9 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+Ordered, labeled tree Each node of the tree is an XML element, written with an opening and closing XML tag (e.g. <title...>, </title...>)
+
+<play> <author>Shakespeare</author> <title>Macbeth</title> <act number=?I?> <scene number=?vii?> <title>Macbeth?s castle</title> <verse>Will I with wine ...</verse> </scene> </act> </play>
+
+Sch?tze, Lioma: XML retrieval u
+
+9 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+Ordered, labeled tree Each node of the tree is an XML element, written with an opening and closing XML tag (e.g. <title...>, </title...>) An element can have one or more XML attributes (e.g. number) Attributes can have values (e.g. vii)
+
+<play> <author>Shakespeare</author> <title>Macbeth</title> <act number=?I?> <scene number=?vii?> <title>Macbeth?s castle</title> <verse>Will I with wine ...</verse> </scene> </act> </play>
+
+Sch?tze, Lioma: XML retrieval u
+
+9 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+Ordered, labeled tree Each node of the tree is an XML element, written with an opening and closing XML tag (e.g. <title...>, </title...>) An element can have one or more XML attributes (e.g. number) Attributes can have values (e.g. vii) Attributes can have child elements (e.g. title, verse)
+Sch?tze, Lioma: XML retrieval u 9 / 42
+
+<play> <author>Shakespeare</author> <title>Macbeth</title> <act number=?I?> <scene number=?vii?> <title>Macbeth?s castle</title> <verse>Will I with wine ...</verse> </scene> </act> </play>
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+root element play element author text Shakespeare attribute number=?I? attribute number=?vii? element scene element verse text Will I with ...
+Sch?tze, Lioma: XML retrieval u
+
+element act
+
+element title text Macbeth
+
+element title text Macbeth?s castle
+10 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+The leaf nodes consist of text root element play element author text Shakespeare attribute number=?I?
+Sch?tze, Lioma: XML retrieval u
+
+element act
+
+element title text Macbeth
+
+element scene
+11 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML document
+The internal nodes encode document structure or metadata functions
+root element play element author text Shakespeare attribute number=?I? attribute number=?vii? element scene element verse text Will I with ... element title text Macbeth?s castle element act element title text Macbeth
+
+Sch?tze, Lioma: XML retrieval u
+
+12 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML basics
+XML Document Object Model (XML DOM): standard for accessing and processing XML documents
+
+Sch?tze, Lioma: XML retrieval u
+
+13 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML basics
+XML Document Object Model (XML DOM): standard for accessing and processing XML documents
+The DOM represents elements, attributes and text within elements as nodes in a tree. With a DOM API, we can process an XML document by starting at the root element and then descending down the tree from parents to children.
+
+Sch?tze, Lioma: XML retrieval u
+
+13 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML basics
+XML Document Object Model (XML DOM): standard for accessing and processing XML documents
+The DOM represents elements, attributes and text within elements as nodes in a tree. With a DOM API, we can process an XML document by starting at the root element and then descending down the tree from parents to children.
+
+XPath: standard for enumerating paths in an XML document collection.
+We will also refer to paths as XML contexts or simply contexts
+
+Sch?tze, Lioma: XML retrieval u
+
+13 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML basics
+XML Document Object Model (XML DOM): standard for accessing and processing XML documents
+The DOM represents elements, attributes and text within elements as nodes in a tree. With a DOM API, we can process an XML document by starting at the root element and then descending down the tree from parents to children.
+
+XPath: standard for enumerating paths in an XML document collection.
+We will also refer to paths as XML contexts or simply contexts
+
+Schema: puts constraints on the structure of allowable XML documents. E.g. a schema for Shakespeare?s plays: scenes can only occur as children of acts.
+
+Sch?tze, Lioma: XML retrieval u
+
+13 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML basics
+XML Document Object Model (XML DOM): standard for accessing and processing XML documents
+The DOM represents elements, attributes and text within elements as nodes in a tree. With a DOM API, we can process an XML document by starting at the root element and then descending down the tree from parents to children.
+
+XPath: standard for enumerating paths in an XML document collection.
+We will also refer to paths as XML contexts or simply contexts
+
+Schema: puts constraints on the structure of allowable XML documents. E.g. a schema for Shakespeare?s plays: scenes can only occur as children of acts.
+Two standards for schemas for XML documents are: XML DTD (document type de?nition) and XML Schema.
+Sch?tze, Lioma: XML retrieval u 13 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Outline
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+14 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+First challenge: document parts to retrieve
+Structured or XML retrieval: users want us to return parts of documents (i.e., XML elements), not entire documents as IR systems usually do in unstructured retrieval.
+
+Sch?tze, Lioma: XML retrieval u
+
+15 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+First challenge: document parts to retrieve
+Structured or XML retrieval: users want us to return parts of documents (i.e., XML elements), not entire documents as IR systems usually do in unstructured retrieval.
+
+Example
+If we query Shakespeare?s plays for Macbeth?s castle, should we return the scene, the act or the entire play?
+
+Sch?tze, Lioma: XML retrieval u
+
+15 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+First challenge: document parts to retrieve
+Structured or XML retrieval: users want us to return parts of documents (i.e., XML elements), not entire documents as IR systems usually do in unstructured retrieval.
+
+Example
+If we query Shakespeare?s plays for Macbeth?s castle, should we return the scene, the act or the entire play? In this case, the user is probably looking for the scene. However, an otherwise unspeci?ed search for Macbeth should return the play of this name, not a subunit.
+
+Sch?tze, Lioma: XML retrieval u
+
+15 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+First challenge: document parts to retrieve
+Structured or XML retrieval: users want us to return parts of documents (i.e., XML elements), not entire documents as IR systems usually do in unstructured retrieval.
+
+Example
+If we query Shakespeare?s plays for Macbeth?s castle, should we return the scene, the act or the entire play? In this case, the user is probably looking for the scene. However, an otherwise unspeci?ed search for Macbeth should return the play of this name, not a subunit. Solution: structured document retrieval principle
+
+Sch?tze, Lioma: XML retrieval u
+
+15 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured document retrieval principle
+Structured document retrieval principle
+One criterion for selecting the most appropriate part of a document: A system should always retrieve the most speci?c part of a document answering the query.
+
+Sch?tze, Lioma: XML retrieval u
+
+16 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured document retrieval principle
+Structured document retrieval principle
+One criterion for selecting the most appropriate part of a document: A system should always retrieve the most speci?c part of a document answering the query. Motivates a retrieval strategy that returns the smallest unit that contains the information sought, but does not go below this level.
+
+Sch?tze, Lioma: XML retrieval u
+
+16 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured document retrieval principle
+Structured document retrieval principle
+One criterion for selecting the most appropriate part of a document: A system should always retrieve the most speci?c part of a document answering the query. Motivates a retrieval strategy that returns the smallest unit that contains the information sought, but does not go below this level. Hard to implement this principle algorithmically. E.g. query: title:Macbeth can match both the title of the tragedy, Macbeth, and the title of Act I, Scene vii, Macbeth?s castle.
+
+Sch?tze, Lioma: XML retrieval u
+
+16 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structured document retrieval principle
+Structured document retrieval principle
+One criterion for selecting the most appropriate part of a document: A system should always retrieve the most speci?c part of a document answering the query. Motivates a retrieval strategy that returns the smallest unit that contains the information sought, but does not go below this level. Hard to implement this principle algorithmically. E.g. query: title:Macbeth can match both the title of the tragedy, Macbeth, and the title of Act I, Scene vii, Macbeth?s castle.
+But in this case, the title of the tragedy (higher node) is preferred. Di?cult to decide which level of the tree satis?es the query.
+Sch?tze, Lioma: XML retrieval u 16 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Second challenge: document parts to index
+
+Central notion for indexing and ranking in IR: document unit or indexing unit.
+
+Sch?tze, Lioma: XML retrieval u
+
+17 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Second challenge: document parts to index
+
+Central notion for indexing and ranking in IR: document unit or indexing unit. In unstructured retrieval, usually straightforward: ?les on your desktop, email messages, web pages on the web etc.
+
+Sch?tze, Lioma: XML retrieval u
+
+17 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Second challenge: document parts to index
+
+Central notion for indexing and ranking in IR: document unit or indexing unit. In unstructured retrieval, usually straightforward: ?les on your desktop, email messages, web pages on the web etc. In structured retrieval, there are four main di?erent approaches to de?ning the indexing unit.
+
+Sch?tze, Lioma: XML retrieval u
+
+17 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Second challenge: document parts to index
+
+Central notion for indexing and ranking in IR: document unit or indexing unit. In unstructured retrieval, usually straightforward: ?les on your desktop, email messages, web pages on the web etc. In structured retrieval, there are four main di?erent approaches to de?ning the indexing unit.
+1 2 3 4
+
+non-overlapping pseudodocuments top down bottom up all
+
+Sch?tze, Lioma: XML retrieval u
+
+17 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 1
+Group nodes into non-overlapping pseudodocuments.
+
+Sch?tze, Lioma: XML retrieval u
+
+18 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 1
+Group nodes into non-overlapping pseudodocuments.
+
+Sch?tze, Lioma: XML retrieval u
+
+18 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 1
+Group nodes into non-overlapping pseudodocuments.
+
+Indexing units: books, chapters, sections, but without overlap. Disadvantage: pseudodocuments may not make sense to the user because they are not coherent units.
+Sch?tze, Lioma: XML retrieval u 18 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 2
+
+Top down (2-stage process):
+
+Sch?tze, Lioma: XML retrieval u
+
+19 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 2
+
+Top down (2-stage process):
+1
+
+start with one of the largest elements as the indexing unit, e.g. the book element in a collection of books then, postprocess search results to ?nd for each book the subelement that is the best hit.
+
+2
+
+Sch?tze, Lioma: XML retrieval u
+
+19 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 2
+
+Top down (2-stage process):
+1
+
+start with one of the largest elements as the indexing unit, e.g. the book element in a collection of books then, postprocess search results to ?nd for each book the subelement that is the best hit.
+
+2
+
+This two-stage retrieval process often fails to return the best subelement because the relevance of a whole book is often not a good predictor of the relevance of small subelements within it.
+
+Sch?tze, Lioma: XML retrieval u
+
+19 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 3
+
+Bottom up: Instead of retrieving large units and identifying subelements (top down), we can search all leaves, select the most relevant ones and then extend them to larger units in postprocessing.
+
+Sch?tze, Lioma: XML retrieval u
+
+20 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 3
+
+Bottom up: Instead of retrieving large units and identifying subelements (top down), we can search all leaves, select the most relevant ones and then extend them to larger units in postprocessing. Similar problem as top down: the relevance of a leaf element is often not a good predictor of the relevance of elements it is contained in.
+
+Sch?tze, Lioma: XML retrieval u
+
+20 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 4
+Index all elements: the least restrictive approach.
+
+Sch?tze, Lioma: XML retrieval u
+
+21 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 4
+Index all elements: the least restrictive approach. Also problematic: many XML elements are not meaningful search results, e.g., an ISBN number. indexing all elements means that search results will be highly redundant.
+
+Sch?tze, Lioma: XML retrieval u
+
+21 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 4
+Index all elements: the least restrictive approach. Also problematic: many XML elements are not meaningful search results, e.g., an ISBN number. indexing all elements means that search results will be highly redundant.
+
+Example
+For the query Macbeth?s castle we would return all of the play, act, scene and title elements on the path between the root node and Macbeth?s castle. The leaf node would then occur 4 times in the result set: 1 directly and 3 as part of other elements.
+
+Sch?tze, Lioma: XML retrieval u
+
+21 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+XML indexing unit: approach 4
+Index all elements: the least restrictive approach. Also problematic: many XML elements are not meaningful search results, e.g., an ISBN number. indexing all elements means that search results will be highly redundant.
+
+Example
+For the query Macbeth?s castle we would return all of the play, act, scene and title elements on the path between the root node and Macbeth?s castle. The leaf node would then occur 4 times in the result set: 1 directly and 3 as part of other elements. We call elements that are contained within each other nested elements. Returning redundant nested elements in a list of returned hits is not very user-friendly.
+Sch?tze, Lioma: XML retrieval u 21 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval.
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include:
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include: discard all small elements
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include: discard all small elements discard all element types that users do not look at (working XML retrieval system logs)
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include: discard all small elements discard all element types that users do not look at (working XML retrieval system logs) discard all element types that assessors generally do not judge to be relevant (if relevance assessments are available)
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include: discard all small elements discard all element types that users do not look at (working XML retrieval system logs) discard all element types that assessors generally do not judge to be relevant (if relevance assessments are available) only keep element types that a system designer or librarian has deemed to be useful search results
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Because of the redundancy caused by nested elements it is common to restrict the set of elements eligible for retrieval. Restriction strategies include: discard all small elements discard all element types that users do not look at (working XML retrieval system logs) discard all element types that assessors generally do not judge to be relevant (if relevance assessments are available) only keep element types that a system designer or librarian has deemed to be useful search results In most of these approaches, result sets will still contain nested elements.
+
+Sch?tze, Lioma: XML retrieval u
+
+22 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Further techniques:
+
+Sch?tze, Lioma: XML retrieval u
+
+23 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Further techniques: remove nested elements in a postprocessing step to reduce redundancy.
+
+Sch?tze, Lioma: XML retrieval u
+
+23 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Further techniques: remove nested elements in a postprocessing step to reduce redundancy. collapse several nested elements in the results list and use highlighting of query terms to draw the user?s attention to the relevant passages.
+
+Sch?tze, Lioma: XML retrieval u
+
+23 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Third challenge: nested elements
+Further techniques: remove nested elements in a postprocessing step to reduce redundancy. collapse several nested elements in the results list and use highlighting of query terms to draw the user?s attention to the relevant passages.
+
+Highlighting
+Gain 1: enables users to scan medium-sized elements (e.g., a section); thus, if the section and the paragraph both occur in the results list, it is su?cient to show the section. Gain 2: paragraphs are presented in-context (i.e., their embedding section). This context may be helpful in interpreting the paragraph.
+Sch?tze, Lioma: XML retrieval u 23 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Nested elements and term statistics
+Further challenge related to nesting: we may need to distinguish di?erent contexts of a term when we compute term statistics for ranking, in particular inverse document frequency (idf).
+
+Sch?tze, Lioma: XML retrieval u
+
+24 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Nested elements and term statistics
+Further challenge related to nesting: we may need to distinguish di?erent contexts of a term when we compute term statistics for ranking, in particular inverse document frequency (idf).
+
+Example
+The term Gates under the node author is unrelated to an occurrence under a content node like section if used to refer to the plural of gate. It makes little sense to compute a single document frequency for Gates in this example.
+
+Sch?tze, Lioma: XML retrieval u
+
+24 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Nested elements and term statistics
+Further challenge related to nesting: we may need to distinguish di?erent contexts of a term when we compute term statistics for ranking, in particular inverse document frequency (idf).
+
+Example
+The term Gates under the node author is unrelated to an occurrence under a content node like section if used to refer to the plural of gate. It makes little sense to compute a single document frequency for Gates in this example. Solution: compute idf for XML-context term pairs.
+
+Sch?tze, Lioma: XML retrieval u
+
+24 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Nested elements and term statistics
+Further challenge related to nesting: we may need to distinguish di?erent contexts of a term when we compute term statistics for ranking, in particular inverse document frequency (idf).
+
+Example
+The term Gates under the node author is unrelated to an occurrence under a content node like section if used to refer to the plural of gate. It makes little sense to compute a single document frequency for Gates in this example. Solution: compute idf for XML-context term pairs. sparse data problems (many XML-context pairs occur too rarely to reliably estimate df) compromise: consider the parent node x of the term and not the rest of the path from the root to x to distinguish contexts.
+Sch?tze, Lioma: XML retrieval u 24 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Outline
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+25 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Main idea: lexicalised subtrees
+Aim: to have each dimension of the vector space encode a word together with its position within the XML tree.
+
+Sch?tze, Lioma: XML retrieval u
+
+26 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Main idea: lexicalised subtrees
+Aim: to have each dimension of the vector space encode a word together with its position within the XML tree. How: Map XML documents to lexicalised subtrees.
+
+Sch?tze, Lioma: XML retrieval u
+
+26 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Main idea: lexicalised subtrees
+
+Sch?tze, Lioma: XML retrieval u
+
+27 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Main idea: lexicalised subtrees
+1
+
+Take each text node (leaf) and break it into multiple nodes, one for each word. E.g. split Bill Gates into Bill and Gates.
+
+Sch?tze, Lioma: XML retrieval u
+
+27 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Main idea: lexicalised subtrees
+1
+
+2
+
+Take each text node (leaf) and break it into multiple nodes, one for each word. E.g. split Bill Gates into Bill and Gates. De?ne the dimensions of the vector space to be lexicalized subtrees of documents ? subtrees that contain at least one vocabulary term.
+
+Sch?tze, Lioma: XML retrieval u
+
+27 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Lexicalised subtrees
+
+We can now represent queries and documents as vectors in this space of lexicalized subtrees and compute matches between them, e.g. using the vector space formalism.
+
+Sch?tze, Lioma: XML retrieval u
+
+28 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Lexicalised subtrees
+
+We can now represent queries and documents as vectors in this space of lexicalized subtrees and compute matches between them, e.g. using the vector space formalism.
+
+Vector space formalism in unstructured VS. structured IR
+The main di?erence is that the dimensions of vector space in unstructured retrieval are vocabulary terms whereas they are lexicalized subtrees in XML retrieval.
+
+Sch?tze, Lioma: XML retrieval u
+
+28 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structural term
+There is a tradeo? between the dimensionality of the space and accuracy of query results.
+
+Sch?tze, Lioma: XML retrieval u
+
+29 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structural term
+There is a tradeo? between the dimensionality of the space and accuracy of query results. If we restrict dimensions to vocabulary terms, then we have a standard vector space retrieval system that will retrieve many documents that do not match the structure of the query (e.g., Gates in the title as opposed to the author element). If we create a separate dimension for each lexicalized subtree occurring in the collection, the dimensionality of the space becomes too large.
+
+Sch?tze, Lioma: XML retrieval u
+
+29 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Structural term
+There is a tradeo? between the dimensionality of the space and accuracy of query results. If we restrict dimensions to vocabulary terms, then we have a standard vector space retrieval system that will retrieve many documents that do not match the structure of the query (e.g., Gates in the title as opposed to the author element). If we create a separate dimension for each lexicalized subtree occurring in the collection, the dimensionality of the space becomes too large. Compromise: index all paths that end in a single vocabulary term, in other words, all XML-context term pairs. We call such an XML-context term pair a structural term and denote it by c, t : a pair of XML-context c and vocabulary term t.
+Sch?tze, Lioma: XML retrieval u 29 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance
+
+A simple measure of the similarity of a path cq in a query and a path cd in a document is the following context resemblance function Cr: Cr(cq , cd ) =
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+(1)
+
+Sch?tze, Lioma: XML retrieval u
+
+30 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance
+
+A simple measure of the similarity of a path cq in a query and a path cd in a document is the following context resemblance function Cr: Cr(cq , cd ) =
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+(1)
+
+|cq | and |cd | are the number of nodes in the query path and document path, resp.
+
+Sch?tze, Lioma: XML retrieval u
+
+30 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance
+
+A simple measure of the similarity of a path cq in a query and a path cd in a document is the following context resemblance function Cr: Cr(cq , cd ) =
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+(1)
+
+|cq | and |cd | are the number of nodes in the query path and document path, resp. cq matches cd i? we can transform cq into cd by inserting additional nodes.
+
+Sch?tze, Lioma: XML retrieval u
+
+30 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance example
+book
+
+book
+
+book
+
+author
+
+author
+
+book
+
+creator
+
+?rstname
+
+lastname
+
+Gates
+
+Gates
+
+Gates
+
+Bill
+
+Gates
+
+q3
+
+q4
+
+d2
+
+d3
+
+Sch?tze, Lioma: XML retrieval u
+
+31 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance example
+book
+
+book
+
+book
+
+author
+
+author
+
+book
+
+creator
+
+?rstname
+
+lastname
+
+Gates
+
+Gates
+
+Gates
+
+Bill
+
+Gates
+
+q3
+
+q4
+
+d2
+
+d3
+
+Cr(cq , cd ) =
+
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+Cr(cq4 , cd2 ) = 3/4 = 0.75.
+Sch?tze, Lioma: XML retrieval u 31 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance example
+book
+
+book
+
+book
+
+author
+
+author
+
+book
+
+creator
+
+?rstname
+
+lastname
+
+Gates
+
+Gates
+
+Gates
+
+Bill
+
+Gates
+
+q3
+
+q4
+
+d2
+
+d3
+
+Cr(cq , cd ) =
+
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+Cr(cq4 , cd2 ) = 3/4 = 0.75. The value of Cr(cq , cd ) is 1.0 if q and d are identical.
+Sch?tze, Lioma: XML retrieval u 31 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance exercise
+book
+
+book
+
+book
+
+author
+
+author
+
+book
+
+creator
+
+?rstname
+
+lastname
+
+Gates
+
+Gates
+
+Gates
+
+Bill
+
+Gates
+
+q3
+
+q4
+
+d2
+
+d3
+
+Cr(cq , cd ) = Cr(cq4 , cd3 ) =?
+Sch?tze, Lioma: XML retrieval u
+
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+32 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Context resemblance exercise
+book
+
+book
+
+book
+
+author
+
+author
+
+book
+
+creator
+
+?rstname
+
+lastname
+
+Gates
+
+Gates
+
+Gates
+
+Bill
+
+Gates
+
+q3
+
+q4
+
+d2
+
+d3
+
+Cr(cq , cd ) =
+
+1+|cq | 1+|cd |
+
+0
+
+if cq matches cd if cq does not match cd
+
+Cr(cq4 , cd3 ) =? Cr(cq4 , cd3 ) = 3/5 = 0.6.
+Sch?tze, Lioma: XML retrieval u 32 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Document similarity measure
+The ?nal score for a document is computed as a variant of the cosine measure, which we call SimNoMerge. SimNoMerge(q, d) = Cr(ck , cl )
+ck ?B cl ?B t?V
+
+weight(q, t, ck )
+
+weight(d, t, cl )
+c?B,t?V
+
+weight2 (d, t, c)
+
+V is the vocabulary of non-structural terms B is the set of all XML contexts weight(q, t, c), weight(d, t, c) are the weights of term t in XML context c in query q and document d, resp. (standard weighting e.g. idft ? wft,d , where idft depends on which elements we use to compute dft . ) SimNoMerge(q, d) is not a true cosine measure since its value can be larger than 1.0.
+Sch?tze, Lioma: XML retrieval u 33 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+SimNoMerge algorithm
+ScoreDocumentsWithSimNoMerge(q, B, V , N, normalizer ) 1 for n ? 1 to N 2 do score[n] ? 0 3 for each cq , t ? q 4 do wq ? Weight(q, t, cq ) 5 for each c ? B 6 do if Cr(cq , c) > 0 7 then postings ? GetPostings( c, t ) 8 for each posting ? postings 9 do x ? Cr(cq , c) ? wq ? weight(posting ) 10 score[docID(posting )]+ = x 11 for n ? 1 to N 12 do score[n] ? score[n]/normalizer [n] 13 return score
+Sch?tze, Lioma: XML retrieval u 34 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Outline
+
+1
+
+Introduction Basic XML concepts Challenges in XML IR Vector space model for XML IR Evaluation of XML IR
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze, Lioma: XML retrieval u
+
+35 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Initiative for the Evaluation of XML Retrieval (INEX)
+INEX: standard benchmark evaluation (yearly) that has produced test collections (documents, sets of queries, and relevance judgments). Based on IEEE journal collection (since 2006 INEX uses the much larger English Wikipedia as a test collection). The relevance of documents is judged by human assessors.
+
+Sch?tze, Lioma: XML retrieval u
+
+36 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Initiative for the Evaluation of XML Retrieval (INEX)
+INEX: standard benchmark evaluation (yearly) that has produced test collections (documents, sets of queries, and relevance judgments). Based on IEEE journal collection (since 2006 INEX uses the much larger English Wikipedia as a test collection). The relevance of documents is judged by human assessors.
+
+INEX 2002 collection statistics
+12,107 494 MB 1995?2002 1,532 6.9 30 30
+Sch?tze, Lioma: XML retrieval u
+
+number of documents size time of publication of articles average number of XML nodes per document average depth of a node number of CAS topics number of CO topics
+36 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX topics
+
+Two types:
+1
+
+content-only or CO topics: regular keyword queries as in unstructured information retrieval content-and-structure or CAS topics: have structural constraints in addition to keywords
+
+2
+
+Sch?tze, Lioma: XML retrieval u
+
+37 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX topics
+
+Two types:
+1
+
+content-only or CO topics: regular keyword queries as in unstructured information retrieval content-and-structure or CAS topics: have structural constraints in addition to keywords
+
+2
+
+Since CAS queries have both structural and content criteria, relevance assessments are more complicated than in unstructured retrieval.
+
+Sch?tze, Lioma: XML retrieval u
+
+37 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+INEX 2002 de?ned component coverage and topical relevance as orthogonal dimensions of relevance.
+
+Sch?tze, Lioma: XML retrieval u
+
+38 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+INEX 2002 de?ned component coverage and topical relevance as orthogonal dimensions of relevance.
+
+Component coverage
+Evaluates whether the element retrieved is ?structurally? correct, i.e., neither too low nor too high in the tree.
+
+Sch?tze, Lioma: XML retrieval u
+
+38 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+INEX 2002 de?ned component coverage and topical relevance as orthogonal dimensions of relevance.
+
+Component coverage
+Evaluates whether the element retrieved is ?structurally? correct, i.e., neither too low nor too high in the tree. We distinguish four cases:
+1
+
+2
+
+3
+
+4
+
+Exact coverage (E): The information sought is the main topic of the component and the component is a meaningful unit of information. Too small (S): The information sought is the main topic of the component, but the component is not a meaningful (self-contained) unit of information. Too large (L): The information sought is present in the component, but is not the main topic. No coverage (N): The information sought is not a topic of the component.
+38 / 42
+
+Sch?tze, Lioma: XML retrieval u
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+
+The topical relevance dimension also has four levels: highly relevant (3), fairly relevant (2), marginally relevant (1) and nonrelevant (0).
+
+Sch?tze, Lioma: XML retrieval u
+
+39 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+
+The topical relevance dimension also has four levels: highly relevant (3), fairly relevant (2), marginally relevant (1) and nonrelevant (0).
+
+Combining the relevance dimensions
+Components are judged on both dimensions and the judgments are then combined into a digit-letter code, e.g. 2S is a fairly relevant component that is too small. In theory, there are 16 combinations of coverage and relevance, but many cannot occur. For example, a nonrelevant component cannot have exact coverage, so the combination 3N is not possible.
+
+Sch?tze, Lioma: XML retrieval u
+
+39 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+The relevance-coverage ? ? ? ? ? ? Q(rel , cov ) = ? ? ? ? ? combinations are quantized as follows: 1.00 0.75 0.50 0.25 0.00 if if if if if (rel , cov ) = 3E (rel , cov ) ? {2E, 3L} (rel , cov ) ? {1E, 2L, 2S} (rel , cov ) ? {1S, 1L} (rel , cov ) = 0N
+
+This evaluation scheme takes account of the fact that binary relevance judgments, which are standard in unstructured IR, are not appropriate for XML retrieval. The quantization function Q does not impose a binary choice relevant/nonrelevant and instead allows us to grade the component as partially relevant.
+
+Sch?tze, Lioma: XML retrieval u
+
+40 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX relevance assessments
+The relevance-coverage ? ? ? ? ? ? Q(rel , cov ) = ? ? ? ? ? combinations are quantized as follows: 1.00 0.75 0.50 0.25 0.00 if if if if if (rel , cov ) = 3E (rel , cov ) ? {2E, 3L} (rel , cov ) ? {1E, 2L, 2S} (rel , cov ) ? {1S, 1L} (rel , cov ) = 0N
+
+This evaluation scheme takes account of the fact that binary relevance judgments, which are standard in unstructured IR, are not appropriate for XML retrieval. The quantization function Q does not impose a binary choice relevant/nonrelevant and instead allows us to grade the component as partially relevant. The number of relevant components in a retrieved set A of components can then be computed as: #(relevant items retrieved) =
+c?A
+
+Q(rel (c), cov (c))
+40 / 42
+
+Sch?tze, Lioma: XML retrieval u
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX evaluation measures
+
+As an approximation, the standard de?nitions of precision and recall can be applied to this modi?ed de?nition of relevant items retrieved, with some subtleties because we sum graded as opposed to binary relevance assessments.
+
+Sch?tze, Lioma: XML retrieval u
+
+41 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX evaluation measures
+
+As an approximation, the standard de?nitions of precision and recall can be applied to this modi?ed de?nition of relevant items retrieved, with some subtleties because we sum graded as opposed to binary relevance assessments.
+
+Drawback
+Overlap is not accounted for. Accentuated by the problem of multiple nested elements occurring in a search result.
+
+Sch?tze, Lioma: XML retrieval u
+
+41 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+INEX evaluation measures
+
+As an approximation, the standard de?nitions of precision and recall can be applied to this modi?ed de?nition of relevant items retrieved, with some subtleties because we sum graded as opposed to binary relevance assessments.
+
+Drawback
+Overlap is not accounted for. Accentuated by the problem of multiple nested elements occurring in a search result. Recent INEX focus: develop algorithms and evaluation measures that return non-redundant results lists and evaluate them properly.
+
+Sch?tze, Lioma: XML retrieval u
+
+41 / 42
+
+Introduction
+
+Basic XML concepts
+
+Challenges in XML IR
+
+Vector space model for XML IR
+
+Evaluation of XML IR
+
+Recap
+
+Structured or XML IR: e?ort to port unstructured (standard) IR know-how onto a scenario that uses structured (DB-like) data Specialised applications (e.g. patents, digital libraries) A decade old, unsolved problem http://inex.is.informatik.uni-duisburg.de/
+
+Sch?tze, Lioma: XML retrieval u
+
+42 / 42
+
+

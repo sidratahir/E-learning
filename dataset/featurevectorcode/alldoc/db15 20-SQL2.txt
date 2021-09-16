@@ -1,0 +1,352 @@
+SQL 2 ? The Sequel
+CS 186, Spring 2007, Lecture 8 R&G, Chapter 5 Mary Roth The important thing is not to stop questioning. Albert Einstein Life is just a bowl of queries. -Anon (not Forrest Gump)
+
+?
+
+?
+
+Review: SQL DML
+? DML includes 4 main statements: SELECT (query), INSERT, UPDATE and DELETE
+PROJECT
+
+? e.g:
+
+SELECT S.name, E.cid FROM Students S, Enrolled E WHERE S.sid = E.sid AND S.age=19
+SELECT
+
+JOIN
+
+Example: Find sailors who have reserved a red and a green boat
+SELECT R.sid FROM Boats B,Reserves R WHERE B.color = ?red? AND R.bid=B.bid INTERSECT SELECT R.sid FROM Boats B,Reserves R WHERE B.color = ?green? AND R.bid=B.bid
+sid 1 2
+Now let?s do this with a self-join
+
+Boats
+bid 101 102 103 105 bname Nina Pinta Santa Maria Titanic color red blue red green
+
+Reserves
+sid bid 101 103 105 day 9/12 9/13 9/13 1 2 1
+
+?
+
+sid 1
+
+=
+
+sid 1
+
+Find sids of sailors who?ve reserved a red and a green boat
+SELECT R1.sid FROM Boats B1, Reserves R1, Boats B2, Reserves R2 WHERE B1.color = ?red? AND B1.bid=R1.bid AND B2.color = ?green? AND B2.bid=R2.bid AND R1.sid=R2.sid
+bid 101 102 103 105 bname Nina Pinta Santa Maria Titanic color red blue red green sid 1 2 1 bid 101 103 105
+
+Find red reserved boats Find green reserved boats Find matching green and red reserved boats
+day 9/12 9/13 9/13
+
+sid 1 2 sid 1
+
+=
+
+sid 1
+
+Nested Queries
+? The WHERE clause can itself contain an SQL query!
+(Actually, so can FROM and HAVING clauses can too)
+
+e.g. Find the names of sailors who?ve reserved boat #103:
+Reserves
+
+SELECT S.sname FROM Sailors S WHERE S.sid IN (SELECT R.sid FROM Reserves R sname WHERE R.bid=103)
+Sailors
+sid sname Frodo Bilbo Sam Bilbo rating 7 2 8 age 22 39 27
+
+sid 1 2 1
+
+bid 101 103 105
+
+day 9/12 9/13 9/13
+
+First compute the set of all sailors that have reserved boat 103? ?and then check each the sid of each tuple in Sailors to see if it is in S1
+sid 2
+
+S1 S2 S3
+
+Nested Queries
+? This nested query was uncorrelated because the subquery does not refer to anything in the enclosing query SELECT S.sname FROM Sailors S WHERE S.sid IN (SELECT R.sid FROM Reserves R WHERE R.bid=103)
+
+?It can evaluated once and then checked for each tuple in enclosing query
+
+Nested Queries with correlation
+? Nested queries can also be correlated; the subquery refers to the enclosing query SELECT S.sname FROM Sailors S WHERE EXISTS (SELECT * FROM Reserves R WHERE R.bid=103 AND R.sid=S.sid) ?The subquery must be re-evaluated for each tuple in enclosing query ? EXISTS is a set operator that is true if result of set expression has at least one tuple
+
+Nested Queries
+e.g. Find the names of sailors who?ve reserved boat #103: SELECT S.sname FROM Sailors S WHERE EXISTS (SELECT * FROM Reserves R WHERE R.bid=103 AND R.sid=S.sid)
+Sailors
+sid sname Frodo Bilbo Sam rating 7 2 8 age 22 39 27
+
+Notice that this query computes the same answer as the previous query!
+
+1 2 3
+
+Reserves
+sid 1 2 1 bid 101 103 105 day 9/12 9/13 9/13 sid bid day
+
+S1 S2 S3
+
+2
+
+103 9/13
+
+Set-Comparison Operators
+? <tuple expression> IN <set expression>
+? True if <tuple> is a member of <set> ? Also, NOT IN EXISTS <set expression> ? True if <set expression> evaluates to a set with at least one member ? Also, NOT EXISTS UNIQUE <set expression>
+
+?
+
+?
+
+? True if <set expression> evaluates to a set with no duplicates; each row can appear exactly once ? Also, NOT UNIQUE ? <tuple expression> comparison op ANY <set expression> ? True if <set expression> contains at least one member that makes the comparison true ? Also, op ALL
+
+Use NOT Exists for Division
+Recall: X/Y means only give me X tuples that have a match in Y.
+
+Find sailors who?ve reserved all boats.
+
+X = set of sailors and Y = set of all boats with reservations.
+SELECT S.sname Find Sailors S such that ... FROM Sailors S WHERE NOT EXISTS there is no boat B... (SELECT B.bid FROM Boats B WHERE NOT EXISTS (SELECT R.bid without a FROM Reserves R Sailor S WHERE R.bid=B.bid AND R.sid=S.sid))
+
+reservation by
+
+Division
+SELECT S.sname FROM Sailors S WHERE NOT EXISTS (SELECT B.bid FROM Boats B WHERE NOT EXISTS (SELECT R.bid FROM Reserves R WHERE R.bid=B.bid AND R.sid=S.sid))
+Sailors
+sid sname Frodo Bilbo Sam rating 7 2 8 age 22 39 27
+
+101 103 3 1 2 Reserves Boats
+bid bname Nina Pinta color red blue
+sid bid 103 103 103 101 103 day 9/12 9/13 9/14 9/12 9/13
+
+R R R R R
+
+1 2 3 3 1
+
+S1 S2 S3
+
+B B
+
+101 103
+
+UNIQUE
+Find the names of sailors who?ve reserved boat #103 exactly once SELECT S.sname FROM Sailors S WHERE UNIQUE (SELECT sid, bid FROM Reserves R WHERE R.bid=103 AND S.sid=R.sid)
+Sailors
+sid sname Frodo Bilbo Sam rating 7 2 8 age 22 39 27
+
+1 2 3
+
+Reserves
+sid 1 2 1 bid 103 103 103 day 9/12 9/13 9/13 sid bid day
+
+S1 S2 S3
+
+2
+
+103 9/13
+
+ANY
+Find sailors whose rating is greater than that of some sailor called Bilbo: SELECT * FROM Sailors S WHERE S.rating > ANY(SELECT S2.rating FROM Sailors S2 WHERE S2.sname=?Bilbo?)
+S1
+sid 1 2 3 sname Frodo Bilbo Sam rating 7 2 8 age 22 39 27
+
+Correlated or uncorrelated?
+
+S2
+sid 2 1 2 3 sname Bilbo Frodo Bilbo Sam rating 2 7 2 8 39 22 39 27
+
+Uncorrelated!
+age
+
+Intermission
+
+Aggregate Operators
+? Very powerful; enables computations over sets of tuples
+? COUNT: returns a count of tuples in the set ? AVG: returns average of column values in the set ? SUM: returns sum of column values in the set ? MIN, MAX: returns min (max) value of column values in a set. ? DISTINCT can be added to COUNT, AVG, SUM to perform computation only over distinct values. SELECT COUNT (*) FROM Sailors S SELECT AVG (S.age) FROM Sailors S WHERE S.rating=10 SELECT AVG(DISTINCT S.age) FROM Sailors S WHERE S.rating=10
+
+Aggregate Operators
+Find name and age of the oldest sailor(s)
+SELECT S.sname, MAX FROM Sailors S
+
+X
+
+(S.age)
+
+Sailors
+sid 1 2 3 sname Frodo Bilbo Sam rating 7 2 8 age 22 39 27
+
+What will the result be?
+sname Frodo Bilbo Sam age 39 39 39
+
+Not legal syntax; no other columns allowed in SELECT clause without a GROUP BY clause (we?ll learn about those next)
+
+Aggregate Operators
+Find name and age of the oldest sailor(s) Instead:
+SELECT S.sname, S.age And then find the FROM Sailors S sailors(s) of that age? WHERE S.age = Find the maximum age? (SELECT MAX (S2.age) FROM Sailors S2)
+
+GROUP BY and HAVING
+? So far, we?ve seen aggregate operators applied to all tuples.
+? What if we want to apply ops to each of several groups of tuples?
+
+? Consider: Find the age of the youngest sailor for each rating level.
+? In general, we don?t know how many rating levels exist, and what the rating values for these levels are! ? Suppose we know that rating values go from 1 to 10; we can write 10 queries that look like this (!):
+
+For i = 1, 2, ... , 10:
+
+SELECT MIN (S.age) FROM Sailors S WHERE S.rating = i
+
+Queries With GROUP BY
+? To generate values for a column based on groups of rows, use aggregate functions in SELECT statements with the GROUP BY clause
+Returning 1 row per group
+
+SELECT [DISTINCT] target-list FROM relation-list [WHERE qualification] GROUP BY grouping-list
+
+And finally compute aggregate function over each group? First select these rows? Then group them by the values in these columns?
+
+target-list contains: ? list of column names from grouping?list ? terms with aggregate operations (e.g., MIN (S.age)).
+
+Group By Example For each rating, find the age of the youngest sailor with age ? 18 Sailors
+SELECT S.rating, MIN FROM Sailors S WHERE S.age >= 18 GROUP BY S.rating
+
+(S.age)
+
+sid 1 2 3 4 5
+
+sname Frodo Bilbo Sam Pippin Merry Frodo Bilbo Pippin Sam
+
+rating 7 2 8 2 8 7 2 2 8
+
+age 22 39 27 21 17 22 39 21 27
+
+7 2 8
+
+22 21 27
+
+Group 1 Group 2 Group 3
+
+1 2 4 3
+
+Find the number of reservations for each red boat.
+SELECT B.bid, COUNT(*) AS tot_res FROM Boats B, Reserves R Boats WHERE R.bid=B.bid AND B.color=?red? bid bname GROUP BY B.bid
+101 102 103 101 2 3 4 1 2 103 101 101 9/13 9/14 9/14 103 Nina Pinta Santa Maria
+
+color red blue red
+
+Reserves
+sid 1 2 3 4 bid 102 103 101 101 day 9/12 9/13 9/14 9/14
+
+Queries With GROUP BY and HAVING
+SELECT [DISTINCT] target-list FROM relation-list WHERE qualification GROUP BY grouping-list HAVING group-qualification
+? Use the HAVING clause with the GROUP BY clause to restrict which group-rows are returned in the result set
+
+Find the age of the youngest sailor with age ? 18, for each rating with at least 2 such sailors SELECT S.rating, MIN (S.age) FROM Sailors S WHERE S.age >= 18 GROUP BY S.rating HAVING COUNT (*) > 1
+
+2
+
+3 Answer
+
+Sailors who have reserved all boats
+SELECT S.name FROM Sailors S, reserves R WHERE S.sid = R.sid GROUP BY S.name, S.sid HAVING COUNT(DISTINCT R.bid) = ( Select COUNT (*) FROM Boats) sid bid sname
+Frodo Bilbo Bilbo Frodo Bilbo sname Frodo Bilbo 1 2 2 1 2 sid 1 2 102 101 102 102 103 bid 102,102 101, 102, 103 sname Frodo Bilbo sid 1 2 count 1 3
+
+Sailors sid sname rating age 1 2 3 Boats bid 101 102 103 bname Nina Pinta Santa Maria Reserves color red blue red Frodo Bilbo Sam 7 2 8 22 39 27
+
+count 3
+
+sid 1 2 2 1 2
+
+bid 102 102 101 102 103
+
+day 9/12 9/12 9/14 9/10 9/13
+
+More about Joins
+SELECT (column_list) FROM table_name [INNER | {LEFT |RIGHT | FULL } OUTER] JOIN table_name ON qualification_list WHERE ?
+
+Explicit join semantics needed unless it is an INNER join (INNER is default)
+
+Default semantics: Inner Join
+Only rows that match search conditions are returned. SELECT s.sid, s.name, r.bid FROM Sailors s INNER JOIN Reserves r ON s.sid = r.sid Returns only those sailors who have reserved boats SQL-92 also allows: SELECT s.sid, s.name, r.bid FROM Sailors s NATURAL JOIN Reserves r ?NATURAL? means equi-join for each pair of attributes with the same name
+
+SELECT s.sid, s.name, r.bid FROM Sailors s INNER JOIN Reserves r ON s.sid = r.sid
+
+s.sid
+
+s.name r.bid 22 Dustin 101 95 Bob 103
+
+Left Outer Join
+Left Outer Join returns all matched rows, plus all unmatched rows from the table on the left of the join clause (use nulls in fields of non-matching tuples) SELECT s.sid, s.name, r.bid FROM Sailors s LEFT OUTER JOIN Reserves r ON s.sid = r.sid Returns all sailors & information on whether they have reserved boats
+
+SELECT s.sid, s.name, r.bid FROM Sailors s LEFT OUTER JOIN Reserves r ON s.sid = r.sid
+
+s.sid
+
+s.name r.bid 22 Dustin 101 95 Bob 103 31 Lubber
+
+Right Outer Join
+Right Outer Join returns all matched rows, plus all unmatched rows from the table on the right of the join clause SELECT r.sid, b.bid, b.name FROM Reserves r RIGHT OUTER JOIN Boats b ON r.bid = b.bid Returns all boats & information on which ones are reserved.
+
+SELECT r.sid, b.bid, b.name FROM Reserves r RIGHT OUTER JOIN Boats b ON r.bid = b.bid
+
+r.sid 22 95
+
+b.bid 101 102 103 104
+
+b.name Interlake Interlake Clipper Marine
+
+Full Outer Join
+Full Outer Join returns all (matched or unmatched) rows from the tables on both sides of the join clause SELECT r.sid, b.bid, b.name FROM Reserves r FULL OUTER JOIN Boats b ON r.bid = b.bid Returns all boats & all information on reservations
+
+SELECT r.sid, b.bid, b.name FROM Reserves r FULL OUTER JOIN Boats b ON r.bid = b.bid
+
+r.sid 22 95
+
+b.bid 101 102 103 104
+
+b.name Interlake Interlake Clipper Marine
+
+Note: in this case it is the same as the ROJ because bid is a foreign key in reserves, so all reservations must have a corresponding tuple in boats.
+
+INSERT
+INSERT [INTO] table_name [(column_list)] VALUES ( value_list) INSERT [INTO] table_name [(column_list)] <select statement>
+INSERT INTO Boats VALUES ( 105, ?Clipper?, ?purple?) INSERT INTO Boats (bid, color) VALUES (99, ?yellow?) ?bulk insert? from one table to another (must be type compatible): INSERT INTO TEMP(bid) SELECT r.bid FROM Reserves R WHERE r.sid = 22; ?bulk insert? from files (in Postgres) Copy
+
+DELETE & UPDATE
+DELETE [FROM] table_name [WHERE qualification]
+
+DELETE FROM Boats WHERE color = ?red? DELETE FROM Boats b WHERE b. bid = (SELECT r.bid FROM Reserves R WHERE r.sid = 22) Can also modify tuples using UPDATE statement. UPDATE Boats SET Color = ?green? WHERE bid = 103;
+
+Null Values
+? Values are sometimes ? unknown (e.g., a rating has not been assigned or ? inapplicable (e.g., no spouse?s name). ? SQL provides a special value null for such situations. ? The presence of null complicates many issues. E.g.: ? Special operators needed to check if value is/is not null. ? ?rating>8? - true or false when rating is null? What about AND, OR and NOT connectives? ? Need a 3-valued logic (true, false and unknown). ? Meaning of constructs must be defined carefully. (e.g., WHERE clause eliminates rows that don?t evaluate to true.) ? New operators (in particular, outer joins) possible/needed.
+
+Null Values ? 3 Valued Logic
+(null > 0) (null + 1) (null = 0) null AND true is null is null is null is null
+
+AND T F NULL
+
+T
+T F Null
+
+F
+F F F
+
+Null
+Null F Null
+
+OR T F NULL
+
+T
+T T T
+
+F
+T F Null
+
+Null
+T Null Null
+
+

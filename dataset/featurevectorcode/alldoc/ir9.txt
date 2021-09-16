@@ -1,0 +1,357 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke and José Pinto
+Lecture 8: Feedback and Classification June 1st 2017
+Lecture 8: Feedback and Classification
+1. Relevance Feedback 2. Document Classification
+2Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Remember the query process from the first lecture:
+Relevance Feedback
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Relevance Feedback
+Query (or Feedback)
+Document Collection
+Result
+Representation of Query
+Representation of Doc. Coll.
+Comparison
+• There are four main approaches to result improvement: – Manual modification of query (query refinement) – Browsing / “Find similar pages” – Faceted Search – Relevance feedback (RF) • Manual modification requires active user engagement • Browsing requires a “good” clustering, which is hard • Relevance feedback is much easier to use • Today, we consider two examples of relevance feedback: – RF in probabilistic retrieval (BIR) – RF in vector space retrieval Result Improvement 4Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Faceted search: – http://dblp.l3s.de
+– http://idealo.de
+Demos
+5Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Observing user behavior during normal interaction – Eye tracking • Pupil dilation, eye fixation,… – Mouse movements – Reading time • Spend more time on relevant results – User’s history and queries. – Clicks in result list • Click on third result but no click on first or second result implies that the first and second result are not relevant
+Implicit Relevance Feedback
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Remember the BIR retrieval model – We had to estimate Pr(Di = 1 | D ? Rq): How many relevant documents contain term i? – We estimated it using heuristics: Choose 0.9! • Better estimation: Exploit user feedback! – Show the user the current retrieval result (with 0.9 estimation) – Let him/her label the relevant ones – Determine the proportion of relevant documents containing term i by counting • Use the new estimation to return a better result set – This process can be repeated…
+RF in Probabilistic Retrieval
+7Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Example: Query = “jaguar”
+What’s Pr(Dcar = 1 | D ? Rq)? ?1/2
+RF in Probabilistic Retrieval (2)
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+jaguar car jaguar animal jaguar fast jaguar system
+relevant
+• Relevance feedback without asking the user? YES! • The “manual” part of relevance feedback can be automated
+• Pseudo Relevance Feedback: – Generate a result list for the user’s query – Assumption:  “The top k documents are relevant!” • Usually true if k is small – Use this assumption for relevance feedback – Repeat this several times…
+Pseudo Relevance Feedback
+9Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pros: – Works well on average • Cons: – Can go horribly wrong for some queries: Topic drift!
+• Example of topic drift in pseudo RF: Query = “apple”
+Pseudo Relevance Feedback (2)
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• In the vector space model, relevance feedback is classically done using Rocchio’s algorithm (Rocchio, 1971)
+• Idea: Move the query point… – …into the direction of relevant documents, and – …away from nonrelevant documents
+RF in the Vector Space Model
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+R R
+R
+R
+NR
+NR NR NR old query point
+new query point
+• Theory: – The new query should… • …maximize cosine similarity to all relevant documents • …minimize cosine similarity to all nonrelevant documents – Let C be the set of documents returned to the user – Let C+ ? C be the set of documents rated as relevant – Let C- ? C be the set of documents rated as nonrelevant – Note: C+ ? C- ? C could be true – Task: Find the query point q that maximizes
+Rocchio’s Algorithm
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Cosine similarity
+• To keep things simple, assume that both the query and all documents are unit vectors – Vector length does not really matter with cosine similarity • Then the problem becomes: Maximize (in q)
+subject to |q| = 1
+• This optimization problem can be solved using the method of Lagrange multipliers
+Rocchio’s Algorithm (2)
+13Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Maximize (in q)
+subject to |q| = 1 • Observation underlying Lagrange multipliers: Any maximum of the following expression (in q, ?) yields a maximum of the original expression:
+• |q| = 1 is enforced, since otherwise no maximum exists
+Rocchio’s Algorithm (3)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to find the maximum of this expression? Equate all partial derivatives (wrt. q1, …, qm, ?) to zero! – Partial derivative with respect to qj:
+– Partial derivative with respect to ?:
+Rocchio’s Algorithm (4)
+15Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The first equation gives:
+– Note that all possible choices for q only differ in their length • The second equation just expresses the “length 1” constraint – Therefore, the choice of q having length 1 is the right one
+Rocchio’s Algorithm (5)
+16Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• We arrive at:
+• Because of the constraint |q| = 1, the optimal solution points in the same direction as qopt(?) but has unit length:
+• Note that qopt is a scaled version of the difference vector between C+’s centroid and C-’s centroid
+Rocchio’s Algorithm (6)
+17Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Rocchio’s Algorithm (7)
+18Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+x
+x
+x
+x
+o
+o
+o
+Optimal query
+x  non-relevant documents o  relevant documents
+o
+o
+o
+x
+x
+xx
+x
+x
+x
+x
+x
+x
+x
+x
+?
+x
+x
+Origin of space
+• Problems: – The user’s judgments are biased by the initial result set – We cannot trust the user’s judgments ultimately • Therefore, in practice a modified approach is used • Idea: Modify the initial query vector!
+– q0: Initial query – a, ß, ?: Weighting factors
+Rocchio’s Algorithm (8)
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Rocchio’s Algorithm (9)
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+x
+x
+x
+x
+o
+o
+o
+Origin of space
+x  non-relevant documents o  relevant documents
+o
+o
+o
+x
+x
+xx
+x
+x
+x
+x
+x
+x
+x
+x
+?
+x
+x
+Initial query
+Centroid of relevant documents
+Centroid of nonrelevant documents
+?
+New querya = 1 ß = 1.3 ? = 0.5
+• How to choose a, ß, and ?? – Only if we have a lot of judged documents, we want ß and ? to be larger than a – Positive feedback usually is more valuable than negative feedback, so set ß > ? – Reasonable values might be: • a = 1 • ß = 0.75 • ? = 0.15
+Rocchio’s Algorithm (10)
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pros: – Intuitive approach to automatic query refinement – Positive and negative feedback can be exploited – Pseudo relevance feedback can enhance result quality without any user interaction
+• Cons: – Requires the initial query to be “good enough” – Relies on the cluster hypothesis: • Relevant documents are similar • Relevant documents are dissimilar from nonrelevant ones – Change of results often is hard to explain to the user
+Relevance Feedback: Pros and Cons
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 8: Feedback and Classification
+1. Relevance Feedback 2. Document Classification
+23Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Task: Automatically assign a given document to one or more categories, based on its contents
+• Typical applications in IR: – Spam detection – E-mail sorting (friends and family, job, study, …) – Detection of sexually explicit content – Domain-specific search (e.g. Google Scholar) – Language detection – Information filtering (standing queries)
+What’s Document Classification?
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• General task: Learn how to classify new documents • Supervised document classification: – Some external mechanism (such as human feedback) provides a correctly classified training set of documents (and possibly some explicit classification rules) • Unsupervised document classification: – No training set is available but a sample of unclassified docs – Exploits statistical properties of the data (e.g. clustering) • Semi-supervised document classification: – A (usually small) training set as well as a set of unclassified documents is available
+Document Classification
+25Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• We will focus on supervised classification here, which is the most common type
+• Some fundamental definitions: – Let X be the document space (e.g. Rm in vector space retrieval) – Let C = {c1, …, cr} be a fixed set of classes (aka categories, labels) – Let D be a set of training pairs (d, c) ? X × C (training set) • Task in supervised learning: – Using a learning algorithm, find a classification function (aka classifier) f : X ? C, which maps documents to classes
+Supervised Classification
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The learning algorithm takes the training set D as input and returns the learned classification function f
+• The quality of a learned classification function can be evaluated using a test set, which also consists of correctly labeled training pairs (d, c) ? X × C • Consequently, the training and test set should be similar (or from the same distribution)
+Supervised Classification (2)
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Training set D Learning algorithm Classifier f
+Example from (Manning et al., 2008):
+Supervised Classification (3)
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+f(test document) = China
+• There are several popular learning algorithms, which we will have a look at in this and the next lecture: – Naïve Bayes: A simple probabilistic approach – Rocchio: Classes are represented by centroids – K-nearest neighbors: Look at the nearest neighbors of a new document to determine class membership – Support vector machines: Use hyperplanes to cut the document space into slices; each slice corresponds to a class
+Supervised Classification (4)
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+A simple Bayesian network:
+Naïve Bayes
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+C Document is about China
+S Document contains the word “Stuttgart”
+W Document contains the word “wall”
+B Document contains the word “Beijing”
+Pr(C) = #C / #docs
+Pr(B) = #B / #docs Pr(B|C) = #(B and C) / #C Pr(B|¬C) = #(B and ¬C) / #(¬C)
+Pr(S) = … Pr(S|C) = … Pr(S|¬C) = …
+Pr(W) = … Pr(W|C) = … Pr(W|¬C) = … All these probabilities can be estimated from the training set (possibly using smoothing)!
+What proportion of all documents is about China?
+• Classifying a new document: – We know whether each of the events B, S, and W occurred – We want to find out whether event C is true • This can be done using Bayes’ Theorem:
+Naïve Bayes (2)
+31Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+C Document is about China
+S Document contains the word “Stuttgart”
+W Document contains the word “wall”
+B Document contains the word “Beijing”
+• Assume that the document to be classified contains the word “Beijing” but neither “Stuttgart” nor “wall” • Consequently, we want to find Pr(C | B, ¬S, ¬W) • Bayes Theorem yields:
+Naïve Bayes (3)
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+C Document is about China
+S Document contains the word “Stuttgart”
+W Document contains the word “wall”
+B Document contains the word “Beijing”
+• In naïve Bayes (sometimes called idiot Bayes), statistical independence is assumed:
+• How to classify a new document d? – Estimate Pr(c | d), for any class c ? C – Assign d to the class having the highest probability
+Naïve Bayes (4)
+33Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Example (from Manning et al., 2008; modified):
+– Estimation for Pr(China): 3/4 – Estimation for Pr(Chinese | China): 2/3 – Estimation for Pr(Tokyo | China): 1/3 – Estimation for Pr(Japan | China): 1/3 – Estimation for Pr(¬Shanghai | China): 2/3 – Estimation for Pr(¬Beijing | China): 1/3
+Naïve Bayes (5)
+34Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+• Pr(China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing)
+= 3/4  ·                                           = 64/243  ˜  0.26
+• Pr(¬China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing)
+= 1/4 ·                                            = 0
+• Since Pr(China | …) > Pr(¬China | …), let’s classify doc 5 as “China”
+Naïve Bayes (6)
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+2/3 · 1/3 · 1/3 · 2/3 · 1/3 1/2 · 1/2 · 1/2 · 3/4 · 1/2
+0/1 · 1/1 · 1/1 · 1/1 · 1/1 1/2 · 1/2 · 1/2 · 3/4 · 1/2
+Pr(China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing) = 0.26 Pr(¬China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing) = 0 • Well, obviously, we need some smoothing here… – For example, estimate Pr(Chinese | ¬China) by a linear blend of
+– From now on, we estimate Pr(Chinese | ¬China) by 0.8· 0 + 0.2· 1/2 = 0.1 • We do the same for all other probabilities (using weights 0.8 and 0.2)
+Naïve Bayes (7)
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+#(“Chinese” and “¬China”) #(“¬China”)
+#(“Chinese”) #documents
+and
+Using the smoothed estimates, we get the following: • Pr(China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing)
+= 3/4  ·                                                             ˜  0.34
+• Pr(¬China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing)
+= 1/4 ·                                                            ˜  0.37
+• Since Pr(China | …) < Pr(¬China | …), let’s classify doc 5 as “¬China”
+Naïve Bayes (8)
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+19/30 · 11/30 · 11/30 · 41/60 · 11/30 1/2  · 1/2  · 1/2  · 3/4   · 1/2
+1/10 · 9/10 · 9/10 · 19/20 · 9/10 1/2   · 1/2  · 1/2  · 3/4  · 1/2
+Pr(China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing) ˜ 0.34 Pr(¬China | Chinese, Tokyo, Japan, ¬Shanghai, ¬Beijing) ˜ 0.37
+• Why don’t these probabilities sum up to 1? – We assumed independence but it does not hold in the data – This is true even without smoothing – Example: • Pr(Chinese, Beijing | China) = 2/3 • Pr(Chinese | China) · Pr(Beijing | China) = 2/3 · 2/3 = 4/9 ? 2/3
+• Conclusion: Naïve Bayes is just a heuristic, but an effective one
+Naïve Bayes (9)
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+Typically, when using naïve Bayes, one considers only positive events, that is, only probabilities of terms that actually occur in the document: • Pr(China | Chinese, Tokyo, Japan)
+= 3/4  ·                                     ˜  0.51
+• Pr(¬China | Chinese, Tokyo, Japan)
+= 1/4 ·                                  ˜  0.65
+• Since Pr(China | …) < Pr(¬China | …), let’s classify doc 5 as “¬China”
+Naïve Bayes (10)
+DocID Words in document Label “China”? Training set 1 Chinese Beijing Japan Yes 2 Shanghai Yes 3 Chinese Beijing Tokyo Yes 4 Tokyo Japan No Test set 5 Chinese Tokyo Japan ?
+19/30 · 11/30 · 11/30 1/2  · 1/2  · 1/2
+1/10 · 9/10 · 9/10 1/2   · 1/2  · 1/2
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig 39
+• There are many ways to extend naïve Bayes…
+• Account for number of occurrences • Use better smoothing techniques for estimations • Do not assume independence • Restrict model to the “most indicative” terms • Extend model to handle more than two classes • …
+Extensions of Naïve Bayes
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Rocchio classification – Requires a vector space representation of documents – Divides the space into regions centered on centroids
+• Rocchio relies on the contiguity hypothesis:
+Rocchio
+41Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+“Documents in the same class form a contiguous region and regions of different classes do not overlap”
+Example (from Manning et al., 2008):
+Rocchio (2)
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+A training set with 3 classes: China, UK, and Kenya
+New document to be classified
+Rocchio classification:
+Rocchio (3)
+43Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Compute centroids and assign new documents to their nearest centroid
+Centroid of class “UK”
+These lines divide the space into contiguous regions (“Voronoi tessellation”)
+• Unlike Rocchio, k-nearest neighbor classification (kNN) uses class boundaries based on individual documents (instead of centroids of classes) • Each new documents gets assigned to the majority class of its k closest neighbors, where k is a parameter • For k = 1, the classes correspond to the Voronoi tessellation of the training set • Clearly, kNN for k > 1 is more robust than kNN for k = 1
+K-Nearest Neighbors
+44Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Example (from Manning et al., 2008):
+K-Nearest Neighbors (2)
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+k = 1
+• We can also weight the “votes” of the k nearest neighbors by their cosine similarity • The score of class c with respect to some document to be classified d then is:
+– NNk(d): The set of the k nearest neighbors of d in the training set – class(d’): The class of training document d’ • Every document to be classified gets assigned to the class having the highest score
+K-Nearest Neighbors (3)
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Another very important classifier: – Support vector machines – Highly effective but more complicated to explain – Next lecture…
+Support Vector Machines
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+-
++
++
+-
+-
+-
+-
+-
++
++
++
++
++
++
++
+-
+• Each different classification algorithm comes with individual strengths and weaknesses – “There ain’t no such thing as a free lunch” • For hard classification problems, the usual classifiers tend to be weak learners – Weak learner = only slightly better than random guessing
+• Question: – Can a set of weak learners create a single strong learner? • Answer: YES! – Boosting algorithms do the trick!
+Boosting
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Boosting algorithms are meta-algorithms – Basically, a boosting algorithm is a blueprint of how to combine a set of “real” classification algorithms to yield a single combined (and hopefully better) classifier
+Boosting (2)
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Base classifier 1 Base classifier 2
+Base classifier 3
+Boosting algorithm
+Boosting (3)
+• Naïve approach to boosting: Majority vote! 1. Train base classifiers independently on the training set 2. For each new object to be classified, independently ask each base classifier and return the answer given by the majority
+• Problems: – Does only work if the majority is right very often – Each base algorithm cannot take advantage of its individual strengths – Should expert votes have the same weight as any other vote?
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Boosting (4)
+• Better approach: Adaptive boosting 1. Train the first base classifier on the training set 2. Check which training examples cannot be explained by the first case classifier’s underlying model (“errors”) 3. Assign a weight to each training example • Low weight = Example fits perfectly into the first classifier’s model • High weight = Example fits hardly into the first classifier’s model 4. Train the second base classifier on the weighted training set • Fitting training example with high weights is more important than fitting those with low weights 5. Reweight as in step (3) 6. Repeat the steps (4) and (5) for all remaining base classifiers
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Boosting (5)
+• Adaptive boosting (continued) – In addition, assign an importance weight to each base classifier, depending on how many training examples fit its model • High importance if errors occur only on training examples with low weight • Low importance if errors occur on training examples with high weight – How does the combined classifier work? 1. Classify the new example with each base classifier 2. Use majority vote but weight the individual classifier’s answers by their importance weights; also incorporate each classifier’s confidence if this information is available – Typically, the importance weights and the weights of the individual training examples are chosen to be balanced, such that the weighted majority now is right very often
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Why is adaptive boosting better than “pure” majority vote? – Later weak learners focus more on those training examples previous weak learners had problems with – Individual weaknesses can be compensated – Individual strengths can be exploited
+Boosting (6)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig 53
+• Toy example:
+Boosting: Example
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Taken from Freund/Schapire: A Tutorial on Boosting
+• Round 1:
+Boosting: Example
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Taken from Freund/Schapire: A Tutorial on Boosting
+Model of classifier 1 Reweighted training data
+• Round 2:
+Boosting: Example
+56Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Taken from Freund/Schapire: A Tutorial on Boosting
+Model of classifier 2 Reweighted training data
+• Round 3:
+Boosting: Example
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Taken from Freund/Schapire: A Tutorial on Boosting
+Model of classifier 3
+• Combined classifier:
+Boosting: Example
+58Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Taken from Freund/Schapire: A Tutorial on Boosting
+0.42 0.65 0.92
+0.42 0.65 0.92
+0.42 0.65 0.92
+• Support vector machines • The bias–variance tradeoff (overfitting)
+Next Lecture
+59Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig

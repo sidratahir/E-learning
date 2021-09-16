@@ -1,0 +1,4879 @@
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 6: Scoring, Term Weighting, The Vector Space Model
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-04-30
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+1 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Overview
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+2 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Outline
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+3 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Heaps? law
+Vocabulary size M as a function of collection size T (number of tokens) for Reuters-RCV1. For these data, the dashed line log10 M = 0.49 ? log10 T + 1.64 is the best least squares ?t. Thus, M = 101.64 T 0.49 and k = 101.64 ? 44 and b = 0.49.
+
+log10 M
+
+0 0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+2
+
+4 log10 T
+
+6
+
+8
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+4 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Zipf?s law
+cf i ? 1 i The most frequent term (the) occurs cf 1 times, the second most frequent term 1 (of) occurs cf 2 = 2 cf 1 times, the third most frequent term (and) occurs cf 3 = 1 cf 1 times etc. 3
+
+log10 cf 0 0 1 2 3
+
+4
+
+5
+
+6
+
+7
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+log10 rank
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+5 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Dictionary as a string
+. . . sys t i l esyzyget i csyzyg i a l syzygysza i be l y i teszec i nszono. . .
+
+freq.
+
+postings ptr. term ptr.
+
+9 92 5 71 12 ...
+
+? ? ? ? ? ...
+
+... 3 bytes
+
+4 bytes 4 bytes
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+6 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Gap encoding
+the computer arachnocentric encoding docIDs gaps docIDs gaps docIDs gaps postings list ... ... 252000 252000 283042 1 283047 107 500100 248100 283154 5 283043 1 283159 43 283044 1 283202 283045 ... ... ... ...
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+7 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Variable byte (VB) code
+
+Dedicate 1 bit (high bit) to be a continuation bit c. If the gap G ?ts within 7 bits, binary-encode it in the 7 available bits and set c = 1. Else: set c = 0, encode high-order 7 bits and then use one or more additional bytes to encode the lower order bits using the same algorithm.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+8 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Gamma codes for gap encoding
+
+Represent a gap G as a pair of length and o?set. O?set is the gap in binary, with the leading bit chopped o?. Length is the length of o?set. Encode length in unary code The Gamma code is the concatenation of length and o?set.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+9 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Compression of Reuters
+data structure dictionary, ?xed-width dictionary, term pointers into string ?, with blocking, k = 4 ?, with blocking & front coding collection (text, xml markup etc) collection (text) T/D incidence matrix postings, uncompressed (32-bit words) postings, uncompressed (20 bits) postings, variable byte encoded postings, ? encoded size in MB 11.2 7.6 7.1 5.9 3600.0 960.0 40,000.0 400.0 250.0 116.0 101.0
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+10 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+More on compression for information retrieval
+
+Zobel, Mo?at: Inverted ?les for text search engines. ACM Computing Surveys, 2006. (a lot more detail) Witten, Mo?at, Bell: Managing Gigabytes, 1999. (the classic) B?ttcher, Clarke, Cormack: Information retrieval: u Implementing and evaluating search engines, 2010.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+11 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+12 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Ranking search results: why it is important (as opposed to just presenting a set of unordered Boolean results)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+12 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Ranking search results: why it is important (as opposed to just presenting a set of unordered Boolean results) Term frequency: This is a key ingredient for ranking.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+12 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Ranking search results: why it is important (as opposed to just presenting a set of unordered Boolean results) Term frequency: This is a key ingredient for ranking. Tf-idf ranking: best known traditional ranking scheme
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+12 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Ranking search results: why it is important (as opposed to just presenting a set of unordered Boolean results) Term frequency: This is a key ingredient for ranking. Tf-idf ranking: best known traditional ranking scheme Vector space model: Important formal model for information retrieval (along with Boolean and probabilistic models)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+12 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Outline
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+13 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results. Not good for the majority of users
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results. Not good for the majority of users Most users are not capable of writing Boolean queries . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results. Not good for the majority of users Most users are not capable of writing Boolean queries . . .
+. . . or they are, but they think it?s too much work.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results. Not good for the majority of users Most users are not capable of writing Boolean queries . . .
+. . . or they are, but they think it?s too much work.
+
+Most users don?t want to wade through 1000s of results.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Ranked retrieval
+Thus far, our queries have been Boolean.
+Documents either match or don?t.
+
+Good for expert users with precise understanding of their needs and of the collection. Also good for applications: Applications can easily consume 1000s of results. Not good for the majority of users Most users are not capable of writing Boolean queries . . .
+. . . or they are, but they think it?s too much work.
+
+Most users don?t want to wade through 1000s of results. This is particularly true of web search.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+14 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results. Query 1 (boolean conjunction): [standard user dlink 650]
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results. Query 1 (boolean conjunction): [standard user dlink 650]
+? 200,000 hits ? feast
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results. Query 1 (boolean conjunction): [standard user dlink 650] Query 2 (boolean conjunction): [standard user dlink 650 no card found]
+? 200,000 hits ? feast
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results. Query 1 (boolean conjunction): [standard user dlink 650] Query 2 (boolean conjunction): [standard user dlink 650 no card found]
+? 0 hits ? famine ? 200,000 hits ? feast
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Problem with Boolean search: Feast or famine
+
+Boolean queries often result in either too few (=0) or too many (1000s) results. Query 1 (boolean conjunction): [standard user dlink 650] Query 2 (boolean conjunction): [standard user dlink 650 no card found] In Boolean retrieval, it takes a lot of skill to come up with a query that produces a manageable number of hits.
+? 0 hits ? famine ? 200,000 hits ? feast
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+15 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Feast or famine: No problem in ranked retrieval
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+16 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Feast or famine: No problem in ranked retrieval
+
+With ranking, large result sets are not an issue.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+16 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Feast or famine: No problem in ranked retrieval
+
+With ranking, large result sets are not an issue. Just show the top 10 results
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+16 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Feast or famine: No problem in ranked retrieval
+
+With ranking, large result sets are not an issue. Just show the top 10 results Doesn?t overwhelm the user
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+16 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Feast or famine: No problem in ranked retrieval
+
+With ranking, large result sets are not an issue. Just show the top 10 results Doesn?t overwhelm the user Premise: the ranking algorithm works: More relevant results are ranked higher than less relevant results.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+16 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Scoring as the basis of ranked retrieval
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+17 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Scoring as the basis of ranked retrieval
+
+How can we accomplish a relevance ranking of the documents with respect to a query?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+17 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Scoring as the basis of ranked retrieval
+
+How can we accomplish a relevance ranking of the documents with respect to a query? Assign a score to each query-document pair, say in [0, 1].
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+17 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Scoring as the basis of ranked retrieval
+
+How can we accomplish a relevance ranking of the documents with respect to a query? Assign a score to each query-document pair, say in [0, 1]. This score measures how well document and query ?match?.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+17 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Scoring as the basis of ranked retrieval
+
+How can we accomplish a relevance ranking of the documents with respect to a query? Assign a score to each query-document pair, say in [0, 1]. This score measures how well document and query ?match?. Sort documents according to scores
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+17 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Query-document matching scores
+
+How do we compute the score of a query-document pair?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+18 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Query-document matching scores
+
+How do we compute the score of a query-document pair? If no query term occurs in the document: score should be 0.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+18 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Query-document matching scores
+
+How do we compute the score of a query-document pair? If no query term occurs in the document: score should be 0. The more frequent a query term in the document, the higher the score
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+18 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Query-document matching scores
+
+How do we compute the score of a query-document pair? If no query term occurs in the document: score should be 0. The more frequent a query term in the document, the higher the score The more query terms occur in the document, the higher the score
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+18 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Query-document matching scores
+
+How do we compute the score of a query-document pair? If no query term occurs in the document: score should be 0. The more frequent a query term in the document, the higher the score The more query terms occur in the document, the higher the score We will look at a number of alternatives for doing this.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+18 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) |A ? B| |A ? B|
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) |A ? B| |A ? B|
+
+jaccard(A, A) = 1
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) |A ? B| |A ? B|
+
+jaccard(A, A) = 1 jaccard(A, B) = 0 if A ? B = 0
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) |A ? B| |A ? B|
+
+jaccard(A, A) = 1 jaccard(A, B) = 0 if A ? B = 0 A and B don?t have to be the same size.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take 1: Jaccard coe?cient
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) |A ? B| |A ? B|
+
+jaccard(A, A) = 1 jaccard(A, B) = 0 if A ? B = 0 A and B don?t have to be the same size. Always assigns a number between 0 and 1.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+19 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Jaccard coe?cient: Example
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+20 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Jaccard coe?cient: Example
+
+What is the query-document match score that the Jaccard coe?cient computes for:
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+20 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Jaccard coe?cient: Example
+
+What is the query-document match score that the Jaccard coe?cient computes for:
+Query: ?ides of March?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+20 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Jaccard coe?cient: Example
+
+What is the query-document match score that the Jaccard coe?cient computes for:
+Query: ?ides of March? Document ?Caesar died in March?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+20 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Jaccard coe?cient: Example
+
+What is the query-document match score that the Jaccard coe?cient computes for:
+Query: ?ides of March? Document ?Caesar died in March? jaccard(q, d) = 1/6
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+20 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+It doesn?t consider term frequency (how many occurrences a term has).
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+It doesn?t consider term frequency (how many occurrences a term has). Rare terms are more informative than frequent terms. Jaccard does not consider this information.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+It doesn?t consider term frequency (how many occurrences a term has). Rare terms are more informative than frequent terms. Jaccard does not consider this information. We need a more sophisticated way of normalizing for the length of a document.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+It doesn?t consider term frequency (how many occurrences a term has). Rare terms are more informative than frequent terms. Jaccard does not consider this information. We need a more sophisticated way of normalizing for the length of a document. Later in this lecture, we?ll use |A ? B|/ |A ? B| (cosine) . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+What?s wrong with Jaccard?
+
+It doesn?t consider term frequency (how many occurrences a term has). Rare terms are more informative than frequent terms. Jaccard does not consider this information. We need a more sophisticated way of normalizing for the length of a document. Later in this lecture, we?ll use |A ? B|/ |A ? B| (cosine) . . . . . . instead of |A ? B|/|A ? B| (Jaccard) for length normalization.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+21 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Outline
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+22 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Binary incidence matrix
+Anthony and Cleopatra 1 1 1 0 1 1 1 Julius Caesar 1 1 1 1 0 0 0 The Tempest 0 0 0 0 0 1 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 1 1 0 0 1 1
+
+0 0 1 0 0 1 1
+
+1 0 1 0 0 1 0
+
+Each document is represented as a binary vector ? {0, 1}|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+23 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Binary incidence matrix
+Anthony and Cleopatra 1 1 1 0 1 1 1 Julius Caesar 1 1 1 1 0 0 0 The Tempest 0 0 0 0 0 1 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 1 1 0 0 1 1
+
+0 0 1 0 0 1 1
+
+1 0 1 0 0 1 0
+
+Each document is represented as a binary vector ? {0, 1}|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+23 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Count matrix
+Anthony and Cleopatra 157 4 232 0 57 2 2 Julius Caesar 73 157 227 10 0 0 0 The Tempest 0 0 0 0 0 3 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 2 2 0 0 8 1
+
+0 0 1 0 0 5 1
+
+1 0 0 0 0 8 5
+
+Each document is now represented as a count vector ? N|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+24 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Count matrix
+Anthony and Cleopatra 157 4 232 0 57 2 2 Julius Caesar 73 157 227 10 0 0 0 The Tempest 0 0 0 0 0 3 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 2 2 0 0 8 1
+
+0 0 1 0 0 5 1
+
+1 0 0 0 0 8 5
+
+Each document is now represented as a count vector ? N|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+24 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document. John is quicker than Mary and Mary is quicker than John are represented the same way.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document. John is quicker than Mary and Mary is quicker than John are represented the same way. This is called a bag of words model.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document. John is quicker than Mary and Mary is quicker than John are represented the same way. This is called a bag of words model. In a sense, this is a step back: The positional index was able to distinguish these two documents.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document. John is quicker than Mary and Mary is quicker than John are represented the same way. This is called a bag of words model. In a sense, this is a step back: The positional index was able to distinguish these two documents. We will look at ?recovering? positional information later in this course.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Bag of words model
+
+We do not consider the order of words in a document. John is quicker than Mary and Mary is quicker than John are represented the same way. This is called a bag of words model. In a sense, this is a step back: The positional index was able to distinguish these two documents. We will look at ?recovering? positional information later in this course. For now: bag of words model
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+25 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because:
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because: A document with tf = 10 occurrences of the term is more relevant than a document with tf = 1 occurrence of the term.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because: A document with tf = 10 occurrences of the term is more relevant than a document with tf = 1 occurrence of the term. But not 10 times more relevant.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because: A document with tf = 10 occurrences of the term is more relevant than a document with tf = 1 occurrence of the term. But not 10 times more relevant. Relevance does not increase proportionally with term frequency.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because: A document with tf = 10 occurrences of the term is more relevant than a document with tf = 1 occurrence of the term. But not 10 times more relevant. Relevance does not increase proportionally with term frequency.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Term frequency tf
+The term frequency tft,d of term t in document d is de?ned as the number of times that t occurs in d. We want to use tf when computing query-document match scores. But how? Raw term frequency is not what we want because: A document with tf = 10 occurrences of the term is more relevant than a document with tf = 1 occurrence of the term. But not 10 times more relevant. Relevance does not increase proportionally with term frequency.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+26 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Instead of raw frequency: Log frequency weighting
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+27 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Instead of raw frequency: Log frequency weighting
+
+The log frequency weight of term t in d is de?ned as follows wt,d = 1 + log10 tft,d 0 if tft,d > 0 otherwise
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+27 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Instead of raw frequency: Log frequency weighting
+
+The log frequency weight of term t in d is de?ned as follows wt,d = 1 + log10 tft,d 0 if tft,d > 0 otherwise
+
+tft,d ? wt,d : 0 ? 0, 1 ? 1, 2 ? 1.3, 10 ? 2, 1000 ? 4, etc.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+27 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Instead of raw frequency: Log frequency weighting
+
+The log frequency weight of term t in d is de?ned as follows wt,d = 1 + log10 tft,d 0 if tft,d > 0 otherwise
+
+tft,d ? wt,d : 0 ? 0, 1 ? 1, 2 ? 1.3, 10 ? 2, 1000 ? 4, etc.
+
+Score for a document-query pair: sum over terms t in both q and d: tf-matching-score(q, d) = t?q?d (1 + log tft,d )
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+27 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Instead of raw frequency: Log frequency weighting
+
+The log frequency weight of term t in d is de?ned as follows wt,d = 1 + log10 tft,d 0 if tft,d > 0 otherwise
+
+tft,d ? wt,d : 0 ? 0, 1 ? 1, 2 ? 1.3, 10 ? 2, 1000 ? 4, etc.
+
+Score for a document-query pair: sum over terms t in both q and d: tf-matching-score(q, d) = t?q?d (1 + log tft,d ) The score is 0 if none of the query terms is present in the document.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+27 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Exercise
+
+Compute the Jaccard matching score and the tf matching score for the following query-document pairs. q: [information on cars] d: ?all you?ve ever wanted to know about cars? q: [information on cars] d: ?information on trucks, information on planes, information on trains? q: [red cars and red trucks] d: ?cops stop red cars more often?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+28 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Outline
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+29 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Frequency in document vs. frequency in collection
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+30 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Frequency in document vs. frequency in collection
+
+In addition, to term frequency (the frequency of the term in the document) . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+30 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Frequency in document vs. frequency in collection
+
+In addition, to term frequency (the frequency of the term in the document) . . . . . . we also want to use the frequency of the term in the collection for weighting and ranking.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+30 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for rare terms
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+31 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for rare terms
+
+Rare terms are more informative than frequent terms.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+31 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for rare terms
+
+Rare terms are more informative than frequent terms. Consider a term in the query that is rare in the collection (e.g., arachnocentric).
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+31 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for rare terms
+
+Rare terms are more informative than frequent terms. Consider a term in the query that is rare in the collection (e.g., arachnocentric). A document containing this term is very likely to be relevant.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+31 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for rare terms
+
+Rare terms are more informative than frequent terms. Consider a term in the query that is rare in the collection (e.g., arachnocentric). A document containing this term is very likely to be relevant. ? We want high weights for rare terms like arachnocentric.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+31 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms. Consider a term in the query that is frequent in the collection (e.g., good, increase, line).
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms. Consider a term in the query that is frequent in the collection (e.g., good, increase, line). A document containing this term is more likely to be relevant than a document that doesn?t . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms. Consider a term in the query that is frequent in the collection (e.g., good, increase, line). A document containing this term is more likely to be relevant than a document that doesn?t . . . . . . but words like good, increase and line are not sure indicators of relevance.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms. Consider a term in the query that is frequent in the collection (e.g., good, increase, line). A document containing this term is more likely to be relevant than a document that doesn?t . . . . . . but words like good, increase and line are not sure indicators of relevance. ? For frequent terms like good, increase, and line, we want positive weights . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Desired weight for frequent terms
+
+Frequent terms are less informative than rare terms. Consider a term in the query that is frequent in the collection (e.g., good, increase, line). A document containing this term is more likely to be relevant than a document that doesn?t . . . . . . but words like good, increase and line are not sure indicators of relevance. ? For frequent terms like good, increase, and line, we want positive weights . . . . . . but lower weights than for rare terms.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+32 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Document frequency
+
+We want high weights for rare terms like arachnocentric. We want low (positive) weights for frequent words like good, increase, and line.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+33 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Document frequency
+
+We want high weights for rare terms like arachnocentric. We want low (positive) weights for frequent words like good, increase, and line. We will use document frequency to factor this into computing the matching score.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+33 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Document frequency
+
+We want high weights for rare terms like arachnocentric. We want low (positive) weights for frequent words like good, increase, and line. We will use document frequency to factor this into computing the matching score. The document frequency is the number of documents in the collection that the term occurs in.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+33 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in. dft is an inverse measure of the informativeness of term t.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in. dft is an inverse measure of the informativeness of term t. We de?ne the idf weight of term t as follows: idft = log10 N dft
+
+(N is the number of documents in the collection.)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in. dft is an inverse measure of the informativeness of term t. We de?ne the idf weight of term t as follows: idft = log10 N dft
+
+(N is the number of documents in the collection.) idft is a measure of the informativeness of the term.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in. dft is an inverse measure of the informativeness of term t. We de?ne the idf weight of term t as follows: idft = log10 N dft
+
+(N is the number of documents in the collection.) idft is a measure of the informativeness of the term. [log N/dft ] instead of [N/dft ] to ?dampen? the e?ect of idf
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+idf weight
+dft is the document frequency, the number of documents that t occurs in. dft is an inverse measure of the informativeness of term t. We de?ne the idf weight of term t as follows: idft = log10 N dft
+
+(N is the number of documents in the collection.) idft is a measure of the informativeness of the term. [log N/dft ] instead of [N/dft ] to ?dampen? the e?ect of idf Note that we use the log transformation for both term frequency and document frequency.
+Sch?tze: Scoring, term weighting, the vector space model u 34 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Examples for idf
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+35 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Examples for idf
+
+Compute idft using the formula: idft = log10
+
+1,000,000
+
+dft
+
+term calpurnia animal sunday ?y under the
+
+dft 1 100 1000 10,000 100,000 1,000,000
+
+idft
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+35 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Examples for idf
+
+Compute idft using the formula: idft = log10
+
+1,000,000
+
+dft
+
+term calpurnia animal sunday ?y under the
+
+dft 1 100 1000 10,000 100,000 1,000,000
+
+idft
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+35 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Examples for idf
+
+Compute idft using the formula: idft = log10
+
+1,000,000
+
+dft
+
+term calpurnia animal sunday ?y under the
+
+dft 1 100 1000 10,000 100,000 1,000,000
+
+idft 6 4 3 2 1 0
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+35 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+E?ect of idf on ranking
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+36 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+E?ect of idf on ranking
+
+idf a?ects the ranking of documents for queries with at least two terms.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+36 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+E?ect of idf on ranking
+
+idf a?ects the ranking of documents for queries with at least two terms. For example, in the query ?arachnocentric line?, idf weighting increases the relative weight of arachnocentric and decreases the relative weight of line.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+36 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+E?ect of idf on ranking
+
+idf a?ects the ranking of documents for queries with at least two terms. For example, in the query ?arachnocentric line?, idf weighting increases the relative weight of arachnocentric and decreases the relative weight of line. idf has little e?ect on ranking for one-term queries.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+36 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Collection frequency vs. Document frequency
+word insurance try collection frequency 10440 10422 document frequency 3997 8760
+
+Collection frequency of t: number of tokens of t in the collection Document frequency of t: number of documents t occurs in
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+37 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Collection frequency vs. Document frequency
+word insurance try collection frequency 10440 10422 document frequency 3997 8760
+
+Collection frequency of t: number of tokens of t in the collection Document frequency of t: number of documents t occurs in Why these numbers?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+37 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Collection frequency vs. Document frequency
+word insurance try collection frequency 10440 10422 document frequency 3997 8760
+
+Collection frequency of t: number of tokens of t in the collection Document frequency of t: number of documents t occurs in Why these numbers? Which word is a better search term (and should get a higher weight)?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+37 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Collection frequency vs. Document frequency
+word insurance try collection frequency 10440 10422 document frequency 3997 8760
+
+Collection frequency of t: number of tokens of t in the collection Document frequency of t: number of documents t occurs in Why these numbers? Which word is a better search term (and should get a higher weight)? This example suggests that df (and idf) is better for weighting than cf (and ?icf?).
+Sch?tze: Scoring, term weighting, the vector space model u 37 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log N dft
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log tf-weight N dft
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log N dft
+
+idf-weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log N dft
+
+Best known weighting scheme in information retrieval
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf weighting
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log N dft
+
+Best known weighting scheme in information retrieval Alternative names: tf.idf, tf x idf
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+38 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: tf-idf
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+39 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: tf-idf
+
+Assign a tf-idf weight for each term t in each document d: wt,d = (1 + log tft,d ) ? log N dft
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+39 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: tf-idf
+
+Assign a tf-idf weight for each term t in each document d: wt,d = (1 + log tft,d ) ? log N dft The tf-idf weight . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+39 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: tf-idf
+
+Assign a tf-idf weight for each term t in each document d: wt,d = (1 + log tft,d ) ? log N dft The tf-idf weight . . .
+. . . increases with the number of occurrences within a document. (term frequency)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+39 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: tf-idf
+
+Assign a tf-idf weight for each term t in each document d: wt,d = (1 + log tft,d ) ? log N dft The tf-idf weight . . .
+. . . increases with the number of occurrences within a document. (term frequency) . . . increases with the rarity of the term in the collection. (inverse document frequency)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+39 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Exercise: Term, collection and document frequency
+Quantity term frequency document frequency collection frequency Symbol tft,d dft cft De?nition number of occurrences of t in d number of documents in the collection that t occurs in total number of occurrences of t in the collection
+
+Relationship between df and cf? Relationship between tf and cf? Relationship between tf and df?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+40 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Outline
+
+1
+
+Recap Why ranked retrieval? Term frequency tf-idf weighting The vector space model
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+41 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Binary incidence matrix
+Anthony and Cleopatra 1 1 1 0 1 1 1 Julius Caesar 1 1 1 1 0 0 0 The Tempest 0 0 0 0 0 1 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 1 1 0 0 1 1
+
+0 0 1 0 0 1 1
+
+1 0 1 0 0 1 0
+
+Each document is represented as a binary vector ? {0, 1}|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+42 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Count matrix
+Anthony and Cleopatra 157 4 232 0 57 2 2 Julius Caesar 73 157 227 10 0 0 0 The Tempest 0 0 0 0 0 3 1 Hamlet Othello Macbeth ...
+
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ...
+
+0 2 2 0 0 8 1
+
+0 0 1 0 0 5 1
+
+1 0 0 0 0 8 5
+
+Each document is now represented as a count vector ? N|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+43 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Binary ? count ? weight matrix
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ... Anthony and Cleopatra 5.25 1.21 8.59 0.0 2.85 1.51 1.37 Julius Caesar 3.18 6.10 2.54 1.54 0.0 0.0 0.0 The Tempest 0.0 0.0 0.0 0.0 0.0 1.90 0.11
+
+Hamlet
+
+Othello
+
+Macbeth
+
+...
+
+0.0 1.0 1.51 0.0 0.0 0.12 4.15
+
+0.0 0.0 0.25 0.0 0.0 5.25 0.25
+
+0.35 0.0 0.0 0.0 0.0 0.88 1.95
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+44 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Binary ? count ? weight matrix
+Anthony Brutus Caesar Calpurnia Cleopatra mercy worser ... Anthony and Cleopatra 5.25 1.21 8.59 0.0 2.85 1.51 1.37 Julius Caesar 3.18 6.10 2.54 1.54 0.0 0.0 0.0 The Tempest 0.0 0.0 0.0 0.0 0.0 1.90 0.11
+
+Hamlet
+
+Othello
+
+Macbeth
+
+...
+
+0.0 1.0 1.51 0.0 0.0 0.12 4.15
+
+0.0 0.0 0.25 0.0 0.0 5.25 0.25
+
+0.35 0.0 0.0 0.0 0.0 0.88 1.95
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+44 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | . So we have a |V |-dimensional real-valued vector space.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | . So we have a |V |-dimensional real-valued vector space. Terms are axes of the space.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | . So we have a |V |-dimensional real-valued vector space. Terms are axes of the space. Documents are points or vectors in this space.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | . So we have a |V |-dimensional real-valued vector space. Terms are axes of the space. Documents are points or vectors in this space. Very high-dimensional: tens of millions of dimensions when you apply this to web search engines
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Documents as vectors
+
+Each document is now represented as a real-valued vector of tf-idf weights ? R|V | . So we have a |V |-dimensional real-valued vector space. Terms are axes of the space. Documents are points or vectors in this space. Very high-dimensional: tens of millions of dimensions when you apply this to web search engines Each vector is very sparse - most entries are zero.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+45 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space Key idea 2: Rank documents according to their proximity to the query
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space Key idea 2: Rank documents according to their proximity to the query proximity = similarity
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space Key idea 2: Rank documents according to their proximity to the query proximity = similarity proximity ? negative distance
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space Key idea 2: Rank documents according to their proximity to the query proximity = similarity proximity ? negative distance Recall: We?re doing this because we want to get away from the you?re-either-in-or-out, feast-or-famine Boolean model.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Queries as vectors
+
+Key idea 1: do the same for queries: represent them as vectors in the high-dimensional space Key idea 2: Rank documents according to their proximity to the query proximity = similarity proximity ? negative distance Recall: We?re doing this because we want to get away from the you?re-either-in-or-out, feast-or-famine Boolean model. Instead: rank relevant documents higher than nonrelevant documents
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+46 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+First cut: (negative) distance between two points
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+First cut: (negative) distance between two points ( = distance between the end points of the two vectors)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+First cut: (negative) distance between two points ( = distance between the end points of the two vectors) Euclidean distance?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+First cut: (negative) distance between two points ( = distance between the end points of the two vectors) Euclidean distance? Euclidean distance is a bad idea . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+How do we formalize vector space similarity?
+
+First cut: (negative) distance between two points ( = distance between the end points of the two vectors) Euclidean distance? Euclidean distance is a bad idea . . . . . . because Euclidean distance is large for vectors of di?erent lengths.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+47 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Why distance is a bad idea
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+48 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Why distance is a bad idea
+poor 1 d1: Ranks of starving poets swell q: [rich poor] d2: Rich poor gap grows
+
+0 0
+
+1
+
+d3: Record baseball salaries in 2010 rich
+
+The Euclidean distance of q and d2 is large although the distribution of terms in the query q and the distribution of terms in the document d2 are very similar.
+Sch?tze: Scoring, term weighting, the vector space model u 48 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Why distance is a bad idea
+poor 1 d1: Ranks of starving poets swell q: [rich poor] d2: Rich poor gap grows
+
+0 0
+
+1
+
+d3: Record baseball salaries in 2010 rich
+
+The Euclidean distance of q and d2 is large although the distribution of terms in the query q and the distribution of terms in the document d2 are very similar. Questions about basic vector space setup?
+Sch?tze: Scoring, term weighting, the vector space model u 48 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Rank documents according to angle with query
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Rank documents according to angle with query Thought experiment: take a document d and append it to itself. Call this document d ? . d ? is twice as long as d.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Rank documents according to angle with query Thought experiment: take a document d and append it to itself. Call this document d ? . d ? is twice as long as d. ?Semantically? d and d ? have the same content.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Rank documents according to angle with query Thought experiment: take a document d and append it to itself. Call this document d ? . d ? is twice as long as d. ?Semantically? d and d ? have the same content. The angle between the two documents is 0, corresponding to maximal similarity . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Use angle instead of distance
+
+Rank documents according to angle with query Thought experiment: take a document d and append it to itself. Call this document d ? . d ? is twice as long as d. ?Semantically? d and d ? have the same content. The angle between the two documents is 0, corresponding to maximal similarity . . . . . . even though the Euclidean distance between the two documents can be quite large.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+49 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+From angles to cosines
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+50 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+From angles to cosines
+
+The following two notions are equivalent.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+50 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+From angles to cosines
+
+The following two notions are equivalent.
+Rank documents according to the angle between query and document in decreasing order
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+50 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+From angles to cosines
+
+The following two notions are equivalent.
+Rank documents according to the angle between query and document in decreasing order Rank documents according to cosine(query,document) in increasing order
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+50 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+From angles to cosines
+
+The following two notions are equivalent.
+Rank documents according to the angle between query and document in decreasing order Rank documents according to cosine(query,document) in increasing order
+
+Cosine is a monotonically decreasing function of the angle for the interval [0? , 180? ]
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+50 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+51 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+51 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine? A vector can be (length-) normalized by dividing each of its components by its length ? here we use the L2 norm: ||x||2 =
+i
+
+xi2
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine? A vector can be (length-) normalized by dividing each of its components by its length ? here we use the L2 norm: ||x||2 =
+i
+
+xi2
+
+This maps vectors onto the unit sphere . . .
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine? A vector can be (length-) normalized by dividing each of its components by its length ? here we use the L2 norm: ||x||2 =
+i
+
+xi2 xi2 = 1.0
+
+This maps vectors onto the unit sphere . . . . . . since after normalization: ||x||2 =
+i
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine? A vector can be (length-) normalized by dividing each of its components by its length ? here we use the L2 norm: ||x||2 =
+i
+
+xi2 xi2 = 1.0
+
+This maps vectors onto the unit sphere . . . . . . since after normalization: ||x||2 =
+i
+
+As a result, longer documents and shorter documents have weights of the same order of magnitude.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Length normalization
+How do we compute the cosine? A vector can be (length-) normalized by dividing each of its components by its length ? here we use the L2 norm: ||x||2 =
+i
+
+xi2 xi2 = 1.0
+
+This maps vectors onto the unit sphere . . . . . . since after normalization: ||x||2 =
+i
+
+As a result, longer documents and shorter documents have weights of the same order of magnitude. E?ect on the two documents d and d ? (d appended to itself) from earlier slide: they have identical vectors after length-normalization.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+52 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity between query and document
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+53 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity between query and document
+
+cos(q, d) = sim(q, d) =
+
+|q||d|
+
+q?d
+
+=
+
+|V | i =1 qi di |V | 2 i =1 qi |V | 2 i =1 di
+
+qi is the tf-idf weight of term i in the query.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+53 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity between query and document
+
+cos(q, d) = sim(q, d) =
+
+|q||d|
+
+q?d
+
+=
+
+|V | i =1 qi di |V | 2 i =1 qi |V | 2 i =1 di
+
+qi is the tf-idf weight of term i in the query. di is the tf-idf weight of term i in the document.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+53 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity between query and document
+
+cos(q, d) = sim(q, d) =
+
+|q||d|
+
+q?d
+
+=
+
+|V | i =1 qi di |V | 2 i =1 qi |V | 2 i =1 di
+
+qi is the tf-idf weight of term i in the query. di is the tf-idf weight of term i in the document. |q| and |d| are the lengths of q and d.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+53 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity between query and document
+
+cos(q, d) = sim(q, d) =
+
+|q||d|
+
+q?d
+
+=
+
+|V | i =1 qi di |V | 2 i =1 qi |V | 2 i =1 di
+
+qi is the tf-idf weight of term i in the query. di is the tf-idf weight of term i in the document. This is the cosine similarity of q and d . . . . . . or, equivalently, the cosine of the angle between q and d. |q| and |d| are the lengths of q and d.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+53 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine for normalized vectors
+
+For normalized vectors, the cosine is equivalent to the dot product or scalar product. cos(q, d) = q ? d =
+i
+
+(if q and d are length-normalized).
+
+qi ? di
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+54 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity illustrated
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+55 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine similarity illustrated
+
+poor
+1
+
+v(d1 ) v (q) v(d2 ) ?
+
+0 0
+
+v(d3 )
+1
+
+rich
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+55 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+
+How similar are these novels? SaS: Sense and Sensibility PaP: Pride and Prejudice WH: Wuthering Heights
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+56 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+
+How similar are these novels? SaS: Sense and Sensibility PaP: Pride and Prejudice WH: Wuthering Heights
+
+term frequencies (counts) term affection jealous gossip wuthering SaS 115 10 2 0 PaP 58 7 0 0 WH 20 11 6 38
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+56 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+
+term frequencies (counts) term affection jealous gossip wuthering SaS 115 10 2 0 PaP 58 7 0 0 WH 20 11 6 38
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+57 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+
+term frequencies (counts) term affection jealous gossip wuthering SaS 115 10 2 0 PaP 58 7 0 0 WH 20 11 6 38
+
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+57 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+
+term frequencies (counts) term affection jealous gossip wuthering SaS 115 10 2 0 PaP 58 7 0 0 WH 20 11 6 38
+
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58
+
+(To simplify this example, we don?t do idf weighting.)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+57 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58 log frequency weighting & cosine normalization term SaS PaP affection 0.789 0.832 jealous 0.515 0.555 gossip 0.335 0.0 wuthering 0.0 0.0
+
+WH 0.524 0.465 0.405 0.588
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58 log frequency weighting & cosine normalization term SaS PaP affection 0.789 0.832 jealous 0.515 0.555 gossip 0.335 0.0 wuthering 0.0 0.0
+
+WH 0.524 0.465 0.405 0.588
+
+cos(SaS,PaP) ? 0.789 ? 0.832 + 0.515 ? 0.555 + 0.335 ? 0.0 + 0.0 ? 0.0 ? 0.94.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58 log frequency weighting & cosine normalization term SaS PaP affection 0.789 0.832 jealous 0.515 0.555 gossip 0.335 0.0 wuthering 0.0 0.0
+
+WH 0.524 0.465 0.405 0.588
+
+cos(SaS,PaP) ? 0.789 ? 0.832 + 0.515 ? 0.555 + 0.335 ? 0.0 + 0.0 ? 0.0 ? 0.94. cos(SaS,WH) ? 0.79
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58 log frequency weighting & cosine normalization term SaS PaP affection 0.789 0.832 jealous 0.515 0.555 gossip 0.335 0.0 wuthering 0.0 0.0
+
+WH 0.524 0.465 0.405 0.588
+
+cos(SaS,PaP) ? 0.789 ? 0.832 + 0.515 ? 0.555 + 0.335 ? 0.0 + 0.0 ? 0.0 ? 0.94. cos(SaS,WH) ? 0.79 cos(PaP,WH) ? 0.69
+Sch?tze: Scoring, term weighting, the vector space model u 58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Cosine: Example
+log frequency weighting term affection jealous gossip wuthering SaS 3.06 2.0 1.30 0 PaP 2.76 1.85 0 0 WH 2.30 2.04 1.78 2.58 log frequency weighting & cosine normalization term SaS PaP affection 0.789 0.832 jealous 0.515 0.555 gossip 0.335 0.0 wuthering 0.0 0.0
+
+WH 0.524 0.465 0.405 0.588
+
+cos(SaS,PaP) ? 0.789 ? 0.832 + 0.515 ? 0.555 + 0.335 ? 0.0 + 0.0 ? 0.0 ? 0.94. cos(SaS,WH) ? 0.79 cos(PaP,WH) ? 0.69 Why do we have cos(SaS,PaP) > cos(SAS,WH)?
+Sch?tze: Scoring, term weighting, the vector space model u 58 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Computing the cosine score
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+59 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Computing the cosine score
+CosineScore(q) 1 ?oat Scores[N] = 0 2 ?oat Length[N] 3 for each query term t 4 do calculate wt,q and fetch postings list for t 5 for each pair(d, tft,d ) in postings list 6 do Scores[d]+ = wt,d ? wt,q 7 Read the array Length 8 for each d 9 do Scores[d] = Scores[d]/Length[d] 10 return Top K components of Scores[]
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+59 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Components of tf-idf weighting
+Term frequency n (natural) tft,d l (logarithm) a (augmented) b (boolean) L (log ave) 1 + log(tft,d ) 0.5 +
+0.5?tft,d maxt (tft,d )
+
+Document frequency n (no) 1 t (idf) p (prob idf) log
+N
+
+Normalization n (none) c (cosine) 1 ?
+1 2 2 2 w1 +w2 +...+wM
+
+dft
+N?df t df t }
+
+max{0, log
+
+u (pivoted unique) b (byte size)
+
+1/u 1/CharLength? , ?<1
+
+1 if tf t,d > 0 0 otherwise
+1+log(tf t,d ) 1+log(avet?d (tf t,d ))
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+60 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Components of tf-idf weighting
+Term frequency n (natural) tft,d l (logarithm) a (augmented) b (boolean) L (log ave) 1 + log(tft,d ) 0.5 +
+0.5?tft,d maxt (tft,d )
+
+Document frequency n (no) 1 t (idf) p (prob idf) log
+N
+
+Normalization n (none) c (cosine) 1 ?
+1 2 2 2 w1 +w2 +...+wM
+
+dft
+N?df t df t }
+
+max{0, log
+
+u (pivoted unique) b (byte size)
+
+1/u 1/CharLength? , ?<1
+
+1 if tf t,d > 0 0 otherwise
+1+log(tf t,d ) 1+log(avet?d (tf t,d ))
+
+Best known combination of weighting options
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+60 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Components of tf-idf weighting
+Term frequency n (natural) tft,d l (logarithm) a (augmented) b (boolean) L (log ave) 1 + log(tft,d ) 0.5 +
+0.5?tft,d maxt (tft,d )
+
+Document frequency n (no) 1 t (idf) p (prob idf) log
+N
+
+Normalization n (none) c (cosine) 1 ?
+1 2 2 2 w1 +w2 +...+wM
+
+dft
+N?df t df t }
+
+max{0, log
+
+u (pivoted unique) b (byte size)
+
+1/u 1/CharLength? , ?<1
+
+1 if tf t,d > 0 0 otherwise
+1+log(tf t,d ) 1+log(avet?d (tf t,d ))
+
+Default: no weighting
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+60 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents.
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn document: logarithmic tf, no df weighting, cosine normalization
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn document: logarithmic tf, no df weighting, cosine normalization query: logarithmic tf, idf, no normalization
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn document: logarithmic tf, no df weighting, cosine normalization query: logarithmic tf, idf, no normalization Isn?t it bad to not idf-weight the document?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn document: logarithmic tf, no df weighting, cosine normalization query: logarithmic tf, idf, no normalization Isn?t it bad to not idf-weight the document? Example query: ?best car insurance?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example
+
+We often use di?erent weightings for queries and documents. Notation: ddd.qqq Example: lnc.ltn document: logarithmic tf, no df weighting, cosine normalization query: logarithmic tf, idf, no normalization Isn?t it bad to not idf-weight the document? Example query: ?best car insurance? Example document: ?car insurance auto insurance?
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+61 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word tf-raw auto best car insurance Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight tf-wght query df idf weight tf-raw document tf-wght weight product n?lized
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght query df idf weight tf-raw document tf-wght weight product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght query df idf weight tf-raw 1 0 1 2 document tf-wght weight product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df idf weight tf-raw 1 0 1 2 document tf-wght weight product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df idf weight tf-raw 1 0 1 2 document tf-wght weight 1 0 1 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf weight tf-raw 1 0 1 2 document tf-wght weight 1 0 1 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight tf-raw 1 0 1 2 document tf-wght weight 1 0 1 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 0 1 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 0 1 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 1 0 0 1 1 1.3 1.3 product n?lized
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 1 0 0 1 1 1.3 1.3 product n?lized 0.52 0 0.52 0.68
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight ? 12 + 02 + 12 + 1.32 ? 1.92 1/1.92 ? 0.52 1.3/1.92 ? 0.68
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 1 0 0 1 1 1.3 1.3 product n?lized 0.52 0 0.52 0.68 0 0 1.04 2.04
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 1 0 0 1 1 1.3 1.3 product n?lized 0.52 0 0.52 0.68 0 0 1.04 2.04
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Final similarity score between query and document:
+
+i
+
+wqi ? wdi = 0 + 0 + 1.04 + 2.04 = 3.08
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word auto best car insurance tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght weight 1 1 0 0 1 1 1.3 1.3 product n?lized 0.52 0 0.52 0.68 0 0 1.04 2.04
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight
+
+Final similarity score between query and document: Questions?
+
+i
+
+wqi ? wdi = 0 + 0 + 1.04 + 2.04 = 3.08
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+62 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Represent the query as a weighted tf-idf vector
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Represent the query as a weighted tf-idf vector Represent each document as a weighted tf-idf vector
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Represent the query as a weighted tf-idf vector Represent each document as a weighted tf-idf vector Compute the cosine similarity between the query vector and each document vector
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Represent the query as a weighted tf-idf vector Represent each document as a weighted tf-idf vector Compute the cosine similarity between the query vector and each document vector Rank documents with respect to the query
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Summary: Ranked retrieval in the vector space model
+
+Represent the query as a weighted tf-idf vector Represent each document as a weighted tf-idf vector Compute the cosine similarity between the query vector and each document vector Rank documents with respect to the query Return the top K (e.g., K = 10) to the user
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+63 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Take-away today
+
+Ranking search results: why it is important (as opposed to just presenting a set of unordered Boolean results) Term frequency: This is a key ingredient for ranking. Tf-idf ranking: best known traditional ranking scheme Vector space model: Important formal model for information retrieval (along with Boolean and probabilistic models)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+64 / 65
+
+Recap
+
+Why ranked retrieval?
+
+Term frequency
+
+tf-idf weighting
+
+The vector space model
+
+Resources
+
+Chapters 6 and 7 of IIR Resources at http://cislmu.org
+Vector space for dummies Exploring the similarity space (Mo?at and Zobel, 2005) Okapi BM25 (a state-of-the-art weighting method, 11.4.3 of IIR)
+
+Sch?tze: Scoring, term weighting, the vector space model u
+
+65 / 65
+
+

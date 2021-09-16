@@ -1,0 +1,176 @@
+Introduction to Database Systems Normalization
+
+Werner Nutt
+
+1
+
+Normalization
+1. Anomalies
+
+1. 2. 3.
+
+Anomalies Boyce-Codd Normal Form 3rd Normal Form
+
+2
+
+Anomalies
+The goal of relational schema design is to avoid anomalies and redundancy: ? Update anomaly : one occurrence of a fact is changed, but not all occurrences ? Deletion anomaly : a valid fact is lost when a tuple is deleted
+
+3
+
+Example of Bad Design
+Drinkers(name, addr, beersLiked, manf, favBeer) name Janeway Janeway Spock addr Voyager ??? Enterprise beersLiked Bud WickedAle Bud manf A.B. Pete?s ??? favBeer WickedAle ??? Bud
+
+Data is redundant, because each of the ???s can be figured out by using the FDs ? name ? addr favBeer ? beersLiked ? manf
+4
+
+This Bad Design Also Exhibits Anomalies
+
+name Janeway Janeway Spock
+
+addr Voyager Voyager Enterprise
+
+beersLiked Bud WickedAle Bud
+
+manf A.B. Pete?s A.B.
+
+favBeer WickedAle WickedAle Bud
+
+? Update anomaly: if Janeway is transferred to Intrepid, will we remember to change each of her tuples? ? Deletion anomaly: If nobody likes Bud, we lose track of the fact that Anheuser-Busch manufactures Bud.
+5
+
+Normalization
+2. Boyce-Codd Normal Form
+
+1. 2. 3.
+
+Anomalies Boyce-Codd Normal Form 3rd Normal Form
+
+6
+
+Boyce-Codd Normal Form
+A relation R is in Boyce-Codd Normal Form (BCNF) if whenever X ? A is a nontrivial FD that holds in R, then X is a superkey Remember: ? nontrivial means A ? X ? a superkey is any superset of a key (not necessarily a strict superset) ?Each attribute must describe the key, the whole key, and nothing but the key?
+7
+
+Example
+Drinkers(name, addr, beersLiked, manf, favBeer) FDs: name ? addr favBeer, beersLiked ? manf ? The only key is {name, beersLiked} ? In each FD above, the left side is not a superkey ? Any one of these FDs shows Drinkers is not in BCNF Each of the above FDs is a partial dependency, i.e., the right side depends only on a part of the key
+8
+
+Another Example
+Beers(name, manf, manfAddr) FD?s: name ? manf, manf ? manfAddr ? The only key is {name} ? name ? manf does not violate BCNF, ? ? but manf ? manfAddr does The second FD is a transitive dependency, because manfAddr depend on manf, which is not part of any key
+
+9
+
+Decomposition into BCNF
+Given: relation R with FDs F Goal: decompose R into relations R1,?,Rm such that ? each Ri is a projection of R ? each Ri is in BCNF (wrt the projection of F) ? R is the natural join of R1,?,Rm Intuition: R is broken into pieces ? that contain the same information as R, ? but are free of redundancy
+10
+
+The Algorithm: Divide and Conquer
+? Look in F for an FD X ? B that violates BCNF
+(If any FD following from F violates BCNF, then there is surely an FD in F itself that violates BCNF)
+
+? Compute X+
+(X+ does not contain all attributes of R, otherwise X would be superkey)
+
+? Decompose R using X ? B, i.e., replace R by relations with schemas R1 = X+ R2 = (R ? X+) ? X ? Compute the projections F1, F2 of F on R1, R2 ? Continue with R1 ,F1 and R2 ,F2
+11
+
+Decomposition Picture
+X+ R1
+
+R-X +
+
+X
+
+X +-X
+
+R2 R
+
+12
+
+Example
+Drinkers(name, addr, beersLiked, manf, favBeer) F = {name ? addr, name ? favBeer, beersLiked ? manf} ? Pick the BCNF violation name ? addr ? Close the left side: {name}+ = {name, addr, favBeer} ? Decomposed relations: Drinkers1(name, addr, favBeer) Drinkers2(name, beersLiked, manf)
+13
+
+Example (cntd)
+Projecting FDs: ? For Drinkers1(name, addr, favBeer), the only relevant FDs are name ? addr and name ? favBeer: ? the only key is {name} ? Drinkers1 is in BCNF ? For Drinkers2(name, beersLiked, manf), the only relevant FD is beersLiked ? manf: ? the only key is {name, beersLiked} ? violation of BCNF (because there is partial dependency) ? Continue with Drinkers2
+14
+
+Example (cntd)
+Drinkers2(name, beersLiked, manf) F2 = {beersLiked ? manf} ? Pick the BCNF violation beersLiked ? manf ? Close the left side: {beersLiked}+ = {beersLiked, manf} ? Decomposed relations: Drinkers3(beersLiked, manf) Drinkers4(name, beersLiked)
+15
+
+Example (cntd)
+Projecting FDs: ? For Drinkers3(beersLiked, manf), the only relevant FD is beersLiked ? manf: ? the only key is {beersLiked} ? Drinkers3 is in BCNF ? For Drinkers4(name, beersLiked), there is no relevant FD: ? the only key is {name, beersLiked} ? Drinkers4 is in BCNF
+
+16
+
+Example (concluded)
+We have decomposed Drinkers(name, addr, beersLiked, manf, favBeer) into ? Drinkers1(name, addr, favBeer) ? Drinkers3(beersLiked, manf) ? Drinkers4(name, beersLiked) Notice: ? Drinkers1 is about drinkers ? Drinkers3 is about beers ? Drinkers4 is about the relationship between drinkers and the beers they like
+17
+
+Normalization
+3. 3rd Normal Form
+
+1. 2. 3.
+
+Anomalies Boyce-Codd Normal Form 3rd Normal Form
+
+18
+
+Third Normal Form ? Motivation
+There is one structure of FDs that causes trouble when we decompose: ? AB ? C and C ? B Examples: ? A = street address, B = city, C = zip code ? A = lecturer, B = hour, C = course ? There are two keys, { A, B } and { A, C } ? C ? B is a BCNF violation, so we must decompose into ? AC ? BC
+
+19
+
+We Cannot Enforce FDs
+
+If we decompose ABC into AC and BC, then we cannot enforce AB ? C by checking FDs in the decomposed relations
+
+Example with A = street, B = city C = zip on the next slide
+20
+
+An Unenforceable FD
+street 545 Tech Sq. 545 Tech Sq. zip 02138 02139 city Cambridge Cambridge zip 02138 02139
+
+Join tuples with equal zip codes.
+street 545 Tech Sq. 545 Tech Sq. city Cambridge Cambridge zip 02138 02139
+
+Although no FDs were violated in the decomposed relations, FD street city ? zip is violated by the database as a whole
+21
+
+3NF Lets Us Avoid This Problem
+3rd Normal Form (3NF) modifies the BCNF condition so we do not have to decompose in this problem situation ? An attribute is prime if it is a member of any key ? X ? A violates 3NF if and only if ? X is not a superkey ? and also A is not prime
+
+22
+
+Back to the ABC Example
+On ABC, we have FDs AB ? C and C ? B ? There are two keys: AB and AC ? A, B, and C are each prime ? Although C ? B violates BCNF, it does not violate 3NF
+
+23
+
+What 3NF and BCNF Give You
+There are two important properties of a decomposition: Losslessness: It should be possible to project the original relation onto the decomposed schema and then reconstruct the original by a natural join Dependency Preservation: It should be possible to check in the projected relations whether all the given FDs are satisfied
+
+24
+
+3NF and BCNF Continued
+? We can get (1) with a BCNF decomposition ? We can get both (1) and (2) with a 3NF decomposition ? But we can?t always get (1) and (2) with a BCNF decomposition ?street-city-zip? is an example
+
+25
+
+Exercise
+Consider the relation PI (= passengerInfo) with the attributes PI(FlightNo, Date, DepartureTime, SeatNo, TicketNo, Name, Address, LuggageId, Weight) and the FDs ? ? ? ? ? ? FlightNo, Date ? DepartureTime FlightNo, Date, TicketNo ? SeatNo TicketNo ? Name Address LuggageId ? Weight Date TicketNo
+
+Is the relation in Boyce-Codd normal form? If not, decompose into relation that are in BCNF. Is the resulting decomposition dependency preserving?
+
+26
+
+Exercise
+Let R be a relation with attributes ABCD. Consider the following combinations of FDs on R: ? AB ? C, C ? D, D ? A ? B ? C, B ? D ? AB ? C, BC ? D, CD ? A, AD ? B ? A ? B, B ? C, C ? D, D ? A For each collection of FDs do the following: 1. Indicate all the BCNF violations 2. Decompose the relations into collections of relations that are in BCNF 3. Are the decompositions dependency preserving? 27
+
+References
+In preparing the lectures I have used several sources. The main ones are the following: Books: ? A First Course in Database Systems, by J. Ullman and J. Widom ? Fundamentals of Database Systems, by R. Elmasri and S. Navathe Slides: ? The slides of this chapter are based on slides prepared by Jeff Ullman for his introductory course on database systems at Stanford University
+28
+
+

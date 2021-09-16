@@ -1,0 +1,256 @@
+Introduction to Database Systems Functional Dependencies
+
+Werner Nutt
+
+1
+
+Functional Dependencies
+1. Meaning of FDs
+
+1. 2. 3.
+
+Meaning of FDs Keys and Superkeys Inferring FDs
+
+2
+
+Functional Dependencies
+? A FD is written X ? A or X ? Y ? Notation: X, Y, Z represent sets of attributes; A, B, C,? represent single attributes ? X ? A (?X determines A?) is an assertion about a relation R: whenever two tuples of R agree on all the attributes of X, then they must also agree on the attribute A, or t1[X] = t2[X] implies t1[A] = t2[A] for all t1, t2 in R (analogously for X ? Y) ? Convention:We say ?X ? A holds in R? ? Notation: No set braces in sets of attributes: just ABC, rather than {A,B,C }.
+3
+
+Example
+Table Drinkers(name, addr, beersLiked, manf, favBeer)
+
+name Janeway Janeway Spock
+
+addr Voyager Voyager Enterprise
+
+beersLiked Bud WickedAle Bud
+
+manf A.B. Pete?s A.B.
+
+favBeer WickedAle WickedAle Bud
+
+Reasonable FD?s to assert: 1. name ? addr 2. name ? favBeer 3. beersLiked ? manf
+
+4
+
+Example FDs
+
+name Janeway Janeway Spock
+
+addr Voyager Voyager Enterprise
+
+beersLiked Bud WickedAle Bud
+
+manf A.B. Pete?s A.B.
+
+favBeer WickedAle WickedAle Bud
+
+Because of name ? addr
+
+Because of name ? favBeer
+
+Because of beersLiked ? manf
+
+5
+
+FD?s With Multiple Attributes
+FDs with more than one attribute on the right don?t increase expressivity ? ? but allow for convenient shorthands that combine FDs Example: name ? addr and name ? favBeer become name ? addr favBeer More than one attribute on the left may be essential. Example: bar beer ? price
+
+6
+
+Functional Dependencies
+2. Keys and Superkeys
+
+1. 2. 3.
+
+Meaning of FDs Keys and Superkeys Inferring FDs
+
+7
+
+Keys of Relations
+R relation, K a set of attributes of R ? K is a superkey for relation R if K functionally determines all of R ? K is a key for R if K is a superkey, but no proper subset of K is a superkey (that is, K is a minimal superkey)
+
+Sometimes we call ?keys? also ?candidate keys?, to indicate they are candidates for choosing the primary key
+8
+
+Example
+Drinkers(name, addr, beersLiked, manf, favBeer) We have name ? addr favBeer beersLiked ? manf Therefore, {name, beersLiked} determine all the other attributes Hence, {name, beersLiked} is a superkey
+9
+
+Example (cntd.)
+Neither {name} nor {beersLiked} is a superkey: ? name ? manf doesn?t hold ? beersLiked ? addr doesn?t hold Hence: {name, beersLiked} is a key There are no other keys, but lots of superkeys: Any superset of {name, beersLiked} is a superkey
+
+10
+
+ER and Relational Keys
+? Keys in ER concern entities ? Keys in relations concern tuples ? Usually, one tuple corresponds to one entity, so the ideas are similar ? But ? in poor relational designs, one tuple may represent several entities, ? so ER keys and relational keys are different
+
+11
+
+Example Data
+name Janeway Janeway Spock addr Voyager Voyager Enterprise beersLiked Bud WickedAle Bud manf A.B. Pete?s A.B. favBeer WickedAle WickedAle Bud
+
+The relational key is {name, beersLiked} But in E/R, ? name is a key for Drinkers ? beersLiked is a key for Beers. The relation contains ? 2 tuples for Janeway entity ? 2 tuples for Bud entity.
+
+12
+
+Where Do Keys Come From?
+1. Just assert one key K ? The only FDs are K ? A for all attributes A 2. Assert FDs and deduce the keys by systematic exploration ? ER model gives us FDs from entity-set keys and from many-one relationships ? Other FDs we may know from our domain knowledge
+(?no two courses take place in a room at the same time?)
+13
+
+Functional Dependencies
+3. Inferring FDs
+
+1. 2. 3.
+
+Meaning of FDs Keys and Superkeys Inferring FDs
+
+14
+
+Inferring FDs
+We are given FD?s X1 ? A1, X2 ? A2,?, Xn ? An , and we want to know whether an FD Y?B must hold in any relation that satisfies the given FDs Example: If A ? B and B ? C hold, then surely A ? C holds
+
+Important for design of good relation schemas
+15
+
+Inference Test
+We are given a set of FDs and want to know whether Y?B follows from the given FDs. Test: We consider two tuples and assume they agree in all attributes of Y: Y 0000000. . . 0 00000?? . . .?
+
+16
+
+Inference Test (cntd.)
+Apply the given FDs to infer that these tuples must also agree on certain other attributes ? If B is one of these attributes, then Y ? B is true ? Otherwise, the two tuples, with any forced equalities, form a two-tuple relation ? that satisfies the given FDs ? but does not satisfy Y ? B. This would show that Y ? B does not follow from the given FDs.
+17
+
+Inference Test: Example
+Drinkers(name, addr, beersLiked, manf, favBeer) with 1. name ? addr 2. name ? favBeer 3. beersLiked ? manf Which of the FDs below follow from the given FDs? 4. addr ? favBeer 5. name beersLiked ? favBeer
+
+18
+
+Closure Test
+An easier test is based on the concept of attribute closure ? Let R be a relation, F a set of FDs over R, Y a set of attributes of R. ? The closure of Y with respect to F, written Y+, consists of all attributes that are determined by Y, given F. ? Observation: Y ? B follows from F if and only if B ? Y+
+19
+
+The Closure Algorithm
+? Initialization: Y+ = Y ? Loop: ? Look for an FD X ? A in F such that X ? Y+ and A ? Y+ ? Add A to Y+ ? Until: there is no applicable FD left in F ? Output: Y+
+
+This is a typical example of a fixpoint algorithm
+
+20
+
+Closure Algorithm: The Idea
+
+X Y+
+
+A new Y+
+
+21
+
+Example
+Contracts(cno, supplno, projno, depno, partno, qty, value) Short: CSPrDPaQV A designer has found the following set of FDs: ? C is a key, i.e., C ? SPrDPaQV ? A project purchases each part using a single contract, PrPa ? C ? A department purchases at most one part from a supplier, SD ? Pa His colleague has come up with a slightly different set: ? A project purchases each part using a single contract, PrPa ? C ? A contract determines project, supplier and department, C ? PrSD ? SPrD is a key, SDPr ? CPaQV Are the findings of the second designer different from those of the first?
+22
+
+Finding All Implied FDs
+We know how we can determine whether one FD follows from a set of FDs F = { X1 ? A1,?, Xn ? An } Question: How can we find all such FDs? Motivation: To get a better schema, we ?normalize?, i.e., we break one relation schema into two or more schemas.
+
+23
+
+Finding All Implied FD?s: Example
+Relation R with attributes ABCD, with FD?s AB ? C, C ? D, D ? A. Decompose R into ABC, AD, (i.e., project onto ABC and AD) Question: What FDs hold in ABC ? Answer: Not only AB ? C, but also C ? A !
+
+24
+
+Why?
+ABCD a1b1cd1 a2b2cd2 d1=d2 because C?D a1=a2 because D?A a1b1c a2b2c
+
+comes from ABC
+
+Thus, tuples in the projection with equal Cs have equal As: C ? A.
+25
+
+Projecting FDs
+How can we find the FDs that hold on the projection of R? Basic Idea: 1. Start with the given FDs 2. Find all nontrivial FDs that follow from the given FDs (nontrivial = left and right sides disjoint) 3. Restrict to those FDs that involve only attributes of the projected schema
+26
+
+A Simple, Exponential Algorithm
+1. For each set of attributes X, compute X+ 2. Add X ? A for all A ? X+ ? X 3. However, drop XY ? A whenever we discover X ? A
+(Because XY ? A follows from X ? A in any projection)
+
+4. Finally, return only FDs involving projected attributes
+
+27
+
+Optimizations
+Suppose that Z is the set of all attributes of R. Then: ? ?+ = ? ? Z+ = Z ? If X ? Y and X + = Z then Y + = Z
+
+This can be used for optimizations!
+28
+
+Example
+Relation ABC with FDs A ? B and B ? C Project onto AC ? A+ = ABC ? A ? B, A ? C
+(Optimization: We do not need to compute AB+ or AC+ )
+
+? B+ = BC ? B ? C ? C+ = C ? nothing ? BC+ = BC ? nothing Resulting FDs: A ? B, A ? C, and B ? C. Projection onto AC: A ? C.
+(The only FD that involves a subset of { A,C })
+29
+
+A Geometric View of FDs
+? We consider the set of all instances of a particular relation R ? That is, ? all finite sets of tuples ? that have the proper number of components. ? Each instance is a point in this space
+
+30
+
+Example: R(A,B)
+
+{(1,2), (3,4)}
+
+{} {(1,2), (3,4), (1,3)}
+
+{(5,1)}
+
+etc.
+
+31
+
+An FD is a Subset of Instances
+? For each FD X ? A, there is the subset of all instances that satisfy the FD ? Thus, we can identify an FD with a region in the space ? An FD is trivial if and only if it is represented by the entire space Example: A ? A.
+32
+
+Example: A ? B for R(A,B)
+
+{(1,2), (3,4)}
+
+A?B
+{} {(1,2), (3,4), (1,3)} {(5,1)}
+
+33
+
+Representing Sets of FDs
+If each FD is a set of relation instances, then a collection of FDs corresponds to the intersection of those sets
+(Intersection = all instances that satisfy all of the FDs)
+
+Instances satisfying A ? B, B ? C, and CD ? A
+
+A?B B?C CD ? A
+34
+
+Entailment of FDs
+F = { X1 ? A1,?,Xn ? An } set of FDs ? An FD Y ? B follows from F or is entailed by F if every instance that satisfies all FDs in F also satisfies Y ? B
+
+This can be visualized: ? If Y ? B follows from the set F = { X1 ? A1,?,Xn ? An }, then in the space of instances the region for Y ? B must include the intersection of the regions for the FDs Xi ? Ai . That is: ? Every instance satisfying all the Xi ? Ai surely satisfies Y ? B. ? But an instance could satisfy Y ? B, yet not be in this intersection.
+35
+
+Example
+
+A?B
+
+A?C B?C
+
+36
+
+References
+In preparing the lectures I have used several sources. The main ones are the following: Books: ? A First Course in Database Systems, by J. Ullman and J. Widom ? Fundamentals of Database Systems, by R. Elmasri and S. Navathe Slides: ? The slides of this chapter are based on slides prepared by Jeff Ullman for his introductory course on database systems at Stanford University
+37
+
+

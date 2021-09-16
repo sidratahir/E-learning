@@ -1,0 +1,192 @@
+Introduction	to Information	Retrieval
+CS276 Information	Retrieval	and	Web	Search Chris	Manning	and	Pandu	Nayak Crawling	and	Duplicates
+Introduction	to	Information	Retrieval Today’s	lecture § Web	Crawling § (Near)	duplicate	detection
+2
+Introduction	to	Information	Retrieval Basic	crawler	operation § Begin	with	known	“seed”URLs § Fetch	and	parse	them §Extract	URLs	they	point	to §Place	the	extracted	URLs	on	a	queue § Fetch	each	URL	on	the	queue	and	repeat Sec. 20.2
+3
+Introduction	to	Information	Retrieval Crawling	picture
+Web
+URLs frontier
+Unseen Web
+Seed pages
+URLs crawled and parsed
+Sec. 20.2
+4
+Introduction	to	Information	Retrieval Simple	picture	–complications § Web	crawling	isn’t	feasible	with	one	machine § All	of	the	above	steps	distributed § Malicious	pages § Spam	pages	§ Spider	traps	–incl	dynamically	generated § Even	non-malicious	pages	pose	challenges § Latency/bandwidth	to	remote	servers	vary § Webmasters’stipulations § How	“deep”should	you	crawl	a	site’s	URL	hierarchy? § Site	mirrors	and	duplicate	pages § Politeness	–don’t	hit	a	server	too	often
+Sec. 20.1.1
+5
+Introduction	to	Information	Retrieval What	any	crawler	mustdo § Be	Robust:	Be	immune	to	spider	traps	and	other	malicious	behavior	from	web	servers
+§ Be	Polite:	Respect	implicit	and	explicit	politeness	considerations
+Sec. 20.1.1
+6
+Introduction	to	Information	Retrieval Explicit	and	implicit	politeness § Explicit	politeness:	specifications	from	webmasters	on	what	portions	of	site	can	be	crawled § robots.txt § Implicit	politeness:	even	with	no	specification,	avoid	hitting	any	site	too	often Sec. 20.2
+7
+Introduction	to	Information	Retrieval Robots.txt § Protocol	for	giving	spiders	(“robots”)	limited	access	to	a	website,	originally	from	1994 § www.robotstxt.org/robotstxt.html § Website	announces	its	request	on	what	can(not)	be	crawled § For	a	server,	create	a	file	/robots.txt § This	file	specifies	access	restrictions Sec. 20.2.1
+8
+Introduction	to	Information	Retrieval Robots.txt	example § No	robot	should	visit	any	URL	starting	with	"/yoursite/temp/",	except	the	robot	called	“searchengine":	
+User-agent: * Disallow: /yoursite/temp/ User-agent: searchengine Disallow:
+Sec. 20.2.1
+9
+Introduction	to	Information	Retrieval What	any	crawler	shoulddo § Be	capable	of	distributedoperation:	designed	to	run	on	multiple	distributed	machines § Be	scalable:	designed	to	increase	the	crawl	rate	by	adding	more	machines § Performance/efficiency:	permit	full	use	of	available	processing	and	network	resources Sec. 20.1.1
+10
+Introduction	to	Information	Retrieval What	any	crawler	shoulddo § Fetch	pages	of	“higher	quality”first § Continuousoperation:	Continue	fetching	fresh	copies	of	a	previously	fetched	page § Extensible:	Adapt	to	new	data	formats,	protocols Sec. 20.1.1
+11
+Introduction	to	Information	Retrieval Updated	crawling	picture
+URLs crawled and parsed
+Unseen Web
+Seed Pages
+URL frontier
+Crawling thread
+Sec. 20.1.1
+12
+Introduction	to	Information	Retrieval URL	frontier § Can	include	multiple	pages	from	the	same	host § Must	avoid	trying	to	fetch	them	all	at	the	same	time § Must	try	to	keep	all	crawling	threads	busy Sec. 20.2
+13
+Introduction	to	Information	Retrieval Processing	steps	in	crawling § Pick	a	URL	from	the	frontier § Fetch	the	document	at	the	URL § Parse	the	URL § Extract	links	from	it	to	other	docs	(URLs) § Check	if	URL	has	content	already	seen § If	not,	add	to	indexes § For	each	extracted	URL § Ensure	it	passes	certain	URL	filter	tests § Check	if	it	is	already	in	the	frontier	(duplicate	URL	elimination) E.g., only crawl .edu, obey robots.txt, etc. Which one? Sec. 20.2.1
+14
+Introduction	to	Information	Retrieval Basic	crawl	architecture
+WWW
+DNS
+Parse
+Content seen?
+Doc FP’s
+Dup URL elim
+URL set
+URL Frontier
+URL filter
+robots filters
+Fetch
+Sec. 20.2.1
+15
+Introduction	to	Information	Retrieval DNS	(Domain	Name	Server) § A	lookup	service	on	the	internet § Given	a	URL,	retrieve	its	IP	address § Service	provided	by	a	distributed	set	of	servers	–thus,	lookup	latencies	can	be	high	(even	seconds) § Common	OS	implementations	of	DNS	lookup	are	blocking:	only	one	outstanding	request	at	a	time § Solutions § DNS	caching § Batch	DNS	resolver	–collects	requests	and	sends	them	out	together Sec. 20.2.2
+16
+Introduction	to	Information	Retrieval Parsing:	URL	normalization
+§ When	a	fetched	document	is	parsed,	some	of	the	extracted	links	are	relativeURLs § E.g.,	http://en.wikipedia.org/wiki/Main_Pagehas	a	relative	link	to	/wiki/Wikipedia:General_disclaimer	which	is	the	same	as	the	absolute	URL	http://en.wikipedia.org/wiki/Wikipedia:General_disclaimer § During	parsing,	must	normalize	(expand)	such	relative	URLs
+Sec. 20.2.1
+17
+Introduction	to	Information	Retrieval Content	seen? § Duplication	is	widespread	on	the	web § If	the	page	just	fetched	is	already	in	the	index,	do	not	further	process	it § This	is	verified	using	document	fingerprints	or	shingles §Second	part	of	this	lecture Sec. 20.2.1
+18
+Introduction	to	Information	Retrieval Filters	and	robots.txt	§ Filters–regular	expressions	for	URLs	to	be	crawled/not § Once	a	robots.txt	file	is	fetched	from	a	site,	need	not	fetch	it	repeatedly § Doing	so	burns	bandwidth,	hits	web	server § Cache	robots.txt	files Sec. 20.2.1
+19
+Introduction	to	Information	Retrieval Duplicate	URL	elimination § For	a	non-continuous	(one-shot)	crawl,	test	to	see	if	an	extracted+filtered	URL	has	already	been	passed	to	the	frontier § For	a	continuous	crawl	–see	details	of	frontier	implementation Sec. 20.2.1
+20
+Introduction	to	Information	Retrieval Distributing	the	crawler § Run	multiple	crawl	threads,	under	different	processes	–potentially	at	different	nodes § Geographically	distributed	nodes § Partition	hosts	being	crawled	into	nodes § Hash	used	for	partition § How	do	these	nodes	communicate	and	share	URLs? Sec. 20.2.1
+21
+Introduction	to	Information	Retrieval Communication	between	nodes § Output	of	the	URL	filter	at	each	node	is	sent	to	the	Dup	URL	Eliminator	of	the	appropriate	node
+WWW
+Fetch
+DNS
+Parse
+Content seen?
+URL filter
+Dup URL elim
+Doc FP’s
+URL set
+URL Frontier
+robots filters
+Host splitter
+To other nodes
+From other nodes
+Sec. 20.2.1
+22
+Introduction	to	Information	Retrieval
+URL	frontier:	two	main	considerations § Politeness:	do	not	hit	a	web	server	too	frequently § Freshness:	crawl	some	pages	more	often	than	others § E.g.,	pages	(such	as	News	sites)	whose	content	changes	often These	goals	may	conflict	with	each	other. (E.g.,	simple	priority	queue	fails	–many	links	out	of	a	page	go	to	its	own	site,	creating	a	burst	of	accesses	to	that	site.)
+Sec. 20.2.3
+23
+Introduction	to	Information	Retrieval Politeness	–challenges § Even	if	we	restrict	only	one	thread	to	fetch	from	a	host,	can	hit	it	repeatedly § Common	heuristic:	insert	time	gap	between	successive	requests	to	a	host	that	is	>>	time	for	most	recent	fetch	from	that	host Sec. 20.2.3
+24
+Introduction	to	Information	Retrieval
+Back queue selector
+B back queues Single host on each
+Crawl thread requesting URL
+URL	frontier:	Mercator	scheme
+Biased front queue selector Back queue router
+Prioritizer
+K front queues
+URLs
+Sec. 20.2.3
+25
+Introduction	to	Information	Retrieval Mercator	URL	frontier § URLs	flow	in	from	the	top	into	the	frontier § Front	queuesmanage	prioritization § Back	queuesenforce	politeness § Each	queue	is	FIFO
+Sec. 20.2.3
+26
+Introduction	to	Information	Retrieval Front	queues
+Prioritizer
+1 K
+Biased front queue selector Back queue router
+Sec. 20.2.3
+27
+Introduction	to	Information	Retrieval Front	queues § Prioritizer	assigns	to	URL	an	integer	priority	between	1	and	K § Appends	URL	to	corresponding	queue § Heuristics	for	assigning	priority § Refresh	rate	sampled	from	previous	crawls § Application-specific	(e.g.,	“crawl	news	sites	more	often”) Sec. 20.2.3
+28
+Introduction	to	Information	Retrieval Biased	front	queue	selector § When	a	back	queuerequests	a	URL	(in	a	sequence	to	be	described):	picks	a	front	queue from	which	to	pull	a	URL § This	choice	can	be	round	robin	biased	to	queues	of	higher	priority,	or	some	more	sophisticated	variant § Can	be	randomized Sec. 20.2.3
+29
+Introduction	to	Information	Retrieval Back	queues
+Biased front queue selector Back queue router
+Back queue selector
+1 B
+Heap
+Sec. 20.2.3
+30
+Introduction	to	Information	Retrieval Back	queue	invariants
+§ Each	back	queue	is	kept	non-empty	while	the	crawl	is	in	progress § Each	back	queue	only	contains	URLs	from	a	single	host § Maintain	a	table	from	hosts	to	back	queues
+Host name Back queue … 3 1 B
+Sec. 20.2.3
+31
+Introduction	to	Information	Retrieval Back	queue	heap § One	entry	for	each	back	queue § The	entry	is	the	earliest	time	te at	which	the	host	corresponding	to	the	back	queue	can	be	hit	again § This	earliest	time	is	determined	from § Last	access	to	that	host § Any	time	buffer	heuristic	we	choose Sec. 20.2.3
+32
+Introduction	to	Information	Retrieval Back	queue	processing
+§ A	crawler	thread	seeking	a	URL	to	crawl: § Extracts	the	root	of	the	heap § Fetches	URL	at	head	of	corresponding	back	queue	q (look	up	from	table) § Checks	if	queue	qis	now	empty	–if	so,	pulls	a	URL	v from	front	queues § If	there’s	already	a	back	queue	for	v’s	host,	append	vto	it	and	pull	another	URL	from	front	queues,	repeat § Else	add	vto	q § When	qis	non-empty,	create	heap	entry	for	it
+Sec. 20.2.3
+33
+Introduction	to	Information	Retrieval Number	of	back	queues	B § Keep	all	threads	busy	while	respecting	politeness § Mercator	recommendation:	three	times	as	many	back	queues	as	crawler	threads Sec. 20.2.3
+34
+Introduction	to	Information	Retrieval
+Introduction	to Information	Retrieval Near	duplicate	document	detection
+35
+Introduction	to	Information	Retrieval Duplicate	documents § The	web	is	full	of	duplicated	content § Strict	duplicate	detection	=	exact	match § Not	as	common § But	many,	many	cases	of	near	duplicates § E.g.,	Last	modified	date	the	only	difference	between	two	copies	of	a	page
+Sec. 19.6
+Introduction	to	Information	Retrieval Duplicate/Near-Duplicate	Detection
+§ Duplication:	Exact	match		can	be	detected	with	fingerprints § Near-Duplication:	Approximate	match § Overview § Compute	syntactic	similarity	with	an	edit-distance	measure § Use	similarity	threshold	to	detect	near-duplicates § E.g.,		Similarity	>	80%	=>	Documents	are	“near	duplicates” § Not	transitive	though	sometimes	used	transitively
+Sec. 19.6
+Introduction	to	Information	Retrieval Computing	Similarity § Features: § Segments	of	a	document	(natural	or	artificial	breakpoints) § Shingles(Word	N-Grams) § a	rose	is	a	rose	is	a	rose?	4-grams	are a_rose_is_a rose_is_a_rose is_a_rose_is	a_rose_is_a § Similarity	Measure	between	two	docs	(=	sets	of	shingles) § Jaccard	cooefficient:	(Size_of_Intersection	/	Size_of_Union) Sec. 19.6
+Introduction	to	Information	Retrieval Shingles	+	Set	Intersection §Computing	exactset	intersection	of	shingles	between	allpairs	of	documents	is	expensive
+§Approximate	using	a	cleverly	chosen	subset	of	shingles	from	each	(a	sketch) §Estimate	(size_of_intersection	/	size_of_union) based	on	a	short	sketch	Doc A Shingle set A Sketch A
+Doc B
+Shingle set B Sketch B
+Jaccard
+Sec. 19.6
+Introduction	to	Information	Retrieval Sketch	of	a	document § Create	a	“sketch	vector”(of	size	~200)	for	each	document § Documents	that	share	=t(say	80%)	corresponding	vector	elements	are	deemed	near	duplicates § For	doc	D,	sketchD[	i	]	is	as	follows: §Let	f	map	all	shingles	in	the	universe	to	1..2m (e.g.,	f	=	fingerprinting) §Let	pi be	a	random	permutationon	1..2m §Pick	MIN	{pi(f(s))}		over	all	shingles	sin	D Sec. 19.6
+Introduction	to	Information	Retrieval Computing	Sketch[i]	for	Doc1 Document 1
+264 264 264 264
+Start with 64-bit f(shingles) Permute on the number line with pi
+Pick the min value
+Sec. 19.6
+Introduction	to	Information	Retrieval
+Test	if	Doc1.Sketch[i]	=	Doc2.Sketch[i]	Document 1 Document 2
+264 264 264 264
+264 264 264 264
+Are these equal? Test for 200 random permutations: p1, p2,… p200
+A B
+Sec. 19.6
+Introduction	to	Information	Retrieval
+However… Document 1 Document 2 264 264 264 264
+264 264 264 264
+A = B iff the shingle with the MIN value in the union of Doc1 and Doc2 is common to both (i.e., lies in the intersection) Claim: This happens with probability Size_of_intersection / Size_of_union
+BA
+Why?
+Sec. 19.6
+Introduction	to	Information	Retrieval Set	Similarity	of	sets	Ci ,	Cj
+§ View sets as columns of a matrix A; one row for each element in the universe.  aij = 1 indicates presence of item i  in set j § Example ji
+ji ji C C CC )C,Jaccard(C ! " =
+C1 C2 0     1 1    0 1    1        Jaccard(C1,C2) = 2/5 = 0.4 0    0 1    1 0    1
+Sec. 19.6
+Introduction	to	Information	Retrieval Key	Observation § For	columns	Ci,	Cj,four	types	of	rows Ci Cj A 1 1 B 1 0 C 0 1 D 0 0 § Overload	notation:A	=	#	of	rows	of	type	A § Claim
+CBA A)C,Jaccard(C ji + + =
+Sec. 19.6
+Introduction	to	Information	Retrieval “Min”Hashing
+§ Randomly permute rows § Hash h(Ci) = index of first row with 1 in column Ci § Surprising Property
+§ Why? § Both are A/(A+B+C) § Look down columns Ci, Cj until first non-Type-D row § h(Ci) = h(Cj) ßà type A row [ ] ( ) jiji C,CJaccard )h(C)h(C  P ==
+Sec. 19.6
+Introduction	to	Information	Retrieval Random	permutations § Random	permutations	are	expensive	to	compute
+§ Linear	permutations	work	well	in	practice § For	a	large	prime	p,	consider	permutations	over	{0, …, p–1}	drawn	from	the	set: Fp=	{pa,b :	1= a= p–1, 0 = b= p–1} where pa,b(x) = ax+ bmod p
+47
+Introduction	to	Information	Retrieval Final	notes § Shingling	is	a	randomized	algorithm § Our	analysis	did	not	presume	any	probability	model	on	the	inputs § It	will	give	us	the	right	(wrong)	answer	with	some	probability	on	any	input § We’ve	described	how	to	detect	near	duplication	in	a	pair	of	documents § In	“real	life”we’ll	have	to	concurrently	look	at	many	pairs § See	text	book	for	details
+48

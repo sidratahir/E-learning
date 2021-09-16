@@ -1,0 +1,586 @@
+Relational Database Systems 1
+Wolf-Tilo Balke Hermann Kroll, Janus Wawrzinek, Stephan Mennicke
+Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+Exam Facts
+? First off
+? We will post up-to-date information on our website
+
+? Language
+? exam of tasks will be in German ? ? but you may answer either in English, German, or Denglisch
+
+? Content
+? all content from the lecture or exercises may come up in the exams
+? except content that was only in detours and not in an exercise
+
+? This of course includes also lectures 10-14?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+2
+
+Exam Facts
+? SQL Syntax
+? Use the syntax as introduced in the lecture and exercises
+? e.g. You are not allowed to use the Postgres Inheritance feature
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+3
+
+Exam Facts
+? Cheat Sheets
+? you may bring two hand-written two-sided DIN A4 pages with notes
+? No photocopies, print-outs, etc.
+
+? Date
+? the exam will be written on March 8, 2019, from 11:00 until 12:30/13:00
+
+? Duration
+? 90 min or 120 min depending on your exam regulations
+
+? Room allocations will be announced on the website and StudIP
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+4
+
+Towards NoSQL & NewSQL
+14.1 14.2 14.3 14.4 Towards NoSQL & NewSQL Server Hardware at Google Example: CouchDB Outlook: Next Semester
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5
+
+14.1 Towards NoSQL & NewSQL
+? NoSQL and special databases have been popularized by different communities and a driven by different design motivations ? Base motivations
+? Extreme Requirements
+? Extremely high availability, extremely high performance, guaranteed low latency, etc.
+? e.g. global web platforms
+
+? Alternative data models
+? Less complex data model suffices ? (More complex) non-relational data model necessary
+? e.g. multi-media or scientific data
+
+? Alternative database implementation techniques
+? Try to maintain most database features but lessen the drawbacks
+? e.g. ?traditional? database applications, e.g. VoltDB
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+14.1 Towards NoSQL & NewSQL
+? Traditional databases are usually all-purpose systems
+? e.g. DB2, Oracle, MySQL, ? ? Theoretically, general purpose DB provide all features to develop any data driven application ? Powerful query languages
+? SQL, can be used to update and query data; even very complex analytical queries possible
+
+? Expressive data model
+? Most data modeling needs can be served by the relational model
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7
+
+14.1 Towards NoSQL & NewSQL
+? Full transaction support
+? Transactions are guaranteed to be ?safe?
+? i.e. ACID transaction properties
+
+? System durability and security
+? Database servers are resilient to failures
+? Log files are continuously written ? Transactions running during a failure can recovered ? Most databases have support for constant backup ? Even severe failures can be recovered from backups ? Most databases support ?hot-standby? ? 2nd database system running simultaneously which can take over in case of severe failure of the primary system
+
+? Most databases offer basic access control
+? i.e. authentication and authorization
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+14.1 Towards NoSQL & NewSQL
+? In short, databases could be used as storage solutions in all kinds of applications ? Higher scalability can be achieved with distributed databases, having all features known from classical all-purpose databases
+? In order to be distributed, additional mechanisms are needed
+? partitioning, fragmentation, allocation, distributed transactions, distributed query processor,?.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9
+
+14.1 Towards NoSQL & NewSQL
+? However, classical all-purpose databases may lead to problems in extreme conditions
+? Problems when being faced with massively high query loads
+? i.e. millions of transactions per second ? Load to high for a single machine or even a traditional distrusted database
+? Limited scaling
+
+? Problems with fully global applications
+? Transactions originate from all over the globe ? Latency matters!
+? Data should be geographically close to users
+
+? Claims:
+? Amazon: increasing the latency by 10% will decrease the sales by 1% ? Google: increasing the latency by 500ms will decrease traffic by 20%
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10
+
+14.1 Towards NoSQL & NewSQL
+? Problems with extremely high availability constraints
+? Traditionally, databases can be recovered using logs or backups ? Hot-Standbys may help during repair time ? But for some applications, this is not enough: Extreme Availability (Amazon)
+? ?? must be available even if disks are failing, network routes are flapping, and several data centers are destroyed by massive tornados? ? Additional availability and durability concepts needed!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+11
+
+14.1 Towards NoSQL & NewSQL
+? Problems with emerging applications requiring new data models
+? Traditional databases rely on the relational model which is not optimal for many new applications
+? e.g. scientific data management like genome databases, geoinformation databases, etc. ? e.g. for handling data streams and massive volumes of sensor data ? e.g. for handling knowledge networks and reasoning
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+12
+
+14.1 Towards NoSQL & NewSQL
+? In extreme cases, specialized database-like systems may be beneficial
+? Specialize on certain query types ? Focus on a certain characteristic
+? i.e. availability, scalability, expressiveness, etc?
+
+? Allow weaknesses and limited features for other characteristics
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+14.1 Towards NoSQL & NewSQL
+? In the recent years, discussing ?NoSQL? databases has become very popular
+? Careful: big misnomer!
+? Does not necessarily mean that no SQL is used
+? There are SQL-supporting NoSQL systems?
+
+? NoSQL often refers to ?non-standard? architectures for database or database-like systems
+? i.e. system not implemented as shown in RDB2 ? Sometimes, the label NewSQL is also used
+
+? Not formally defined, more used as a ?hype? word
+
+? Popular base dogma: Keep It Stupid Simple!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+14.1 Towards NoSQL & NewSQL
+? The NoSQL movement popularized the development of special purpose databases
+? In contrast to general purpose systems like e.g. Postgres
+
+? NoSQL usually means one or more of the following
+? Being massively scalable
+? Usually, the goal is unlimited linear scalability
+
+? Being massively distributed ? Being extremely available ? Showing extremely high OLTP performance
+? Usually, not suited for OLAP queries
+
+? Not being ?all-purpose?
+? Application-specific storage solutions showing some database characteristics
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+15
+
+14.1 Towards NoSQL & NewSQL
+? Not using the relational model
+? Usually, much simpler data models are used ? Some, much more complex data models are used (XML, Logicbased, objects, etc.)
+
+? Not using strict ACID transactions
+? No transactions at all or weaker transaction models
+
+? Not using SQL
+? But using simpler query paradigms
+
+? Especially, not supporting ?typical? query interfaces
+? i.e. JDBC ? Offering direct access from application to storage system
+
+? System is cloud-based, i.e. not installed on a local server
+? System managed by a 3 rd party
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+14.1 Towards NoSQL & NewSQL
+? In short:
+? Many NoSQL & NewSQL focus on building specialized high-performance data storage systems!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+17
+
+14.1 Towards NoSQL & NewSQL
+? NoSQL and special databases have been popularized by different communities and a driven by different design motivations
+? Extreme Requirements
+? Extremely high availability, extremely high performance, guaranteed low latency, etc.
+? e.g. global web platforms
+
+? Alternative data models
+? Less complex data model suffices
+? See https://highlyscalable.wordpress.com/2012/03/01/nosql-data-modelingtechniques/
+
+? (More complex) non-relational data model necessary
+? e.g. multi-media or scientific data
+
+? Alternative database implementation techniques
+? Try to maintain most database features but lessen the drawbacks
+? e.g. ?traditional? database applications, e.g. VoltDB
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+18
+
+14.1 Towards NoSQL & NewSQL
+Classification
+Key-Value Cache Key-Value Store Key-Value Store - Eventually consistent Key-Value Store - Ordered Tuple Store
+Object Database Document Store
+
+System
+Coherence, eXtreme Scale, GigaSpaces, Hazelcast, Infinispan, JBoss Cache, Memcached, Repcached, Terracotta, Velocity Flare, Keyspace, RAMCloud, SchemaFree
+DovetailDB, Dynamo, Dynomite, MotionDb, Voldemort, SubRecord
+
+Actord, Lightcloud, Luxio, MemcacheDB, NMDB, Scalaris, TokyoTyrant Apache River, Coord, GigaSpaces
+DB4O, Perst, Shoal, ZopeDB, Clusterpoint, CouchDB, MarkLogic, MongoDB, Riak, XML-databases
+
+Wide Columnar Store Array Databases
+Stream Databases
+
+BigTable, Cassandra, HBase, Hypertable, KAI, KDI, OpenNeptune, Qbase SciDB, PostGIS, Oracle GeoRaster, Rasdaman
+StreamSQL, STREAM, AURORA
+
+Analytical Column Stores High Throughput OLTP
+
+Vertica, SybaseIQ VoltDB, Hana
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+19
+
+14.1 Towards NoSQL & NewSQL
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+20
+
+14.3 Example: CouchDB
+? Apache CouchDB
+? Couch==cluster of unreliable commodity hardware ? Aimed at serving webpages and web apps ? Core Features
+? Distributed Architecture with high degree of replication
+? Can run on hundreds of nodes if required ? Focus on availability of data! ? Replicas are NOT always consistent, but eventually consistent ? Some nodes can even be offline! ? CouchDB can fall into partitions, this will be fixed by the system ? Replicas will be synced bi-directionally when opportune
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+21
+
+14.3 Example: CouchDB
+? No support for transactions
+? ... but at least supports some consistency for replicas : eventual consistency ? See CAP theorem if you are interested in this? ? In short: in system with replicas, you can have availability, consistency, and partition tolerance ? Cap theorem: pick only two
+
+? Uses a Document Data model
+? Stores and retrieves documents given by JSON files
+
+? Has a strong emphasize on open Web APIs
+? No client APIs necessary ? No drivers necessary ? All documents have unique URI, exposed via HTTP REST calls
+
+? Strong support for views
+? Views are defined via JavaScript
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+14.3 Example: CouchDB
+? Data Model:
+? JSON Documents
+? Initially a format designed to serialize Javascript objects ? Primary use: data exchange in a Web environment
+? E.g.,AJAX applications
+
+? Extended use: data serialization and storage ? Could be seen as lightweight XML
+? pretty easy to integrate to any programming language, with minimal parsing effort
+
+? However: No query language, no schema ? Basic idea: Structured key-value pairs
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+23
+
+14.3 Example: CouchDB
+? Example: Simple Movie DB ? Simple data items are key-value pairs supporting typical Web data types
+? ?title? : ?Terminator 2? ? ?year? : 1991
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+24
+
+14.3 Example: CouchDB
+? An object is a key value pair which has a set of unordered keyvalue pairs as value
+? Sub-item keys must be unique
+?director?: { ?first_name? : ?James?, ?last_name? : ?Cameron? }
+
+? Objects can be used as values of a key-value pair
+?terminator2?: { ?title? : ?Terminator 2?, ?year? : 1991, ?director? : { ?first_name? : ?James?, ?last_name? : ?Cameron? }}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+25
+
+Example: CouchDB
+? Also, arrays can be used
+?terminator2?: { ?title? : ?Terminator 2?, ?year? : 1991, ?director? : { ?first_name? : ?James?, ?last_name? : ?Cameron? } ?actors?: [ {?first_name? : ?Arnold?, ?last_name? : ?Schwarzenegger? }, {?first_name? : ?Linda?, ?last_name? : ?Hamilton? }, {?first_name? : ?Edward?, ?last_name? : ?Furlong? }, ] }
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+Example: CouchDB
+? Documents are complex and autonomous pieces of information
+? Each document has a unique URI ? Can be retrieved, stored, modified, and deleted
+? REST Calls: GET, PUT, POST, DELETE
+
+? There are no references between documents ? Also, documents can be versioned, replicated, synchronized, and restructured
+? Each document is identified by an id and a revision number ? Each update created a new revision
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+27
+
+Example: CouchDB
+? Quick introduction
+? You can use CURL for quick interaction
+? Programming language & environment for interactive web applications ? Provides native support for most web standards like HTML, REST, or JSON
+
+? Assume we installed CouchDB locally
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+Example: CouchDB
+? Futon Admin Interface: http://127.0.0.1:5984/_utils/
+
+? Already created movies DB
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+29
+
+Example: CouchDB
+? Add some data:
+? Each document needs an ID, think of one!
+curl -X PUT -d
+?{ ?title? : ?Terminator 2?, ?year? : 1991, ?director? : { ?first_name? : ?James?, ?last_name? : ?Cameron? }, ?actors?: [ {?first_name? : ?Arnold?, ?last_name? : ?Schwarzenegger? }, {?first_name? : ?Linda?, ?last_name? : ?Hamilton? }, {?first_name? : ?Edward?, ?last_name? : ?Furlong? }, ] }? http://127.0.0.1:5984/movies/Terminator2
+
+? Or just use files:
+curl -X PUT -d @Terminator2.json http://127.0.0.1:5984/movies/Terminator2
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+30
+
+Example: CouchDB
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+Example: CouchDB
+? This all looks quite easy and nice? ? Let?s query for something by using?no SQL???
+? CouchDB only supports views, no queries! ? Views are defined using JavaScript MapReduce functions
+? Map functions are run on each document and emit a new temporary document part of the view
+? Again: A document has a key, and some value? ? View is ordered by key
+
+? Views can then be queries by a reduce function
+? Reduce functions summarize emitted map result grouped by key
+
+? The MapReduce paradigm allows for an easy distribution of queries in a multi-node environment!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+32
+
+Example: CouchDB
+? Example: Return an ordered list of all movies from 1991 or older
+? ?but we don?t have SQL?
+
+? i.e., SELECT title FROM movies WHERE year<=1991 ? CouchDB:
+? Create a new view with years as keys and titles as values ? Select from this view all pairs with keys<=1991
+
+? Views are collected in design documents
+? Each design document can have multiple views
+Map:
+function(doc) { if (doc.title && doc.year) { emit(doc.year, doc.title); } }
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+33
+
+Example: CouchDB
+? Example: Return an ordered list of all movies from 1991 or older
+If there is a title and a year, create a new document with key=?year? and value=?title? We call this view ?year-title?
+
+No reduce necessary right now
+
+View key-value pairs
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+34
+
+Example: CouchDB
+? Query via REST HTTP
+? http://127.0.0.1:5984/movies/_design/rdb1_14/ _view/year-title?endkey=1991
+View name All keys up to 1991 DB name Design Document Name
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+35
+
+Example: CouchDB
+? Example: Create list of years and the number of movies released in that year ? (skip years without movies released, and consider only years 1991 and older)
+? e.g. SELECT year, count(*) FROM movies WHERE year<=1991 GROUP BY year
+
+? In CouchDB, we can use the same map as for the previous query
+? However, we need a reducer
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+36
+
+Example: CouchDB
+? Reducers are run on all mapped data
+? Mapped values are grouped by key, and a reducer is called for each key with a set of all respective values ? Reducers can also be run on their own output
+? Called a re-reduce, which can be done multiple times
+Reduce:
+function(keys, values, rereduce) { return values.length; }
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+Example: CouchDB
+?terminator2?: { "title": "Terminator 2 - Judgement Day", "year": 1991, ?genre?:?Action?} ?robinHood?: { "title": "Robin Hood - Prince of Thieves", "year": 1991, ?genre?:[?Action?, ?Romance?]} ?conan?: { "title": "Conan the Barbarian", "year": 1982, ?genre?:?Action?} Map:
+function(doc) { if (doc.title && doc.year) { emit(doc.year, doc.title); } }
+
+{1982: "Conan the Barbarian"}
+
+{1991: "Terminator 2 - Judgement Day"}
+{1991: "Robin Hood - Prince of Thieves"}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+38
+
+Example: CouchDB
+{1982: "Conan the Barbarian"} {1991: "Terminator 2 - Judgement Day"} {1991: "Robin Hood - Prince of Thieves"}
+
+Reduce:
+function(key, values, rereduce) { return values.length; }
+
+{1982: 1} {1991: 2}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+Example: CouchDB
+? Query via REST HTTP
+? http://127.0.0.1:5984/movies/_design/rdb1_14/_view/s ums?endkey=1991&group_level=1
+Run reducer on level 0 and level 1
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+Example: CouchDB
+? So, how about transactions?
+? Not supported per se! ? But there are ?easy? workarounds ? just keep track of transaction consistency manually ? Example: inventory management
+? You are selling hammers, and screwdrivers, and don?t want to sell more than you have on stock ? What happens if we sell a hammer? ? In JDBC/SQL, this would be simple?
+? ? ? ? ? Have constraint that inventory number can never be negative Start JDBC transaction in your application Load current inventory number for hammers If there are still hammers, reduce inventory by one Commit transaction ? if this works out, tell customer that everything is fine ? If not, somebody else snatched the last hammer quicker
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+Example: CouchDB
+? ?Solution? A: Work with revision numbers
+? ? ? ? Have an inventory document Load document with hammer inventory number, store revision Sell hammer Update hammer inventory document with new number if only if document has still the same revision
+? If not, retrieve the new document and try to update that one? ? If you find out that there are no hammers anymore, reimburse customer and apologize
+
+? This process catches many potential consistency problems, but gives NO guarantees at all!
+? This is horrible in a high concurrency environment! ? You could have purchases which get pushed back all the time? ? You could still sell more hammer than you have?
+inventory : { _rev : ?471c37eb3116179b9f269427372a86db? ?hammers? : 15; ?screwdrivers? :9; } Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+Example: CouchDB
+? ?Solution? B: Build fake ?locks? for each item
+? For each hammer and screwdriver, have an own inventory document ? If you want to know how many hammers you have, create a view and count all hammer documents ? If you sell a hammer, randomly load one hammer file and try to delete it ? If this works, all might be well?
+
+? This process has still problems?
+? e.g., inventory documents are replicated ? how do you deal with that?
+? Visit our lectures RDB2 and DDM to learn how to program something that will really work? ? ? in which case you just build a distributed database transaction manager yourself!! Congrats, wheel re-invented!
+Hammer_1 : {_rev : ?471c37eb3116179b9f269427372a86db?} Hammer_2 : {_rev : ?5ff77937ea707d35cc907b466f726cc8?} Hammer_3 : {_rev : ?3dd521c277ab448b91ce2e8bb57bbb4f?} Screwdriver_1 : {_rev : ?a1a70294da183c8b0fb525ec285971c9?} Screwdriver_2 : {_rev : ?09bdb275b75fea85369c86f7ba5f3467?}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+NoSQL
+? Closing words?
+? Yes, NoSQL is cool and can do cool things!
+? Usually, its easy, fast, and scalable!
+
+? No, NoSQL does NOT universally invalidate Relational Databases ? New Challenge for YOU:
+? ? ? ? Choose the right tool for the right task! What does your application really require? What will it require in the future? Which technologies fulfill these requirements best?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+14 Next Semester
+? Lectures
+? Relational Database Systems II ? Software Entwicklungs Praktikum
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+45
+
+Relational Databases 2
+? Featuring
+? the architecture of a DBMS ? storing data on hard disks ? indexing ? query evaluation and optimization ? transactions and ACID ? recovery
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+Relational Databases 2
+? Data structures for indexes!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+Relational Databases 2
+? Query optimization!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+48
+
+Relational Databases 2
+? Implementing transactions!
+
+Scheduler
+Transaction Manager
+
+Storage Manager
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+14.3 SEP
+? Music Tinder ? Match your Song!
+? Recommendations based on your favourite music (Do you like that song?) ? Crawl top charts and apply modern machine learning techniques ? App & Server architecture
+
+Intelligent algorithms
+
+The Web
+
+Web crawler
+
+Database
+50
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14 That?s all folks?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+

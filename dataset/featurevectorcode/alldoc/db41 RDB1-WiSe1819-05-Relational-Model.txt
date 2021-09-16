@@ -1,0 +1,1180 @@
+Relational Database Systems 1
+Wolf-Tilo Balke Hermann Kroll, Janus Wawrzinek, Stephan Mennicke Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+Common Mistakes in Modelling
+
+? Mistake: No Primary Key
+? Just don?t do that outside of simple examples ? (same is true for cardinalities)
+
+? Mistake: No Relation Symbol or Name
+Book Person
+
+? Mistake: Modelling Functionality as Data
+? ?Users can write reviews for a book, which they can also delete.?
+Review Book
+delete write
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+Person
+
+2
+
+Common Mistakes in Modelling
+? Mistake: Primary Key does not make sense
+? Intuition: An attribute / set of attributes which uniquely identify an entity ? Additional soft constraints
+? Should feel ?natural? ? Should be minimal ? Should be easy to handle
+? Good: Book(name, author, year, isbn, summary, price) ? Less good: Book(name, author, year, isbn, summary, price)
+
+? Example: Modeling a book in a book store
+
+? More natural, but more complex. Only valid if it is guaranteed that a given author writes only a single book with the same name in a year. Depends on task if this makes sense .
+
+? Not good or even invalid:
+
+? Book(name, author, year, isbn, summary, price) ? Book(name, author, year, isbn, summary, price)
+
+? Weak Entities always have composite key
+? One component is the primary key of the strong entity, the second component is with the weak entity and is only unique within the set of weak entities belonging to the same strong one
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+3
+
+Common Mistakes in Modelling
+
+? Mistake: Confusing Cardinality Notations
+? Warning: There are several conflicting ways of writing cardinalities!
+? Whichever way you choose, BE CONSISTENT!
+
+? Classic ER Style (default in this lecture):
+? Read cardinalities in diagram below as
+? ?each entity of woman participates in any number of relationships of mother_of, while each entity in child must participate in exactly one?
+
+? This notation is needed for non-trivial n-ary relationsships (n>2)
+Woman
+A2
+
+(0,*)
+mother
+
+mother_of r1
+
+(1, 1)
+child
+
+Child
+B2
+
+Woman
+
+A3 A1
+
+A4
+
+r2 r3
+mother_of
+
+B1 B3 B4
+
+Child
+4
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+Common Mistakes in Modelling ? UML Style (not our lecture?s default):
+? Read cardinalities in diagram below as
+? ?each one entity of woman is in relation (via mother_of) with any number of entities of child?
+
+? Usually only distinguishes between 0, 0..1,1, 0..* and *
+? Fine-granular cardinalities and higher arity relations not easily possible
+Woman
+A2 A3
+A1
+
+1
+mother
+
+mother_of r1
+
+*
+child
+
+Child
+B2
+
+A4
+
+r2 r3
+mother_of
+
+Woman
+
+B1 B3 B4
+
+Child
+5
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+Common Mistakes in Modelling
+
+? Mistake: Model not suitable for the task
+? Task: ?Build a person database. Each person should have a mother and a father. The database should be used to explore ancestry. ? Database ? Very Bad: in
+mother
+
+Person
+
+father
+
+? Still quite Bad:
+Mother Father (0,*)
+mother
+
+mother_of father_of
+
+(1, 1) (1, 1)
+
+child
+
+(0,*)
+father
+
+Person
+child
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+Common Mistakes in Modelling ? Better:
+child
+
+(0,2)
+is_mother
+
+parent_of
+
+Person
+(0,*)
+parent
+
+child
+
+child
+
+? Or maybe:
+
+(0,1)
+mother_of
+
+(0,1) Person
+father_of
+
+(1,*)
+mother
+
+d
+
+(1,*) Father
+father
+
+Mother
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7
+
+5 Relational Model
+? ? ? ? ? Basic Set Theory Relational Model From Theory to Practice Integrity Constraints Conversion from ER
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+5.1 Basic Set Theory
+? Set theory is the foundation of mathematics
+? you probably all know these things from your math courses, but repeating never hurts ? the relational model is based on set theory; understanding the basic math will help a lot
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9
+
+5.1 Sets
+? A set is a mathematical primitive, and thus has no formal definition ? A set is a collection of objects (called members or elements of the set)
+? objects (or entities) have to be understood in a very broad sense, can be anything from physical objects, people, abstract concepts, other sets, ?
+
+? Objects belong (or do not belong) to a set (alternatively, are or are not in the set) ? A set consists of all its elements
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10
+
+5.1 Sets
+? Sets can be specified extensionally
+? list all its elements ? e.g. A = {ifis, 42, Balke, Hurz!}
+
+? Sets can be specified intensionally
+? provide a criterion deciding whether an object belongs to the set or not (membership criterion) ? examples:
+? A = {x | x > 4 and x ? ?} ? B = {x ? ? | x < 7} ? C = {all facts about databases you should know}
+
+? Sets can be either finite or infinite
+? set of all super villains is finite ? set of all numbers is infinite
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+11
+
+5.1 Sets
+? Sets are different, iff they have different members
+? {a, a, b, c} = {a, b, c}
+
+? Sets can be empty (written as {} or ?) ? Notations for set membership
+? a ? {a, b, c} ? e ? {a, b, c}
+
+? {a, b, c} = {b, c, a} ? duplicates are not supported in standard set theory
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+12
+
+5.1 Sets
+? Defining a set by its intension
+? intension must be well-defined and unambiguous ? there is always is a clear membership criterion to determine whether an object belongs to the set (or not) ? Example for an invalid definition (Russell?s paradox):
+In a small town, there is just one male barber. He shaves all and only those men in town who do not shave themselves. ? does the barber shave himself?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+5.1 Sets
+? Still, the set?s extension might be unknown (however, there is one) ? Example
+? All students in this room who are older than 22. ? well-defined, but not known to me ? ? but (at least in principle) we can find out!
+
+? Why should we care? Because:
+
+? Intensional set ? database query ? Extensional set ? result of a query, table
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+5.1 Sets
+? For every set and object, there is an accompanying definition of equality (or equivalence)
+? is x = y?
+
+? However, you could have two different descriptions of the same element
+? example: the set of all 26 standard letters
+? ??? is not contained in this set ? ?m? = ?M? and both reflect a single element of the set ? ??? is element of the set ? ?m? ? ?M? and are both elements of the set (two different objects)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? ?m? and ?M? are different descriptions of the same object
+
+? example: the set of all 59 letters and umlauts in German
+
+15
+
+5.1 Sets
+? Sets have a cardinality (i.e., number of elements) ? Set A is a subset of set B, denoted by A ? B, iff every member of A is also a member of B ? B is a superset of A, denoted by B ? A, iff A ? B
+A?B B A
+
+? denoted by |A| ? |{a, b, c}| = 3
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+5.1 Tuples
+? A tuple (or vector) is a sequence of objects
+? length 1: Singleton ? length 2: Pair ? length 3: Triple ? length n: n-tuple
+
+? In contrast to sets?
+? Written as ?a, b, c? or (a, b, c)
+? tuples can contain an object more than once ? the objects appear in a certain order ? the length of the tuple is finite
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+17
+
+5.1 Tuples
+? Hence
+? ?a, b, c? ? ?c, b, a?, whereas {a, b, c} = {c, b, a} ? ?a1, a2? = ?b1, b2? iff a1=b1 and a2=b2
+
+? n-tuples (n > 1) can also be defined as a cascade of ordered pairs:
+? ?a, b, c, d? = ?a, ?b, ?c, d???
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+18
+
+5.1 Set Operations
+? Four binary set operations
+
+? Union: ?
+
+? union, intersection, difference and cartesian product
+
+? Intersection: ?
+
+? creates a new set containing all elements that are contained in (at least) one of two sets ? {a, b} ? {b, c} = {a, b, c}
+A?B A
+
+B
+
+? creates a new set containing all elements that are contained in both sets ? {a, b} ? {b, c} = {b} A?B
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+A
+
+B
+
+19
+
+? Difference: ?
+
+5.1 Set Operations
+A A?B B
+
+? creates a set containing all elements of the first set without those also being in the second set ? {a, b} ? {b, c} = {a}
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+20
+
+? Cartesian Product: ?
+
+5.1 Set Operations
+
+? the cartesian product is an operation between two sets, creating a new set of pairs such that: A ? B = {?a, b? | a ? A and b ? B} ? named after Ren? Descartes
+
+? Example
+? ? ? ?
+
+? The cartesian product can easily be extended to higher dimensionalities: A ? B ? C is a set of triples
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+{a, b} ? {b, c} = {?a, b?, ?a, c?, ?b, b?, ?b, c?} Cleverness = { genius, dumb } Character = { hero, villain } Cleverness ? Character = {?genius, hero?, ?dumb, hero?, ?genius, villain?, ?dumb, villain?}
+
+21
+
+? A relation R over some sets D1, ?, Dn is a subset of their cartesian product
+
+5.1 Relations
+
+? R ? D1 ? ? ? Dn ? the elements of a relation are tuples ? the Di are called domains ? each Di corresponds to an attribute of a tuple
+? ? ? ? n=1: Unary relation or property n=2: Binary relation n=3: Ternary relation ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+5.1 Relations
+? Some important properties
+? relations are sets in the mathematical sense, thus no duplicate tuples are allowed ? the set of tuples is unordered ? the list of domains is ordered ? relations can be modified by?
+? inserting new tuples, ? deleting existing tuples, and ? updating (that is, modifying) existing tuples.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+23
+
+5.1 Relations
+? A special case: Binary relations
+? R ? D1 ? D2 ? relates objects of two different sets to each other ? R is just a set of ordered pairs D R ? R = {?a,1?, ?c,1?, ?d,4?, a c ?e,5?, ?e,6?} b ? imagine Likes ? Person ? Beverage
+? can also be written as aR1, cR1, dR4, ? ? Tilo Likes Coffee, Christian Likes Tea, ?
+e d
+
+? D1 is called domain, D2 is called co-domain (range, target)
+1 2 V
+
+4
+
+5
+
+6
+
+3
+
+? For example, binary relations can naively be used to implement n:m relationship types in a logical data model ? Functions are a special case of binary realtions
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+24
+
+5.1 Relations
+? Example
+? Accessory = {spikes, butterfly helmet} ? Material = {silk, armor plates} ? Color = {pink, black}
+
+Color ? Material ? Accessory = {?pink, silk, butterfly helmet?, ?pink, silk, spikes?, ?pink, armor plates, butterfly helmet?, ?pink, armor plates, spikes?, ?black, silk, butterfly helmet?, ?black, silk, spikes?, ?black, armor plates, butterfly helmet?, ?black, armor plates, spikes?}
+25
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.1 Relations
+? Relation FamousHeroCostumes ? Color ? Material ? Accessory
+
+FamousHeroCostumes = {?pink, silk, butterfly helmet?, ?black, armor plates, spikes?}
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+5.1 Functions
+? Functions are special case of binary relations
+? partial function: each element of the domain is related to at most one element in the co-domain
+? total function: each element in the domain is related to exactly one element in the co-domain
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+27
+
+5.1 Functions
+? Functions can be used to abstract from the exact order of domains in a relation
+? alternative definition of relations: a relation is a set of functions ? every tuple in the relation is considered as a function of the type {A1 , ?, An} ? D1 ? ? ? Dn
+? that means, every tuple maps each attribute to some value
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+5.1 Functions
+? Example
+? ? ? ? Color = {pink, black} Material = {silk, armor plates} Accessory = {spikes, butterfly helmet} to be independent of the domain order, the tuple ?pink, silk, butterfly helmet? can also be represented as the following function t
+? t(Color) = pink ? t(Material) = silk ? t(Accessory) = butterfly helmet
+
+? Usually, one writes t[color] instead of t(color) ? This can be used to change the order of domains for tuples
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? t[Material, Accessory, Color] = ?silk, butterfly helmet, pink?
+29
+
+5 Relational Model
+? ? ? ? ? Basic Set Theory Relational Model From Theory to Practice Integrity Constraints Conversion from ER
+Relation Schemas Ra
+x
+
+bc
+67 zv
+
+Integrity Constraints
+
+y
+
+56
+
+qa
+30
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.2 Relational Model
+? Well, that?s all nice to know? but: we are here to learn about databases!
+? where is the connection?
+
+? Here it is?
+? a database schema is a description of concepts in terms of relations and attribute domains ? a database instance is a set of tuples having certain attribute values
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+5.2 Relational Model
+? OK, then?
+? designing a database schema (e.g., by ER modeling) determines entities and relationships, as well as their corresponding sets of attributes and associated domains ? the Cartesian product of the respective domains is the set of all possible instances (of each entity type or relationship type) ? a relation formalizes the actually existing subset of all possible instances
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+32
+
+5.2 Relational Model
+? Database schemas are described by relation schemas R(A1, ?, An) ? Domains are assigned by the dom function ? The actual database instance is given by a set of matching relations ? Example
+? relation schema: Cat(name: string, age: number) ? A matching relation: { (Blackie, 2), (Kitty, 1), (Fluffy, 4) } ? dom(A1) = D1, dom(A2) = D2, ? ? Also written as: R(A1:D1, ?, An:Dn)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+33
+
+5.2 Relational Model
+? Relations can be written as tables
+relation name attributes
+
+PERSON
+
+tuples ?
+
+first_name Clark Joseph Louise Lex Charles Erik Jeanne Ororo Tony Edward Matt Raven Robert Bruce
+
+last_name Kent Lane Luthor Xavier Magnus Gray Munroe Stark Murdock Wagner Banner
+
+sex m f m m m f f m m f m
+
+domain values
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+34
+
+5.2 Relational Model
+? A relational database schema consists of
+? a set of relation schemas ? a set of integrity constraints
+
+? A relational database instance (or state) is
+? a set of relations adhering to the respective schemas and respecting all integrity constraints
+Relation Schemas Ra
+x
+
+bc
+67 zv
+
+Integrity Constraints
+
+y
+
+56
+
+qa
+35
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.2 Relational Model
+? Every relational DBMS needs a language to define its relation schemas (and integrity constraints)
+? Data Definition Language (DDL) ? typically, it is difficult to formalize all possible integrity constraints, since they tend to be complex and vague
+
+? A relational DBMS also needs a language to handle and manipulate tuples
+? Data Manipulation Language (DML)
+
+? Today?s RDBMS use SQL as both DDL and DML
+? Compare to XML: Here, DDL and DML are separated
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+36
+
+5 Relational Model
+? ? ? ? ? Basic Set Theory Relational Model From Theory to Practice Integrity Constraints Conversion from ER
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+5.3 From Theory to Practice
+? In the early 1970s, the relational model became a hot topic database research
+? based on set theory ? a relation is a subset of the cartesian product over a list of domains
+
+? Early query interfaces for the relational model
+? Relational Algebra ? Tuple Relational Calculus (SQUARE, SEQUEL) ? Domain Relational Calculus (QBE)
+
+? Question: How to build a working database management system using this theory?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+38
+
+5.3 From Theory to Practice
+
+? System R was the first working prototype of a relational database system (starting 1973)
+? most design decisions taken during the development of System R substantially influenced the design of subsequent systems
+
+? Questions
+? how to store and represent data? ? how to query for data? ? how to manipulate data? ? how do you do all this with good performance?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+5.3 From Theory to Practice
+? The challenge of the System R project was to create a working prototype system
+? theory is good ? but developers were willing to sacrifice theoretical beauty and clarity for the sake of usability and performance
+
+? Vocabulary change
+? ? ? ? ? mathematical terms were too unfamiliar for most people table = relation row = tuple column = attribute data type, domain = domain
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+5.3 From Theory to Practice
+
+? Design decisions: During the development of System R, two major and very controversial decisions had been made
+? allow duplicate tuples ? allow NULL values
+
+? Those decisions are still subject to discussions?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+5.3 From Theory to Practice
+
+? Duplicates
+? in a relation, there cannot be any duplicate tuples ? also, query results cannot contain duplicates
+? the relational algebra and relational calculi all have implicit duplicate elimination
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+5.3 From Theory to Practice
+? Practical considerations
+? you want to query for name and birth year of all students of TU Braunschweig ? the result returns roughly 20,000 tuples ? probably there are some duplicates ? it?s 1973, and your computer has 16 kilobytes of main memory and a very slow external storage device? ? to eliminate duplicates, you need to store the result, sort it, and scan for adjacent duplicate lines
+? System R engineers concluded that this effort is not worth the effect ? duplicate elimination in result sets happens only on-request
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+5.3 From Theory to Practice
+? Decision: Don?t eliminate duplicates in results ? What about the tables?
+? again: ensuring that no duplicates end up in the tables requires some work ? engineers also concluded that there is actually no need in enforcing the no-duplicate policy
+? if the user wants duplicates and is willing to deal with all the arising problems ? then that?s fine
+
+? Decision: Allow duplicates in tables ? As a result, the theory underlying relational databases shifted from set theory to multi-set theory
+? straightforward, only notation is more complicated
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+5.3 From Theory to Practice
+
+? Sometimes, an attribute value is not known or an attribute does not apply for an entity
+? e.g. what value should the attribute university_degree take for the entity Heinz M?ller, if Heinz M?ller does not have any degree? ? e.g. you regularly observe the weather and store temperature, wind strength, and air pressure every hour ? and then your barometer breaks... what now?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+45
+
+5.3 From Theory to Practice
+
+? Possible solution: For each domain, define a value indicating that data is not available, not known, not applicable, ?
+? for example, use none for Heinz M?ller?s degree, use ?1 for missing pressure data, ... ? Problem:
+? you need such a special value for each domain or use case ? you need special failure handling for queries, e.g. compute average of all pressure values that are not ?1
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+5.3 From Theory to Practice
+? Again, system designers chose the simplest solution (regarding implementation): NULL values
+? NULL is a special value which is usable in any domain and represents that data is just not there
+? there are many interpretations of what NULL actually means
+
+? Systems have some default rules how to deal with NULL values
+? aggregation functions usually ignore rows with NULL values (which is good in most, but not all cases) ? three-valued logic ? however, creates some strange anomalies
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+5.3 From Theory to Practice
+
+? Another tricky problem: How should users query the DB? ? Classical answer
+? Relational Algebra and Relational Calculi ? problem: more and more non-expert users
+
+? More natural query interfaces:
+? QBE (query by example) ? SEQUEL (structured English query language) ? SQL: the current standard; derived from SEQUEL
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+48
+
+5 Relational Model
+? ? ? ? ? Basic Set Theory Relational Model From Theory to Practice Integrity Constraints Conversion from ER
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+5.4 Integrity Constraints
+? Integrity constraints are difficult to model in ER
+? basically annotations to the diagram, especially for behavioral constraints
+? e.g. The popularity rating of any sidekick should always be less than the respective super hero?s.
+
+? But some structural constraints can directly be expressed
+? e.g., key constraints, functionalities ? Formally, they are not part of the mathematical model, we still integrate them for practical purposes
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+50
+
+5.4 Basic Constraints
+? Primary Key Constraint
+? A relation is defined as a set of tuples
+? all tuples have to be distinct, i.e., no two tuples can have the same combinations of values for all attributes ? so-called uniqueness (unique key) constraint or primary key constraint
+
+? Therefore, we can define the key of a relation as a designated subset of attributes for which no two tuples have the same values (are unique)
+? It?s a little bit more complex than that?see lecture 10
+
+? Each relation will need a designated key
+? We will write this as for example Hero(alias, name, age, ?)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+5.4 Basic Constraints
+? NOT NULL Constraint
+? Remember, a relation is defined as ?? ? ???? ? ? ? ???? with tuples ?? ? ?? ? However, in a practical application its common that not always all attribute values are known ? Sometimes, this is not desired for certain attributes ? Primary Key must never be NULL ? e.g. Address( street: string NOT NULL, number: numeric NOT NULL, zip-code: numeric NOT NULL, city: string NOT NULL postbox : string)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? Therefore, it is usually assumed that there is a special NULL value in each domain, i.e. ???????? ? ???? ? Introduces the NOT NULL constraint
+
+52
+
+5.4 Basic Constraints
+? Foreign Key Constraint
+? Sometimes, we want to link tuples in different relations
+? This will be integral for realizing ER relationships in a database
+
+? A foreign key constraint can be defined between the key attributes of one relation and some attributes of References the key ?id? of hero another one
+? e.g., Hero(id, first name, last name) Aliases(alias, heroid?Hero)
+
+? Tuples of the referring relation can only have values for the referencing attribute which are the key of an existing tuple in the referenced relation
+? This is called referential integrity
+53
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.4 Basic Constraints
+? Example:
+Hero(id, first name, last name) Aliases(alias, heroid?Hero)
+
+Hero
+
+id 1 2 3 4
+
+firstname Charles James Jean Max
+
+lastname Xaviar Howlett Grey Eisenhardt
+
+Aliases
+
+alias Logan Wolverine Weapon X Eric Magnus Magneto Professor X White Queen Invalid!
+
+heroid 2 2 2 4 4 1 5
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+54
+
+5.4 Basic Constraints
+? Convention:
+? If a composite key is referenced, we write this as, e.g., R1(a, b, c) R2(d, e, f, (d, f)?R1) ? This is not a standard notation, but rather close to what you find in SQL
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+55
+
+5.4 First Normal Form
+? There is a another major constraint on the attributes? data types in the relational model
+? the value of any attribute must be atomic, that is, it cannot be composed of several other attributes
+? if this property is met, the relation is often referred to as a being in first normal form (1NF or minimal form) ? in particular, set-valued and relation-valued attributes (tables within tables) are prohibited
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+56
+
+5.4 First Normal Form
+? Example of a set-valued column
+? A person may own several telephones (home, office, cell, ?).
+Person first_name Clark Joseph Louise Lex Charles Erik last_name Kent Lane Luthor Xavier Magnus telephone_no 5555678 {3914533, 3556576, 5463456} 4543689 7658736 {1252345, 8766781}
+
+prohibited
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+57
+
+5.4 First Normal Form
+? Please note, it is possible to model composed attributes in ER models? ? To transform such a model into the relational model, a normalization step is needed
+? this is not always trivial, e.g., what happens to keys?
+Person first_name Clark Joseph Louise Louise Louise Lex Charles Erik Erik
+last_name
+
+Kent Lane Lane Lane Luthor Xavier Magnus Magnus
+
+telephone_no 555-5678 391-4533 355-6576 546-3456 454-3689 765-8736 125-2345 876-6781
+58
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.4 First Normal Form
+? In a purely relational database, all relations are in first normal form
+? object-oriented databases feature multi-valued attributes, thus closing the modeling gap ? object-relational extensions integrate user-defined types (UDTs) into relational databases
+? Oracle from version 9i, IBM DB2 from version 8.1, ?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+59
+
+5 Relational Model
+? ? ? ? ? Basic Set Theory Relational Model From Theory to Practice Integrity Constraints Conversion from ER
+Hero
+(1, *)
+uses
+
+(0,*)
+
+Power
+
+situation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+60
+
+5.5 Conversion from ER
+? After modeling a conceptual schema (e.g., using an ER diagram), the schema can be (semi-) automatically transformed into a relational schema
+conceptual design
+ER diagram UML,?
+
+logical design
+tables, columns,?
+
+physical design
+tablespaces, Indexes,?
+61
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.5 Conversion from ER
+? The ER diagram is semantically richer than the relational model
+? However, its not a real subset
+
+? Many constraints are very hard/impossible to express
+? disjoint/overlapping generalization ? non-trivial cardinalities ? like (11,20), (3,3) or even (1,*) ? ...
+
+? Therefore, it usually is a really good idea to create an ER diagram before coding a logical schema
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+62
+
+5.5 Conversion from ER
+? Question: How to convert EER to relation?
+? We can automatically convert a conceptual ER model to relations
+? Some heuristics follow? ? However, quite often the result will not be as desired ? Therefore, still some manual optimization and steering is beneficial ? While designing a model, it might be very beneficial to keep the result relations and the desired queries in mind?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+63
+
+5.5 Conversion from ER
+? Converting a simple Entity Type into a relation schema:
+id
+name alias
+
+Hero
+It?s as simple as that
+
+Hero(id, name, alias)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+64
+
+5.5 Conversion from ER
+? Converting an n:m relationship type into a relation schema:
+? Relationship type becomes a separate relation schema
+? Links entities of the respective types by using their foreign keys
+id name
+
+Hero
+
+(0,*)
+
+alias
+fights
+
+(0,*) id
+
+name
+
+alias
+
+Villain
+
+Hero(id, name, alias)
+
+Villain(id, name, alias)
+
+hero_fights_villain(hero ? Hero, villain?Villain)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+65
+
+5.5 Conversion from ER
+? Converting an 1:m relationship type a relation schema:
+? Entity Type at 1-side can only participate once at the relationship type
+=> Push relationship type to the 1-side
+id name
+
+Villain
+
+(0,*)
+
+alias
+owns
+
+(1,1)
+
+coordinates Lair
+
+awesomeness
+
+Villain(id, name, alias)
+
+Lair(coordinates, awesomeness, owner?Villain)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+66
+
+5.5 Conversion from ER
+? Converting an 1:1 relationship type a relation schema:
+? A little bit tricky...
+? Cannot be expressed just by the relation schemas... ? Just choose one side as the 1-side and implement it just like a 1:m relationship type
+id name Hero (1,1) alias
+has
+
+(1,1)
+
+id
+
+name Sidekick
+
+alias
+
+Hero(id, name, alias)
+
+Sidekick(id, name, alias, supervisor ? Hero)
+
+? To check if it really 1:1 we need advanced constraints
+? e.g. by using triggers (to be introduced in lecture 14)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+67
+
+5.5 Conversion from ER
+? How to deal with attributes attached to the rel. type
+? Put them wherever you put the respective foreign key(s)
+#lab coats
+
+name Scientist
+
+id
+
+(0,*)
+
+hours
+works on
+
+(0,*)
+
+id
+
+code name
+
+Invention
+
+Scientist(id, name, #lab_coats)
+
+Invention(id, code_name)
+
+scientist_works_on_invention( scientist ? Scientist, invention ? Invention, hours )
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+68
+
+5.5 Conversion from ER
+? What about n-ary relationship types? (n>2)
+? Just apply the exact same approaches:
+#lab coats
+
+name Scientist
+
+id
+
+(0,*)
+
+hours
+works on
+
+(0,*)
+
+(0,*)
+
+id Lab Invention id
+code name
+
+sc_wrk_on_inv_in_lab( scientist ? Scientist, invention ? Invention, lab ? Lab hours)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+69
+
+5.5 Conversion from ER
+? Converting a weak entity into a relation schema:
+? Weak entities are only unique together with the entity at the identifying relationship => Follow ident. rel. and inherit respective foreign keys
+code name
+chance of success
+
+Evil Plan
+
+(0,*)
+
+Priority order has
+
+done
+
+Todo Item
+
+Evil_Plan(code_name, chance_of_success)
+
+todo_item(priority_order, evil_plan ? Evil_Plan, done)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+70
+
+5.5 Conversion from ER
+? How to deal with multi-attributes and composite attributes
+? composition: just flatten it ? multi-attribute: treat it like a weak entity
+id
+names
+
+city
+address
+
+street number
+
+Secret Hideout
+
+Secret_Hideout(id, addr_city, addr_street, addr_number) hideout_name (hideout ? Secret_Hideout, name)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+71
+
+5.5 Conversion from ER
+? Converting types with inherited attributes/ relations into a relation schema:
+? Can be implemented in many ways (depending on inheritance type) ? Most generic way: Inherit foreign keys from super type
+id name Gadget range Weapon o weight Utility Gadget
+
+Gadget(id, name)
+Weapon(gadget ? Gadget, range) Util_gadget(gadget ? Gadget, weight)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+72
+
+5.5 Conversion from ER
+Owner(newkey)
+
+? Union-Type:
+country a l ias
+
+Space Agency
+
+Super Villain
+
+na me
+
+U
+
+Owner
+
+SpaceAgency (name, country, newkey ? Owner) SuperVillain (alias, newkey ? Owner)
+SpaceStation(name) spaceStation_owned_by ((newkey) ? Owner, (name) ? SpaceStation )
+73
+
+(0,*)
+owns
+
+(0,*)
+Space Station
+
+na me
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.5 Conversion from ER
+? Example:
+Person telephone no firstname lastname (1, *) (0,*) type
+(0,*)
+
+Hero weakness alias
+
+uses
+
+Power
+
+reach name
+
+situation
+
+(1, 1)
+
+has
+
+description solution
+
+Side Effect
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+74
+
+5.5 Conversion from ER
+? Entity types:
+Person telephone no firstname lastname
+
+Hero
+
+alias weakness
+
+Hero((firstname, lastname) ? Person, alias, weakness)
+75
+
+Person(firstname, lastname, telephone_no)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5.5 Conversion from ER
+? Relationship types: N:M
+Hero weakness alias situation (1, *)
+uses
+
+(0,*)
+
+type Power
+reach
+
+name
+
+Power(name, type, reach)
+
+uses((name) ? Power (fistname, lastname) ? Hero, situation)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+76
+
+5.5 Conversion from ER
+? Relationship types: 1:N
+(0,*)
+
+type Power reach name
+
+Power(name, type, reach)
+
+SideEffect(description, solution, (name)? Power)
+
+(1, 1)
+
+has
+
+description solution
+
+Sideeffect
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+77
+
+6 Next Lecture
+? Relational Algebra
+
+? Basic relational algebra operations ? Additional derived operations
+
+? Query Optimization ? Advanced relational algebra
+? Outer Joins ? Aggregation
+
+??
+
+?
+
+??
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+78
+
+

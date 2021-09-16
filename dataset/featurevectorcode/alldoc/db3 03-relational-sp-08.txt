@@ -1,0 +1,155 @@
+Databases Model the Real World ER & Relational: Digging Deeper
+R &G - Chapters 2 & 3 ? ?Data Model? allows us to translate real world things into structures computers can store ? Many models: Relational, E-R, O-O, XML, Network, Hierarchical, etc. ? Relational ? Rows & Columns ? Keys & Foreign Keys to link Relations Enrolled
+sid 53666 53666 53650 53666 cid grade Carnatic101 C Reggae203 B Topology112 A History105 B
+
+Students
+sid 53666 53688 53650 name login Jones jones@cs Smith smith@eecs Smith smith@math age 18 18 19 gpa 3.4 3.2 3.8
+
+Aggregation
+
+ssn
+
+name
+
+lot
+
+Conceptual Design Using the ER Model
+? ER modeling can get tricky! ? Design choices:
+? Should a concept be modeled as an entity or an attribute? ? Should a concept be modeled as an entity or a relationship? ? Identifying relationships: Binary or ternary? Aggregation?
+
+Used to model a relationship Monitors until involving a relationship set. since started_on dname Allows us to treat a pid pbudget did budget relationship set Sponsors as an entity set Departments Projects for purposes of participation in Aggregation vs. ternary relationship? ? Monitors is a distinct relationship, with a (other) descriptive attribute. relationships. ? Also, can say that each sponsorship is
+monitored by at most one employee.
+
+Employees
+
+? Note constraints of the ER Model:
+? A lot of data semantics can (and should) be captured. ? But some constraints cannot be captured in ER diagrams.
+? We?ll refine things in our logical (relational) design
+
+Entity vs. Attribute
+? Should address be an attribute of Employees or an entity (related to Employees)? ? Depends upon how we want to use address information, and the semantics of the data: ? If we have several addresses per employee, address must be an entity (since attributes cannot be setvalued). ? If the structure (city, street, etc.) is important, address must be modeled as an entity (since attribute values are atomic). ? If the lifetime of the address differs from the entity, address must be modeled as an entity (since attributes are deleted with their entity).
+
+Entity vs. Attribute (Cont.)
+name from lot Works_In2 to did dname budget Departments
+
+? Works_In2 does not allow an employee to work in a department for two or more periods. ? (why not?) ? Similar to the problem of wanting to record several addresses for an employee: we want to record several values of the descriptive attributes for each instance of this relationship.
+
+ssn Employees
+
+ssn
+
+name
+
+lot Works_In3
+
+did
+
+dname budget Departments
+
+Employees
+
+from
+
+Duration
+
+to
+
+Entity vs. Relationship
+OK as long as a manager gets a separate discretionary budget (dbudget) for each dept. What if manager?s dbudget covers all managed depts? (can repeat value, but such redundancy is problematic)
+name ssn Employees since lot Manages2 dbudget did dname budget Departments
+
+Now you try it
+Try this at home - Courses database: ? Courses, Students, Teachers ? Courses have ids, titles, credits, ? ? Courses have multiple sections that have time/rm and exactly one teacher ? Must track students? course schedules and transcripts including grades, semester taken, etc. ? Must track which classes a professor has taught ? Database should work over multiple semesters
+
+ssn
+
+name lot did dname budget Departments is_manager managed_by Mgr_Appts dbudget since
+
+Employees
+
+apptnum
+
+A Cadastral E-R Diagram These things get pretty hairy!
+? Many E-R diagrams cover entire walls! ? A modest example:
+cadastral: showing or recording property boundaries, subdivision lines, buildings, and related details Source: US Dept. Interior Bureau of Land Management, Federal Geographic Data Committee Cadastral Subcommittee http://www.fairview-industries.com/standardmodule/cad-erd.htm
+
+Converting ER to Relational
+
+Logical DB Design: ER to Relational
+? Entity sets to tables.
+ssn name lot 48 22 123-22-3666 Attishoo 231-31-5368 Smiley
+
+? Fairly analogous structure ? But many simple concepts in ER are subtle to specify in relations
+
+ssn
+
+name
+
+lot
+
+131-24-3650 Smethurst 35
+Employees
+
+CREATE TABLE Employees (ssn CHAR(11), name CHAR(20), lot INTEGER, PRIMARY KEY (ssn))
+
+Relationship Sets to Tables
+CREATE TABLE Works_In( ? In translating a many-tossn CHAR(1), many relationship set to a did INTEGER, relation, attributes of the since DATE, relation must include: PRIMARY KEY (ssn, did), 1) Keys for each FOREIGN KEY (ssn) participating entity set REFERENCES Employees, (as foreign keys). This set FOREIGN KEY (did) of attributes forms a REFERENCES Departments) superkey for the relation. ssn did since 2) All descriptive attributes.
+
+Review: Key Constraints
+? Each dept has at most one manager, according to the key constraint on Manages.
+since name ssn lot did dname budget
+
+Employees
+
+Manages
+
+Departments
+
+123-22-3666 51 123-22-3666 56 231-31-5368 51
+
+1/1/91 3/3/93 2/2/92
+
+Translation to relational model?
+1-to-1 1-to Many Many-to-1 Many-to-Many
+
+Translating ER with Key Constraints
+since name ssn lot Manages did dname budget
+
+Review: Participation Constraints
+? Does every department have a manager? ? If so, this is a participation constraint: the participation of Departments in Manages is said to be total (vs. partial). ? Every did value in Departments table must appear in a row of the Manages table (with a non-null ssn value!)
+name ssn Employees lot Manages since did dname budget Departments
+
+Employees
+
+Departments
+
+? Since each department has a unique manager, we could instead combine Manages and Departments.
+CREATE TABLE Manages( CREATE TABLE Dept_Mgr( ssn CHAR(11), did INTEGER, did INTEGER, dname CHAR(20), Vs. budget REAL, since DATE, PRIMARY KEY (did), ssn CHAR(11), FOREIGN KEY (ssn) since DATE, REFERENCES Employees, PRIMARY KEY (did), FOREIGN KEY (did) FOREIGN KEY (ssn) REFERENCES Departments) REFERENCES Employees)
+
+Works_In
+
+since
+
+Participation Constraints in SQL Review: Weak Entities
+? We can capture participation constraints involving one entity set in a binary relationship, but little else (without resorting to CHECK constraints which we?ll learn later). CREATE TABLE Dept_Mgr( did INTEGER, dname CHAR(20), budget REAL, ssn CHAR(11) NOT NULL, since DATE, PRIMARY KEY (did), FOREIGN KEY (ssn) REFERENCES Employees, ON DELETE NO ACTION) ? A weak entity can be identified uniquely only by considering the primary key of another (owner) entity. ? Owner entity set and weak entity set must participate in a one-to-many relationship set (1 owner, many weak entities). ? Weak entity set must have total participation in this identifying relationship set.
+name ssn lot cost pname age
+
+Employees
+
+Policy
+
+Dependents
+
+Summary of Conceptual Design Translating Weak Entity Sets
+? Weak entity set and identifying relationship set are translated into a single table. ? When the owner entity is deleted, all owned weak entities must also be deleted. CREATE TABLE Dep_Policy ( pname CHAR(20), age INTEGER, cost REAL, ssn CHAR(11) NOT NULL, PRIMARY KEY (pname, ssn), FOREIGN KEY (ssn) REFERENCES Employees, ON DELETE CASCADE) ? Conceptual design follows requirements analysis, ? Yields a high-level description of data to be stored ? ER model popular for conceptual design ? Constructs are expressive, close to the way people think about their applications. ? Note: There are many variations on ER model
+? Both graphically and conceptually
+
+? Basic constructs: entities, relationships, and attributes (of entities and relationships). ? Some additional constructs: weak entities, ISA hierarchies (see text if you?re curious), and aggregation.
+
+Summary of ER (Cont.)
+? Several kinds of integrity constraints: ? key constraints ? participation constraints ? Some foreign key constraints are also implicit in the definition of a relationship set. ? Many other constraints (notably, functional dependencies) cannot be expressed. ? Constraints play an important role in determining the best database design for an enterprise.
+
+Summary of ER (Cont.)
+? ER design is subjective. There are often many ways to model a given scenario! ? Analyzing alternatives can be tricky, especially for a large enterprise. Common choices include: ? Entity vs. attribute, entity vs. relationship, binary or nary relationship, whether or not to use ISA hierarchies, aggregation. ? Ensuring good database design: resulting relational schema should be analyzed and refined further. ? Functional Dependency information and normalization techniques are especially useful.
+
+

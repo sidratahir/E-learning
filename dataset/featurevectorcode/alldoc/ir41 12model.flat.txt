@@ -1,0 +1,566 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 12: Language Models for IR
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2013-05-21
+
+1 / 50
+
+Overview
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+2 / 50
+
+Outline
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+3 / 50
+
+Naive Bayes classi?cation rule
+
+? c map = arg max [log P(c) +
+c?C 1?k?nd
+
+? log P(tk |c)]
+
+? Each conditional parameter log P(tk |c) is a weight that indicates how good an indicator tk is for c. ? The prior log P(c) is a weight that indicates the relative frequency of c. The sum of log prior and term weights is then a measure of how much evidence there is for the document being in the class. We select the class with the most evidence.
+
+4 / 50
+
+Parameter estimation
+Prior: Nc ? P(c) = N where Nc is the number of docs in class c and N the total number of docs Conditional probabilities: ? P(t|c) = Tct + 1 t ? ?V (Tct ? + 1)
+
+where Tct is the number of tokens of t in training documents from class c (includes multiple occurrences)
+
+5 / 50
+
+Add-one smoothing to avoid zeros
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+Without add-one smoothing: if there are no occurrences of WTO in documents in class China, we get a zero estimate for the corresponding parameter: TChina,WTO ? =0 P(WTO|China) = t ? ?V TChina,t ? With this estimate: [d contains WTO] ? [P(China|d) = 0]. We must smooth to get a better estimate P(China|d) > 0.
+
+6 / 50
+
+Naive Bayes Generative Model
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+P(c|d ) ? P(c)
+
+1?k?nd
+
+P(tk |c)
+
+Generate a class with probability P(c) Generate each of the words (in their respective positions), conditional on the class, but independent of each other, with probability P(tk |c)
+
+7 / 50
+
+Take-away today
+
+Feature selection for text classi?cation: How to select a subset of available dimensions Statistical language models: Introduction Statistical language models in IR Discussion: Properties of di?erent probabilistic models in use in IR
+
+8 / 50
+
+Outline
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+9 / 50
+
+Feature selection
+
+In text classi?cation, we usually represent documents in a high-dimensional space, with each dimension corresponding to a term. In this lecture: axis = dimension = word = term = feature Many dimensions correspond to rare words. Rare words can mislead the classi?er. Rare misleading features are called noise features. Eliminating noise features from the representation increases e?ciency and e?ectiveness of text classi?cation. Eliminating features is called feature selection.
+
+10 / 50
+
+Example for a noise feature
+
+Let?s say we?re doing text classi?cation for the class China. Suppose a rare term, say arachnocentric, has no information about China . . . . . . but all instances of arachnocentric happen to occur in China documents in our training set. Then we may learn a classi?er that incorrectly interprets arachnocentric as evidence for the class China. Such an incorrect generalization from an accidental property of the training set is called over?tting. Feature selection reduces over?tting and improves the accuracy of the classi?er.
+
+11 / 50
+
+Basic feature selection algorithm
+
+SelectFeatures(D, c, k) 1 V ? ExtractVocabulary(D) 2 L ? [] 3 for each t ? V 4 do A(t, c) ? ComputeFeatureUtility(D, t, c) 5 Append(L, A(t, c), t ) 6 return FeaturesWithLargestValues(L, k) How do we compute A, the feature utility?
+
+12 / 50
+
+Di?erent feature selection methods
+
+A feature selection method is mainly de?ned by the feature utility measure it employs Feature utility measures:
+Frequency ? select the most frequent terms Mutual information ? select the terms with the highest mutual information Mutual information is also called information gain in this context. Chi-square (see book)
+
+13 / 50
+
+Mutual information
+Compute the feature utility A(t, c) as the mutual information (MI) of term t and class c. MI tells us ?how much information? the term contains about the class and vice versa. For example, if a term?s occurrence is independent of the class (same proportion of docs within/without class contain the term), then MI is 0. De?nition:
+I (U; C ) =
+et ?{1,0} ec ?{1,0}
+
+P(U = et , C = ec ) log2
+
+P(U = et , C = ec ) P(U = et )P(C = ec )
+
+14 / 50
+
+How to compute MI values
+Based on maximum likelihood estimates, the formula we actually use is: I (U; C ) = N11 NN11 NN01 N01 log2 log2 + N N1. N.1 N N0. N.1 NN10 NN00 N00 N10 log2 log2 + + N N1. N.0 N N0. N.0
+
+N10 : number of documents that contain t (et = 1) and are not in c (ec = 0); N11 : number of documents that contain t (et = 1) and are in c (ec = 1); N01 : number of documents that do not contain t (et = 1) and are in c (ec = 1); N00 : number of documents that do not contain t (et = 1) and are not in c (ec = 1); N = N00 + N01 + N10 + N11 .
+
+15 / 50
+
+How to compute MI values (2)
+
+Alternative way of computing MI:
+I (U; C ) =
+et ?{1,0} ec ?{1,0}
+
+P(U = et , C = ec ) log2
+
+N(U = et , C = ec ) E (U = et )E (C = ec )
+
+N(U = et , C = ec ) is the count of documents with values et and ec . E (U = et , C = ec ) is the expected count of documents with values et and ec if we assume that the two random variables are independent.
+
+16 / 50
+
+MI example for poultry/export in Reuters
+ec = e poultry = 1 et = e export = 1 N11 = 49 et = e export = 0 N01 = 141 these values into formula: I (U; C ) = ec = e poultry = 0 N10 = 27,652 Plug N00 = 774,106
+
+49 801,948 ? 49 log2 801,948 (49+27,652)(49+141) 801,948 ? 141 141 log2 + 801,948 (141+774,106)(49+141) 27,652 801,948 ? 27,652 + log2 801,948 (49+27,652)(27,652+774,106) 774,106 801,948 ? 774,106 + log2 801,948 (141+774,106)(27,652+774,106) ? 0.000105
+
+17 / 50
+
+MI feature selection on Reuters
+Class: co?ee term MI coffee 0.0111 bags 0.0042 growers 0.0025 kg 0.0019 colombia 0.0018 brazil 0.0016 export 0.0014 exporters 0.0013 exports 0.0013 crop 0.0012 Class: sports term MI soccer 0.0681 cup 0.0515 match 0.0441 matches 0.0408 played 0.0388 league 0.0386 beat 0.0301 game 0.0299 games 0.0284 team 0.0264
+
+18 / 50
+
+Naive Bayes: E?ect of feature selection
+0.8
+
+0.6
+
+bb xb xx
+
+b
+
+# b
+
+# o b
+
+o #
+
+o
+
+F1 measure
+
+0.4
+
+b
+
+x x
+
+b o x o # x b x # x b o # x # o b x o # b x o #
+
+x
+
+b
+
+(multinomial = multinomial Naive Bayes, binomial = Bernoulli Naive Bayes)
+
+0.2
+
+#
+
+0.0
+
+o x # b
+
+# o o oo ##
+
+# o x b
+
+multinomial, MI multinomial, chisquare multinomial, frequency binomial, MI
+
+1
+
+10
+
+100
+
+1000
+
+10000
+
+number of features selected
+19 / 50
+
+Feature selection for Naive Bayes
+
+In general, feature selection is necessary for Naive Bayes to get decent performance. Also true for many other learning methods in text classi?cation: you need feature selection for optimal performance.
+
+20 / 50
+
+Exercise
+(i) Compute the ?export?/POULTRY contingency table for the ?Kyoto?/JAPAN in the collection given below. (ii) Make up a contingency table for which MI is 0 ? that is, term and class are independent of each other. ?export?/POULTRY table: ec = e poultry = 1 N11 = 49 N01 = 141 ec = e poultry = 0 N10 = 27,652 N00 = 774,106 in c = Japan? yes yes no no no
+21 / 50
+
+et = e export = 1 et = e export = 0 Collection: training set
+
+docID 1 2 3 4 5
+
+words in document Kyoto Osaka Taiwan Japan Kyoto Taipei Taiwan Macao Taiwan Shanghai London
+
+Outline
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+22 / 50
+
+Using language models (LMs) for IR
+1 2
+
+LM = language model We view the document as a generative model that generates the query. What we need to do: De?ne the precise generative model we want to use Estimate parameters (di?erent parameters for each document?s model) Smooth to avoid zeros Apply to query and ?nd document most likely to have generated the query Present most likely document(s) to user Note that 4?7 is very similar to what we did in Naive Bayes.
+23 / 50
+
+3 4 5
+
+6 7
+
+8 9
+
+What is a language model?
+We can view a ?nite state automaton as a deterministic language
+
+I model. I wish I wish I wish I wish . . .
+
+wish
+
+Cannot generate: ?wish I wish?
+
+or ?I wish I? Our basic model: each document was generated by a di?erent automaton like this except that these automata are probabilistic.
+
+24 / 50
+
+A probabilistic language model
+w STOP the a frog P(w |q1 ) 0.2 0.2 0.1 0.01 w toad said likes that ... P(w |q1 ) 0.01 0.03 0.02 0.04 ... This
+
+q1
+
+is a one-state probabilistic ?nite-state automaton ? a unigram language model ? and the state emission distribution for its one state q1 . STOP is not a word, but a special symbol indicating that the automaton stops. frog said that toad likes frog STOP P(string) = 0.01 ?0.03 ?0.04 ?0.01 ?0.02 ?0.01 ?0.2 = 0.0000000000048
+
+25 / 50
+
+A di?erent language model for each document
+d1 w toad said likes that ... query: frog said that toad language w STOP the a frog model of P(w |.) .2 .2 .1 .01 language model of d2 w P(w |.) w P(w |.) P(w |.) .01 STOP .2 toad .02 .03 said .03 the .15 a .08 .02 likes .02 .04 that .05 frog .01 ... ... ... likes frog STOP P(query|Md1 ) = 0.01
+
+?0.03 ?0.04 ?0.01 ?0.02 ?0.01 ?0.2 = 0.0000000000048 = 4.8 ? 10?12 P(query|Md2 ) = 0.01 ?0.03 ?0.05 ?0.02 ?0.02 ?0.01 ?0.2 = 0.0000000000120 = 12 ? 10?12 P(query|Md1 ) < P(query|Md2 )
+
+Thus, document d2 is ?more relevant? to the query ?frog said that toad likes frog STOP? than d1 is.
+26 / 50
+
+Outline
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+27 / 50
+
+Using language models in IR
+Each document is treated as (the basis for) a language model. Given a query q Rank documents based on P(d|q) P(d|q) = P(q|d)P(d) P(q)
+
+P(q) is the same for all documents, so ignore P(d) is the prior ? often treated as the same for all d
+But we can give a higher prior to ?high-quality? documents, e.g., those with high PageRank.
+
+P(q|d) is the probability of q given d . For uniform prior: ranking documents according according to P(q|d) and P(d|q) is equivalent.
+28 / 50
+
+Where we are
+
+In the LM approach to IR, we attempt to model the query generation process. Then we rank documents by the probability that a query would be observed as a random sample from the respective document model. That is, we rank according to P(q|d). Next: how do we compute P(q|d)?
+
+29 / 50
+
+How to compute P(q|d )
+We will make the same conditional independence assumption as for Naive Bayes.
+
+P(q|Md ) = P( t1 , . . . , t|q| |Md ) =
+1?k?|q|
+
+P(tk |Md )
+
+(|q|: length of q; tk : the token occurring at position k in q) This is equivalent to: P(q|Md ) = distinct term t in q tf t,q : term frequency (# occurrences) of t in q Multinomial model (omitting constant factor)
+30 / 50
+
+P(t|Md )tf t,q
+
+Parameter estimation
+Missing piece: Where do the parameters P(t|Md ) come from? Start with maximum likelihood estimates (as we did for Naive Bayes) tf t,d ? P(t|Md ) = |d| (|d|: length of d; tf t,d : # occurrences of t in d) As in Naive Bayes, we have a problem with zeros. A single t with P(t|Md ) = 0 will make P(q|Md ) = P(t|Md ) zero. We would give a single term ?veto power?. For example, for query [Michael Jackson top hits] a document about ?top songs? (but not using the word ?hits?) would have P(q|Md ) = 0. ? Thats?s bad. We need to smooth the estimates to avoid zeros.
+31 / 50
+
+Smoothing
+
+Key intuition: A nonoccurring term is possible (even though it didn?t occur), . . . . . . but no more likely than would be expected by chance in the collection. Notation: Mc : the collection model; cf t : the number of occurrences of t in the collection; T = t cf t : the total number of tokens in the collection. cf t ? P(t|Mc ) = T ? We will use P(t|Mc ) to ?smooth? P(t|d) away from zero.
+
+32 / 50
+
+Jelinek-Mercer smoothing
+
+P(t|d) = ?P(t|Md ) + (1 ? ?)P(t|Mc ) Mixes the probability from the document with the general collection frequency of the word. High value of ?: ?conjunctive-like? search ? tends to retrieve documents containing all query words. Low value of ?: more disjunctive, suitable for long queries Correctly setting ? is very important for good performance.
+
+33 / 50
+
+Jelinek-Mercer smoothing: Summary
+
+P(q|d) ?
+1?k?|q|
+
+(?P(tk |Md ) + (1 ? ?)P(tk |Mc ))
+
+What we model: The user has a document in mind and generates the query from this document. The equation represents the probability that the document that the user had in mind was in fact this one.
+
+34 / 50
+
+Example
+
+Collection: d1 and d2 d1 : Jackson was one of the most talented entertainers of all time d2 : Michael Jackson anointed himself King of Pop Query q: Michael Jackson Use mixture model with ? = 1/2 P(q|d1 ) = [(0/11 + 1/18)/2] ? [(1/11 + 2/18)/2] ? 0.003 P(q|d2 ) = [(1/7 + 1/18)/2] ? [(1/7 + 2/18)/2] ? 0.013 Ranking: d2 > d1
+
+35 / 50
+
+Exercise: Compute ranking
+
+Collection: d1 and d2 d1 : Xerox reports a pro?t but revenue is down d2 : Lucene narrows quarter loss but revenue decreases further Query q: revenue down Use mixture model with ? = 1/2 P(q|d1 ) = [(1/8 + 2/16)/2] ? [(1/8 + 1/16)/2] = 1/8 ? 3/32 = 3/256 P(q|d2 ) = [(1/8 + 2/16)/2] ? [(0/8 + 1/16)/2] = 1/8 ? 1/32 = 1/256 Ranking: d1 > d2
+
+36 / 50
+
+Dirichlet smoothing
+
+? tf t,d + ?P(t|Mc ) ? P(t|d) = Ld + ? ? ? The background distribution P(t|Mc ) is the prior for P(t|d). Intuition: Before having seen any part of the document we start with the background distribution as our estimate. As we read the document and count terms we update the background distribution. The weighting factor ? determines how strong an e?ect the prior has.
+
+37 / 50
+
+Jelinek-Mercer or Dirichlet?
+
+Dirichlet performs better for keyword queries, Jelinek-Mercer performs better for verbose queries. Both models are sensitive to the smoothing parameters ? you shouldn?t use these models without parameter tuning.
+
+38 / 50
+
+Sensitivity of Dirichlet to smoothing parameter
+
+? is the Dirichlet smoothing parameter (called ? on the previous slides)
+39 / 50
+
+Outline
+
+1
+
+Recap Feature selection Language models Language Models for IR Discussion
+
+2
+
+3
+
+4
+
+5
+
+40 / 50
+
+Language models are generative models
+
+We have assumed that queries are generated by a probabilistic process that looks like this: (as in Naive Bayes)
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+41 / 50
+
+Naive Bayes and LM generative model s
+
+We want to classify document d. We want to classify a query q.
+Classes: e.g., geographical regions like China, UK, Kenya. Each document in the collection is a di?erent class.
+
+Assume that d was generated by the generative model. Assume that q was generated by a generative model Key question: Which of the classes is most likely to have generated the document? Which document (=class) is most likely to have generated the query q?
+Or: for which class do we have the most evidence? For which document (as the source of the query) do we have the most evidence?
+
+42 / 50
+
+Naive Bayes Multinomial model / IR language models
+
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+43 / 50
+
+Naive Bayes Bernoulli model / Binary independence model
+
+C =China
+
+U Alaska =0
+
+U Beijing =1
+
+U India =0
+
+U join =1
+
+U Taipei =1
+
+U WTO =1
+
+44 / 50
+
+Comparison of the two models
+
+event model random variable(s) doc. representation parameter estimation dec. rule: maximize multiple occurrences length of docs # features estimate for the
+
+multinomial model / IR language model generation of (multi)set of tokens X = t i? t occurs at given pos d = t1 , . . . , tk , . . . , tnd , tk ? V ? P(X = t|c) ? ? P(c) 1?k?nd P(X = tk |c) taken into account can handle longer docs can handle more ? P(X = the|c) ? 0.05
+
+Bernoulli model / BIM generation of subset of voc Ut = 1 i? t occurs in doc d = e1 , . . . , ei , . . . , eM , ei ? {0, 1} ? P(Ui = e|c) ? ? P(c) ti ?V P(Ui = ei |c) ignored works best for short docs works best with fewer ? P(U the = 1|c) ? 1.0
+
+45 / 50
+
+Vector space (tf-idf) vs. LM
+precision LM %chg 0.7590 +2.0 0.4910 +8.6 0.4045 +15.1 0.2572 +22.9 0.1405 +37.1 0.0432 +169.6 0.0050 +76.9 0.2233 +19.6 signi?cant
+
+Rec. 0.0 0.1 0.2 0.4 0.6 0.8 1.0 11-point average
+
+tf-idf 0.7439 0.4521 0.3514 0.2093 0.1024 0.0160 0.0028 0.1868
+
+* * * * *
+
+The
+
+language modeling approach always does better in these experiments . . . . . . but note that where the approach shows signi?cant gains is at higher levels of recall.
+
+46 / 50
+
+Vector space vs BM25 vs LM
+BM25/LM: based on probability theory Vector space: based on similarity, a geometric/linear algebra notion Term frequency is directly used in all three models.
+LMs: raw term frequency, BM25/Vector space: more complex
+
+Length normalization
+Vector space: Cosine or pivot normalization LMs: probabilities are inherently length normalized BM25: tuning parameters for optimizing length normalization
+
+idf: BM25/vector space use it directly. LMs: Mixing term and collection frequencies has an e?ect similar to idf.
+Terms rare in the general collection, but common in some documents will have a greater in?uence on the ranking.
+
+Collection frequency (LMs) vs. document frequency (BM25, vector space)
+47 / 50
+
+Language models for IR: Assumptions
+
+Simplifying assumption: Queries and documents are objects of the same type. Not true!
+There are other LMs for IR that do not make this assumption. The vector space model makes the same assumption.
+
+Simplifying assumption: Terms are conditionally independent.
+Again, vector space model (and Naive Bayes) make the same assumption.
+
+Cleaner statement of assumptions than vector space Thus, better theoretical foundation than vector space
+. . . but ?pure? LMs perform much worse than ?tuned? LMs.
+
+48 / 50
+
+Take-away today
+
+Feature selection for text classi?cation: How to select a subset of available dimensions Statistical language models: Introduction Statistical language models in IR Discussion: Properties of di?erent probabilistic models in use in IR
+
+49 / 50
+
+Resources
+
+Chapter 13 of IIR (feature selection) Chapter 12 of IIR (language models) Resources at http://cislmu.org
+Ponte and Croft?s 1998 SIGIR paper (one of the ?rst on LMs in IR) Zhai and La?erty: A study of smoothing methods for language models applied to information retrieval. ACM Trans. Inf. Syst. (2004). Lemur toolkit (good support for LMs in IR)
+
+50 / 50
+
+

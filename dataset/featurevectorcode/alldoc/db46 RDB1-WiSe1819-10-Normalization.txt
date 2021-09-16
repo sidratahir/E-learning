@@ -1,0 +1,1684 @@
+Relational Database Systems 1
+Wolf-Tilo Balke Hermann Kroll, Janus Wawrzinek, Stephan Mennicke Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+10.0 Introduction
+? Up to now, we have learned ...
+? ? ? ? ? ? ? ?how to model schemas from a conceptual point of view ... how the relational model works. ... how it is implemented in current RDBMS. ... how to create relational databases (SQL DDL). ... how to define constraints (SQL DDL). ... how to query relational databases. ... how to insert, delete, and update data (SQL DML).
+
+? What?s missing?
+? How to create a good database design? ? By the way: What is a good database design?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+2
+
+10.0 Introduction
+? Which table design is better?
+hero_id
+1
+
+team_id
+1 2 1
+1 1
+
+hero_name
+Thor Mister Fantastic Iron Man
+Hulk Captain America
+
+team_name
+The Avengers Fantastic Four The Avengers
+The Avengers The Avengers
+
+join_year
+1963 1961 1963
+1963 1964
+
+A
+1
+
+2 3
+4 5
+
+6
+
+2
+
+Invisible Girl
+
+Fantastic Four
+
+1961
+
+hero_id
+
+hero_name
+Thor Mister Fantastic
+
+team_id
+1 2
+
+team_name
+The Avengers Fantastic Four
+
+hero_id
+1 2
+
+team_id
+1 2
+
+join_year
+1963 1961
+
+B
+
+2
+
+3 4 5 6
+
+Iron Man Hulk Captain America Invisible Girl
+
+3 4 5 6
+
+1 1 1 2
+
+1963 1963 1964 1961
+3
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.0 Introduction
+hero_id team_id
+1 2 1
+
+hero_name
+Thor Mister Fantastic Iron Man
+
+team_name
+The Avengers Fantastic Four The Avengers
+
+join_year
+1963 1961 1963
+
+A
+
+1 2 3
+
+4 5 6
+
+1 1 2
+
+Hulk Captain America Invisible Girl
+
+The Avengers The Avengers Fantastic Four
+
+1963 1964 1961
+
+? What?s wrong with design A?
+? redundancy: the team names are stored several times ? inferior expressiveness: we cannot nicely represent heroes that currently have no team. ? modification anomalies: (see next slide)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+4
+
+10.0 Introduction
+hero_id team_id
+1 2
+1 1 1
+
+hero_name
+Thor Mister Fantastic
+Iron Man Hulk Captain America
+
+team_name
+The Avengers Fantastic Four
+The Avengers The Avengers The Avengers
+
+join_year
+1963 1961
+1963 1963 1964
+
+A
+
+1 2
+3 4 5
+
+6
+
+2
+
+Invisible Girl
+
+Fantastic Four
+
+1961
+
+? There are three kinds of modification anomalies ? insertion anomalies
+? how do you add heroes that currently have no team? ? how do you (consistently!) add new tuples?
+
+? deletion anomalies
+? deleting Mister Fantastic and Invisible Girl also deletes all information about the Fantastic Four
+
+? update anomalies
+? renaming a team requires updating several tuples (due to redundancy)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5
+
+10.0 Introduction
+? In general, good relational database designs have the following properties
+? redundancy is minimized
+? i.e. no information is represented several times! ? logically distinct information is placed in distinct relation schemes
+
+? modification anomalies are prevented by design
+? i.e. by using keys and foreign keys, not by enforcing an excessive amount of (hard to check) constraints!
+
+? in practice, good designs should also match the characteristics of the used RDBMS
+? enable efficient query processing ? ?.this, however, might in some cases mean that redundancy is beneficial
+? It?s quite tricky to find the proper balance between different optimization goals
+
+? In essence, it?s all about splitting up tables ...
+? remember design B
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+10 Normalization
+? Normalization ? Functional dependencies ? Normal forms
+? 1NF, 2NF, 3NF, BCNF ? Higher normal forms
+??1(Hero)
+hero_id
+1
+
+hero_name
+Thor
+
+2
+3
+
+Mister Fantastic
+Iron Man
+
+4 5
+6
+
+Hulk Captain America
+Invisible Girl
+
+? Denormalization
+??2(Hero)
+team_id
+1
+
+??3(Hero)
+hero_id
+1
+2
+
+team_id
+1
+2
+
+join_year
+1963
+1961
+
+team_name
+The Avengers
+
+3
+4
+
+1
+1
+
+1963
+1963
+
+2
+
+Fantastic Four
+
+5 6
+
+1 2
+
+1964 1961 7
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.1 Normalization
+? The rules of thumb for good database design can be formalized by the concept of relational database normalization ? But before going into details, let?s recap some definitions from the relational model
+? data is represented using a relation schema S(R1, ..., Rn)
+? a relational database schema consists of
+? each relation R(A1, ? An) contains attributes A1, ? An ? a set of relations ? a set of integrity constraints (e.g. hero_id is unique and hero_id determines hero_name)
+
+? a relational database instance (or extension) is
+? a set of tuples adhering to the respective schemas and respecting all integrity constraints
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+10.1 Normalization
+? For this lecture, let?s assume the following
+? S(R1, ..., Rn) is a relation schema ? R(A1, ?, An) is a relation in S ? ?? is a set of constraints satisfied by all extensions of S
+
+? Our ultimate goal is to enhance the database design by decomposing the relations in S into a set of smaller relations, as we did in our example:
+hero_id team_id
+hero_name
+
+team_name
+
+join_year
+
+hero_id
+
+hero_name
+
+team_id
+
+team_name
+
+hero_id
+
+team_id
+
+join_year
+9
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.1 Normalization
+? Definition (decomposition)
+? let ?1, ..., ?k ? {A1, ..., An} be k subsets of R?s attributes
+? note that these subsets may be overlapping
+
+? then, for any ?i, a new relation Ri can be derived:
+Ri = ??i(R)
+
+? ?1, ..., ?k is called a decomposition of R
+
+? Good decompositions have to be reversible
+? the decomposition ?1, ..., ?k is called lossless if and only if R = R1 ? R2 ? ? ? Rk, for any extension of R satisfying the constraints ??
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10
+
+10.1 Normalization
+? Example
+Hero
+hero_id
+1
+
+?? = {?{hero_id, team_id} is unique?, ?hero_id determines hero_name?, ?team_id determines team_name?, ?{hero_id, team_id} determines join_year?}
+
+team_id
+1
+
+hero_name
+Thor
+
+team_name
+The Avengers
+
+join_year
+1963
+
+2 3
+4
+
+2 1
+1
+
+Mister Fantastic Iron Man
+Hulk
+
+Fantastic Four The Avengers
+The Avengers
+
+1961 1963
+1963
+
+5
+6
+
+1
+2
+
+Captain America
+Invisible Girl
+
+The Avengers
+Fantastic Four
+
+1964
+1961
+
+? our example decomposition is lossless
+?1 = {heroID, heroname}, ?2 = {teamID, teamName}, ?3 = {heroID, teamID, joinYear}
+
+??1(Hero)
+hero_id
+1 2
+3
+
+??2(Hero)
+team_id
+1
+2
+
+??3(Hero)
+hero_id
+1
+2
+
+hero_name
+Thor Mister Fantastic
+Iron Man
+
+team_name
+The Avengers
+Fantastic Four
+
+team_id
+1
+2
+
+join_year
+1963
+1961
+
+3
+4
+
+1
+1
+
+1963
+1963
+
+4
+5
+
+Hulk
+Captain America
+
+5 6
+
+1 2
+
+1964 1961 11
+
+6
+
+Invisible Girl
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.1 Normalization
+Hero
+?? = {?{hero_id, team_id} is unique?, ?hero_id determines hero_name?, ?team_id determines team_name?, ?{hero_id, team_id} determines join_year?}
+hero_id
+1
+
+team_id
+1
+
+hero_name
+Thor
+
+team_name
+The Avengers
+
+join_year
+1963
+
+2 3
+4
+
+2 1
+1
+
+Mister Fantastic Iron Man
+Hulk
+
+Fantastic Four The Avengers
+The Avengers
+
+1961 1963
+1963
+
+5
+6
+
+1
+2
+
+Captain America
+Invisible Girl
+
+The Avengers
+Fantastic Four
+
+1964
+1961
+
+? is the following a lossless decomposition?
+?1 = {hero_id, team_id, join_year}, ?2 = {team_id, hero_name, team_name, join_year}
+
+??1(Hero)
+hero_id
+1
+2
+
+??2(Hero)
+join_year
+1963
+1961
+
+team_id
+1
+2
+
+team_id
+1
+2
+
+hero_name
+Thor
+Mister Fantastic
+
+team_name
+The Avengers
+Fantastic Four
+
+join_year
+1963
+1961
+
+3
+4
+
+1
+1
+
+1963
+1963
+
+1
+1
+
+Iron Man
+Hulk
+
+The Avengers
+The Avengers
+
+1963
+1963
+
+5 6
+
+1 2
+
+1964 1961
+
+1 2
+
+Captain America Invisible Girl
+
+The Avengers Fantastic Four
+
+1964 1961 12
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.1 Normalization
+? Normalizing a relation schema S means replacing relations in S by lossless decompositions ? However, this raises some new questions
+? under which conditions is there a (nontrivial) lossless decomposition?
+? decompositions involving ?i = {A1, ..., An} or ?i = ? are called trivial
+
+? if there is a lossless decomposition, how to find it? ? how to measure a relation schema?s design quality?
+? We may abstain from further normalization if the quality is good enough...
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+10.1 Normalization
+? The normalization of S depends entirely on the set of constraints ?? imposed on S ? Instead of dealing with constraints of arbitrary complexity, we restrict ?? to the class of functional dependencies (FDs)
+? hero_name is completely determined by hero_id is an example for a functional dependency ? most update anomalies and problems with redundancy occurring in practice can be traced back to violations of functional dependency constraints
+? typically, functional dependencies are all you need
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+10 Normalization
+? Normalization ? Functional dependencies ? Normal forms
+? 1NF, 2NF, 3NF, BCNF ? Higher normal forms
+It?s that simple!
+
+? Denormalization
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+15
+
+10.2 Functional Dependencies
+? Informally, functional dependencies can be described as follows
+? let X and Y be some sets of attributes ? if Y functionally depends on X, and two tuples agree on their X values, then they also have to agree on their Y values
+
+? Examples
+? {end_time} functionally depends on {start_time, duration} ? {duration} functionally depends on {start_time, end_time} ? {end_time} functionally depends on {end_time}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+10.2 Functional Dependencies
+Formal definition ? Let X and Y be subsets of R?s attributes
+? That is, X, Y ? {A1, ..., An}
+
+? There is functional dependency (FD) between X and Y (denoted as X ? Y), if and only if, ...
+? ? for any two tuples t1 and t2 within any instance of R, the following is true: If ?Xt1 = ?Xt2, then ?Yt1 = ?Yt2
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+17
+
+10.2 Functional Dependencies
+? If X ? Y, then one says that ...
+? X functionally determines Y, and ? Y functionally depends on X.
+
+? X is called the determinant of the FD X ? Y ? Y is called the dependent of the FD X ? Y
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+18
+
+10.2 Functional Dependencies
+? Functional dependencies are semantic properties of the underlying domain and data model
+? They depend on real world knowledge
+
+? FDs are NOT a property of a particular instance (extension) of the relation schema!
+? the designer is responsible for identifying FDs ? FDs are manually defined integrity constraints on S ? all extensions respecting S?s functional dependencies are called legal extensions of S
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+19
+
+10.2 Functional Dependencies
+? In fact, functional dependencies are a generalization of key constraints ? To show this, we need a short recap
+? a set of attributes X is a (candidate) key for R if and only if it has both of the following properties
+? uniqueness: no legal instance of R ever contains two distinct tuples with the same value for X ? irreducibility: no proper subset of X has the uniqueness property
+
+? a superkey is a superset of a key
+? i.e. only uniqueness is required
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+20
+
+10.2 Functional Dependencies
+? In practice, if there is more than one candidate key, we usually choose one and call it the primary key
+? however, for normalization purposes, only candidate keys are important ? thus, we ignore primary keys today
+
+? The following is true
+? X is a superkey of R if and only if X ? {A1, ..., An} is a functional dependency in R
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+21
+
+10.2 Functional Dependencies
+? Example
+? a relation containing students
+? semantics: matriculation_no is unique ? {matriculation_no} ? {firstname, lastname, birthdate}
+matriculation_no firstname lastname birthdate
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+10.2 Functional Dependencies
+? Obviously, there can also be non-minimal super keys with correct functional dependencies
+matriculation_no firstname lastname birthdate
+
+matriculation_no
+
+firstname lastname
+
+birthdate
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+23
+
+10.2 Functional Dependencies
+? Example
+? a relation containing real names and aliases of heroes, where each hero has only one unique alias
+? {alias} ? {real_name}
+
+alias
+
+real_name
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+24
+
+10.2 Functional Dependencies
+? Example
+? a relation containing license plates and the type of the respective car
+? {area_code, character_code, number_code} ? {car_type}
+
+area_code
+
+character_code
+
+number_code
+
+car_type
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+25
+
+10.2 Functional Dependencies
+? Quick Summary on keys:
+? Candidate Key (or simply key)
+? A irreducible set of attributes which uniquely identifies a tuple
+? i.e.: all non-key attributes are functional dependent on the key, and no attribute can be removed without loosing the key properties
+
+? Superkey is a superset of a candidate key
+? i.e. only uniqueness is required
+? Superkey also identifies a tuple, but is not irreducible
+
+? Primary Key
+? A primary key is one single key chosen from the set of candidate keys by the database designer
+? This choice impacts the way the DBMS manages relations and queries
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+10.2 Functional Dependencies
+? What FDs can be derived from the following description of an address book?
+street city state zip
+
+? for any given zip code, there is exactly one city and state
+? ?which, to be exact, is not true in reality
+
+? for any given street, city, and state, there is exactly one zip code.
+
+? What are the FDs and candidate keys?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+27
+
+10.2 Functional Dependencies
+? One possible solution:
+? {zip} ? {city} ? {street} ? {street} ? {state} ? ? ? ...
+? {zip} ? {city, state} ? {street, city, state} ? {zip}
+
+? Typically, not all actual FDs are modeled explicitly
+
+street
+
+city
+
+state
+
+zip
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+10.2 Functional Dependencies
+? Obviously, some FDs are implied by others
+? Moreover, some FDs are trivial
+? {street} ? {street} ? {state} ? ? ? definition: The FD X ? Y is called trivial iff X ? Y ? {zip} ? {city, state} implies {zip} ? {city}
+
+? What do we need?
+? a compact representation for sets of FD constraints
+? no redundant FDs
+
+? an algorithm to compute the set of all implied FDs
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+29
+
+10.2 Functional Dependencies
+? Definition: For any set F of FDs, the closure of F (denoted F+) is the set of all FDs that are logically implied by F
+? Abstract Definition: F implies X ? Y, if and only if any extension of R satisfying any FD in F, also satisfies the X ?Y
+
+? Fortunately, the closure of F can easily be computed using a small set of inference rules
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+30
+
+10.2 Functional Dependencies
+? For any attribute sets X, Y, Z, the following is true
+? reflexivity: If X ? Y, then X ? Y ? augmentation: If X ? Y, then X ? Z ? Y ? Z ? transitivity: If X ? Y and Y ? Z, then X ? Z
+It?s that simple!
+
+? These rules are called Armstrong?s axioms
+? one can show that they are complete and sound
+? completeness: every implied FD can be derived ? soundness: no non-implied FD can be derived
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+10.2 Functional Dependencies
+? To simplify the practical task of computing F+ from F, several additional rules can be derived from Armstrong?s axioms:
+? decomposition: If X ? Y ? Z, then X ? Y and X ? Z ? union: If X ? Y and X ? Z, then X ? Y ? Z ? composition: If X ? Y and Z ? W, then X ? Z ? Y ? W
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+32
+
+10.2 Functional Dependencies
+? Example
+? relational schema R(A, B, C, D, E, F) ? FDs: {A} ? {B, C} {B} ? {E} {C, D} ? {E, F} ? then we can make the following derivation
+1. 2. 3. 4. 5. {A} ? {B, C} {A} ? {C} {A, D} ? {C, D} {A, D} ? {E, F} {A, D} ? {F} (given) (by decomposition) (by augmentation) (by transitivity with given {C, D} ? {E, F}) (by decomposition)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+33
+
+10.2 Functional Dependencies
+? In principle, we can compute the closure F+ of a given set F of FDs by means of the following algorithm:
+? Repeatedly apply the six inference rules until they stop producing new FDs.
+
+? In practice, this algorithm is hardly very efficient
+? however, there usually is little need to compute the full closure ? instead, it often suffices to compute a certain subset of the closure: the subset consisting of all FDs with given left side
+? This will later serve for finding proper keys or normalizing relations
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+34
+
+10.2 Functional Dependencies
+? Definition: Given a set of attributes X and a set of FDs F, the closure of X under F, written as (X, F)+, consists of all attributes that functionally depend on X ? i.e. (X, F)+ ? {Ai | X ? Ai is implied by F} ? The following algorithm computes (X, F)+:
+unused := F closure := X do { for(Y ? Z ? unused) { if(Y ? closure) { unused := unused ? {Y ? Z} closure := closure ? Z } } } while(unused and closure did not change) return closure
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+35
+
+10.2 Functional Dependencies
+? Quiz
+?F={ {A} ? {B, C}, {B} ? {E}, {E} ? {C, F}, {C, D} ? {E, F} }
+
+? What is the closure of {A, B} under F?
+unused := F closure := X do { for(Y ? Z ? unused) { if(Y ? closure) { unused := unused ? {Y ? Z} closure := closure ? Z } } } while(unused and closure did not change) return closure
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+36
+
+10.2 Functional Dependencies
+? Quiz
+?F={ {A} ? {B, C}, {B} ? {E}, {E} ? {C, F}, {C, D} ? {E, F} }
+
+? What is the closure of {A, B} under F?
+
+Intermediate Closure: {A, B} Add C, because {A} ? {B, C} Add E, because {B} ? {E} Add F, because {E} ? {C, F} ({A, B}, F)+ = {A, B, C, E, F}
+
+{A, B, C}
+
+{A, B, C, E}
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+10.2 Functional Dependencies
+? Now, we can do the following
+? just check whether Y ? (X, F)+
+
+? given a set F of FDs, we can easily tell whether a specific FD X ? Y is contained in F+ ? in particular, we can find out whether a set of attributes X is a superkey of R
+? just check whether (X, F)+ = {A1, ..., An}
+
+? What?s still missing?
+? given a set of FDs F, how to find a set of FDs G, such that F+ = G+, and G is as small as possible? ? given sets of FDs F and G, does F+ = G+ hold?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+38
+
+10.2 Functional Dependencies
+? Definition: Two sets of FDs F and G are equivalent iff F+ = G+
+? How can we find out whether two given sets of FDs F and G are equivalent?
+? theorem: F+ = G+ iff for any FD X ? Y ? F ? G, it is (X, F)+ = (X, G)+ ? proof
+? ? ? ? let F? = {X ? (X, F)+ | X ? Y ? F ? G} analogously, derive G? from G obviously, then F?+ = F+ and G?+ = G+ moreover, every left side of an FD in F? occurs as a left side of an FD in G? (and reverse) ? if F? and G? are different, then also F+ and G+ must be different
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+10.2 Functional Dependencies
+? Example
+? F = { {A, B} ? {C}, {C} ? {B} } ? G = { {A} ? {C}, {A, C} ? {B} } ? are F and G equivalent? ? we must check (X, F)+ = (X, G)+ for the following X
+? {A, B}, {C}, {A}, and {A, C}
+
+? ({A, B}, F)+ = {A, B, C} ? ({C}, F)+ = {B, C}
+
+({A, B}, G)+ = {A, B, C} ({C}, G)+ = {C}
+
+? therefore, F and G are not equivalent!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+10.2 Functional Dependencies
+? Remember: To have a small representation of F, we want to find a G, such that
+? F and G are equivalent ? G is as small as possible (we will call this property minimality)
+
+? Definition: A set of FDs F is minimal iff the following is true
+? every FD X ? Y in F is in canonical form ? every FD X ? Y in F is left-irreducible
+? i.e. Y consists of exactly one attribute
+
+? every FD X ? Y in F is non-redundant
+
+? i.e. no attribute can be removed from X without changing F+ ? i.e. X ? Y cannot be removed from F without changing F+
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+10.2 Functional Dependencies
+? The following algorithm minimizes F, that is, it transforms F into a minimal equivalent of F
+1. Split up all right sides to get FDs in canonical form. 2. Remove all redundant attributes from the left sides (by checking which attribute removals change F+). 3. Remove all redundant FDs from F (by checking which FD removals change F+).
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+10.2 Functional Dependencies
+? Example
+{A} ? {B, C}, {A} ? {B}, {A, C} ? {D} 1. Split up the right sides: {A} ? {B}, {A} ? {C}, {A, B} ? {C}, {A, C} ? {D} 2. Remove C from {A, C} ? {D}: ? given F = {
+? ?
+
+{B} ? {C}, {A, B} ? {C}, {B} ? {C}, }
+
+{A} ? {C} implies {A} ? {A, C} (augmentation) {A} ? {A, C} and {A, C} ? {D} imply {A} ? {D} (transitivity)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+10.2 Functional Dependencies
+? Now we have: {A} ? {B}, {A, B} ? {C},
+? ?
+
+3. Remove {A, B} ? {C}: 4. Remove {A} ? {C}:
+
+{A} ? {C}, {A} ? {D}
+
+{B} ? {C},
+
+{A} ? {C} implies {A, B} ? {C}
+
+? Finally, we end up with a minimal equivalent of F: {A} ? {B}, {B} ? {C}, {A} ? {D}
+
+{A} ? {B} and {B} ? {C} imply {A} ? {C} (transitivity)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+10.2 Functional Dependencies
+? Functional dependencies are the perfect tool for performing lossless decompositions
+
+? Heath?s Theorem: Let X ? Y be an FD constraint of the relation schema R(A1, ..., An). Then, the following decomposition of R is lossless: ?1 = X ? Y and ?2 = {A1, ..., An} ? Y. ? Example:
+FDs: {hero_id} ? {hero_name} {team_id} ? {team_name} {hero_id, team_id} ? {join_year}
+
+hero_id
+
+team_id
+
+hero_name
+
+team_name
+
+join_year
+
+Decompose with respect to {hero_id} ? {hero_name}
+hero_id hero_name hero_id team_id team_name
+
+join_year
+45
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.2 Functional Dependencies ? How to come up with functional dependencies?
+? there are several ways
+? Based on domain knowledge ? Based on an explicit data model ? Based on existing data
+
+1. Based on domain knowledge
+? obvious FDs are easy to find ? what about more complicated FDs? ? no guarantee that you found all (important) FDs!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+10.2 Functional Dependencies 2. Based on an explicit model
+A (1,1) r (1, 2) B
+
+? automated generation of FDs possible ? but: are all actual FDs present in the model?
+? what about FDs between attributes of the same entity?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+10.2 Functional Dependencies
+3. Based on existing data
+? in practice, often there is already some data available (that is, tuples) ? we can use the data to derive FD constraints ? obviously
+? ? all FDs that hold in general for some relation schema, also hold for any given extension therefore, the set of all FDs that hold in some extension, is a superset of all true FDs of the relation schema find all FDs that hold in a given extension find a minimal representation of this FD set ask a domain expert, what FDs are generally true
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? what we can do
+? ? ?
+
+48
+
+10.2 Functional Dependencies
+A
+1 1 2 2 3
+
+B
+1 2 1 1 2
+
+C
+1 2 3 4 5
+
+D
+1 2 3 3 1
+
+E
+1 1 1 1 1
+
+? Which of the following FDs are satisfied in this particular extension?
+a) {C} ? {A, B} b) {A, D} ? {C} c) ? ? {E}
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+10.2 Functional Dependencies
+A
+1 1 2 2 3
+
+B
+1 2 1 1 2
+
+C
+1 2 3 4 5
+
+D
+1 2 3 3 1
+
+E
+1 1 1 1 1
+
+? Which of the following FDs are satisfied in this particular extension?
+a) {C} ? {A, B} b) {A, D} ? {C} c) ? ? {E} : Yes : No : Yes
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+50
+
+10.2 Functional Dependencies
+? find all FDs that are satisfied in this extension!
+? we will check any FD X ? Y in canonical form, i.e., X is a subset of {A, B, C, D, E} and Y is an element of {A, B, C, D, E}
+A
+1
+
+B
+1
+
+C
+1
+
+D
+1
+
+E
+1
+
+1 2
+2
+
+2 1
+1
+
+2 3
+4
+
+2 3
+3
+
+1 1
+1
+
+3
+
+2
+
+5
+
+1
+
+1
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+10 Normalization
+? Normalization ? Functional dependencies ? Normal forms
+? 1NF, 2NF, 3NF, BCNF ? Higher normal forms
+
+? Denormalization
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+52
+
+10.3 Normal Forms
+? Back to normalization
+? remember: normalization = finding lossless decompositions ? but only decompose, if the relation schema is of bad quality
+
+? How to measure the quality of a relation schema?
+? claim: the quality depends on the constraints ? in our case: quality depends on the FDs of the relation schema ? schemas can be classified into different quality levels, which are called normal forms
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+53
+
+10.3 Normal Forms
+? Part of a schema design process is to choose a desired normal form and convert the schema into that form ? There are seven normal forms
+? the higher the number, ...
+? ... the stricter the requirements, ? ... the less anomalies and redundancy, and ? ... the better the design quality.
+? (well, from a theoretical point of view; in the real world, there might be good reasons why a lower normal formal is better?.)
+
+6NF
+
+5NF 4NF BCNF
+
+3NF
+
+2NF
+
+1NF
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+54
+
+10.3 1NF
+? First normal form (1NF)
+? already known from previous lectures
+? has nothing to do with functional dependencies!
+
+attribute
+
+? restricts relations to being flat
+? only atomic attribute values are allowed
+
+? multi-valued attributes must be normalized, e.g., by
+a) b) c) introducing a new relation for the multi-valued attribute
+? most common solution
+
+replicating the tuple for each multi-value
+? as e.g., often done for song list metadata (e.g., mp3 tags)
+
+introducing an own attribute for each multi-value (if there is a small maximum number of values)
+? as sometimes done in Big Data Database (e.g., Bigtable)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+55
+
+10.3 1NF
+? a) Introducing a new relation
+? uses old key and multi-attribute as composite key
+hero_id
+1 2
+
+hero_name
+Storm Wolverine
+
+powers
+weather control, flight extreme cellular regeneration
+
+3
+
+Phoenix
+
+omnipotence, indestructibility, limitless energy manipulation
+
+hero_id
+1 2
+3
+
+hero_name
+Storm Wolverine
+Phoenix
+
+hero_id
+1 1
+
+power
+weather control flight
+
+2 3 3
+3
+
+extreme cellular regeneration omnipotence indestructibility
+limitless energy manipulation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+56
+
+10.3 1NF
+? b) Replicating the tuple for each multi-value
+? uses old key and multi-attribute as composite key
+hero_id
+1
+
+hero_name
+Storm
+
+powers
+weather control, flight
+
+2 3
+
+Wolverine Phoenix
+
+extreme cellular regeneration omnipotence, indestructibility, limitless energy manipulation
+
+hero_id
+1 1
+
+hero_name
+Storm Storm
+
+powers
+weather control flight
+
+2 3 3 3
+
+Wolverine Phoenix Phoenix Phoenix
+
+extreme cellular regeneration omnipotence indestructibility limitless energy manipulation
+57
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 1NF
+? c) Introducing an own attribute for each multi-value
+hero_id
+1
+
+hero_name
+Storm
+
+powers
+weather control, flight
+
+2 3
+
+Wolverine Phoenix
+
+extreme cellular regeneration omnipotence, indestructibility, limitless energy manipulation
+
+hero_id
+1
+
+hero_name
+Storm
+
+power1
+weather control
+
+power2
+flight
+
+power3
+NULL
+
+2 3
+
+Wolverine Phoenix
+
+cellular regeneration omnipotence
+
+NULL indestructibility
+
+NULL limitless energy manipulation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+58
+
+10.3 2NF
+? The second normal form (2NF)
+? the 2NF aims to avoid attributes that are functionally dependent on proper subsets of keys ? remember
+? a set of attributes X is a (candidate) key if and only if X ? {A1, ..., An} is a valid FD ? an attribute Ai is a key attribute if and only if it is contained in some key; otherwise, it is a non-key attribute
+
+? definition (2NF): A relation schema is in 2NF (wrt. a set of FDs) iff ...
+? it is in 1NF and ? no non-key attribute is functionally dependent on a proper subset of any candidate key.
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+59
+
+10.3 2NF
+? Functional dependence on key parts is only a problem in relation schemas with composite keys
+? a (candidate) key is called composite key if it consists of more than one attribute
+
+? Corollary: Every 1NF-relation without constant attributes and without composite keys is in 2NF.
+? 2NF is violated, if there is a composite key and some non-key attribute depends only on a proper subset of this composite key
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+60
+
+10.3 2NF
+? Normalization into 2NF is achieved by decomposition according to the non-2NF FDs
+? if X ? Y is a valid FD and X is a proper subset of some key, then decompose into ?1 = X ? Y and ?2 = {A1, ..., An} ? Y ? according to Heath?s Theorem, this decomposition is lossless
+
+hero_id
+
+team_id
+
+hero_name
+
+team_name
+
+join_year
+
+FDs: {hero_id} ? {hero_name} {team_id} ? {team_name} {hero_id, team_id} ? {join_year}
+
+Decompose with respect to {hero_id} ? {hero_name}
+
+hero_id
+
+hero_name
+
+hero_id
+
+team_id
+
+team_name
+
+join_year
+61
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 2NF
+? Repeat this decomposition step for every created relation schema that is still not in 2NF
+hero_id team_id team_name join_year
+
+FDs: {team_id} ? {team_name} {hero_id, team_id} ? {join_year}
+
+Decompose with respect to {team_id} ? {team_name}
+
+hero_id
+
+team_id
+
+join_year
+
+team_id
+
+team_name
+62
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 2NF
+? Practical Implication of 2NF:
+? Normalized tables tend to focus on a single topic
+? Other topics are usually pulled in own tables ? Some topic mixes remain
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+63
+
+10.3 3NF
+? The third normal form (3NF)
+? Most relevant and practical normal form! ? A relation schema is in 3NF if and only if:
+? it is 2NF and ? all non-key attribute are determined ONLY by the candidate key.
+hero_id
+11 12
+13 14
+
+hero_name
+Professor X Wolverine
+Cyclops Phoenix
+
+home_city_id
+563 782
+112 563
+
+home_city_name
+New York Alberta
+Anchorage New York
+
+{hero_id} ? {hero_name} Not in 3NF {hero_id} ? {home_city_id} {home_city_id} ? {home_city_name}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+64
+
+10.3 3NF
+? the 3NF relies on the concept of transitive FDs
+? X ? Y ? F+, ? Y ? X ? F+, and ? Y ? Z ? F+.
+
+? Definition transitive FDs: Given a set of FDs F, an FD X ? Z ? F+ is transitive in F, if and only if there is an attribute set Y such that:
+
+? No non-key attribute is transitively dependent on a key attribute
+
+? Example
+? ? ? ?
+
+{hero_id} ? {hero_name} {hero_id} ? {home_city_id} {hero_id} ? {home_city_name} {home_city_id} ? {home_city_name}
+
+hero_id 11 12 13
+14
+
+hero_name Professor X Wolverine Cyclops
+Phoenix
+
+home_ci ty_id 563 782 112
+563
+
+home_city_name New York Alberta Anchorage
+New York
+65
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 3NF
+? Assume that the non-3NF transitive FD X ? Z has been created by FDs X ? Y and Y ? Z ? Then, normalization into 3NF is archived by decomposition according to Y ? Z
+? again, this decomposition is lossless
+hero_id hero_name home_city_id
+
+FDs: {hero_id} ? {hero_name} home_city_name {hero_id} ? {home_city_id} {home_city_id} ? {home_city_name} Decompose with respect to {home_city_id} ? {home_city_name}
+
+hero_id
+
+hero_name
+
+home_city_id
+
+home_city_id
+
+home_city_name
+66
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 BCNF
+? Boyce-Codd normal form (BCNF)
+? was actually proposed by Ian Heath (he called it 3NF) three years before Boyce and Codd ? definition: A relation schema R is in BCNF if and only if, in any non-trivial FD X ? Y, the set X is a superkey
+
+? All BCNF schemas are also in 3NF, and most 3NF schemas are also in BCNF
+? there are some rare exceptions
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+67
+
+10.3 BCNF
+? BCNF is very similar to 3NF:
+? BCNF: In any non-trivial FD X ? Y, the set X is a superkey. ? 3NF (alternative definition): In any non-trivial FD X ? Y, the set X is a superkey, or the set Y is a subset of some key.
+
+? a 3NF schema is not in BCNF, if it has two or more overlapping composite keys.
+? i.e. there are different keys X and Y such that |X|, |Y| ? 2 and X ? Y ? ?.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+68
+
+10.3 BCNF
+? Example
+? Students, a topic, and an advisor ? let?s assume that the following dependencies hold
+? {student, topic} ? {advisor} ? {advisor} ? {topic}
+
+? i.e. For each topic, a student has a specific advisor. Each advisor is responsible for a single specific topic.
+
+student
+100 100 101
+102
+
+topic
+Math Physics Math
+Math
+
+advisor
+Gauss Einstein Leibniz
+Gauss
+69
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 BCNF
+student topic advisor
+
+? consequently, there are the following keys
+? {student, topic} ? {student, advisor}
+
+? the schema is in 3NF, because it is in 1NF and there are no non-key attributes ? however, it is not in BCNF
+
+? We have {advisor} ? {topic} but {advisor} is not a superkey
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+70
+
+10.3 BCNF
+? Moreover, there are modification anomalies:
+student
+100 100 101 102
+
+topic
+Math Physics Math Math
+
+advisor
+Gauss Einstein Leibniz Gauss
+
+If you delete this row, all information about Leibniz doing math is lost
+
+? Deleting the last student of an advisor? ? An advisor changes his topic?
+? Because {Advisor} ? {Topic}, multiple updates necessarry
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+71
+
+10.3 BCNF
+? What options do we have?
+? decompose into one of
+? ? ?
+student topic advisor topic advisor topic
+
+? Which one to chose? ? {Student, Topic} ? {Advisor} is ?lost? in all options
+
+and and and
+
+student
+
+advisor
+
+topic advisor
+
+student student
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+72
+
+10.3 BCNF
+? In any case, we should perform a lossless decomposition
+? =>
+advisor topic
+
+student
+
+topic
+
+advisor
+
+? Apply Heath?s theorem w.r.t. {advisor} ? {topic}
+and
+advisor student
+
+? All other decompositions can produce false tuples when rejoining ? Multiple advisors in the same topic possible ? Completeness of FDs was traded against a higher normal form
+advisor
+Gauss Einstein Leibniz
+
+topic
+Math Physics Math
+
+advisor
+Gauss Einstein Leibniz
+
+student
+100 100 101
+
+Gauss
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+102
+73
+
+10.3 Higher Normal Forms ? BCNF is the ultimate normal form when using only functional dependencies as constraints
+? ?Every attribute depends on a key, a whole key, and nothing but a key, so help me Codd.?
+
+? However, there are higher normal forms (4NF to 6NF) that rely on generalizations of FDs
+? 4NF: multivalued dependencies ? 5NF/6NF: join dependencies
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+74
+
+10.3 4NF
+? The 4NF is about multivalued dependencies (MVDs) ? Example
+course
+Physics Physics Physics Physics Math Math Math
+
+teacher
+Prof. Green Prof. Green Prof. Brown Prof. Brown Prof. Green Prof. Green Prof. Green
+
+textbook
+Basic Mechanics Principles of Optics Basic Mechanics Principles of Optics Basic Mechanics Vector Analysis Trigonometry
+
+Dependencies:
+? For any course, there is a fixed set of teachers. (written as {course} ? {teacher}) ? For any course, there is a fixed set of textbooks, which is independent of the teacher. (written as {course} ? {textbook})
+
+? In fact, every FD can be expressed as a MVD
+
+? if X ? Y then also X ? Y ? but both expressions are not equivalent!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+75
+
+10.3 4NF
+? Definition: A relation schema is in 4NF if and only if, for any non-trivial multivalued dependency X ? Y, X is a superkey.
+
+? Decomposition into 4NF schemas:
+course
+Physics
+
+teacher
+Prof. Green Prof. Brown Prof. Green
+
+course
+Physics Physics Physics
+
+teacher
+Prof. Green Prof. Green Prof. Brown
+
+textbook
+Basic Mechanics Principles of Optics Basic Mechanics
+
+Physics Math
+
+course
+Physics Physics Math Math Math
+
+textbook
+Basic Mechanics Principles of Optics Basic Mechanics Vector Analysis Trigonometry
+76
+
+Physics Math Math Math
+
+Prof. Brown Prof. Green Prof. Green Prof. Green
+
+Principles of Optics Basic Mechanics Vector Analysis Trigonometry
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10.3 4NF
+? Result from a bad conceptual schema:
+Course has Textbook
+
+Teacher
+
+? Instead of
+Teacher teaches Course Textbook for
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+77
+
+10 Normalization
+? Normalization ? Functional dependencies ? Normal forms
+? 1NF, 2NF, 3NF, BCNF ? Higher normal forms
+
+? Denormalization
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+78
+
+10.4 Denormalization
+? Normalization in real world databases
+? guided by normal form theory ? but: normalization is not everything! ? trade-off: redundancy/anomalies vs. speed
+? general design: avoid redundancy wherever possible, because redundancies often lead to inconsistent states ? an exception: materialized views (? precomputed joins) ? expensive to maintain, but can boost read efficiency ? Also: distributed and parallel databases
+? Here, redundancy is a good thing and increases data reliability and query speeds! ? but creates huge problems when faced with updates?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+79
+
+10.4 Denormalization
+? Usually, a schema in a higher normal form is better than one in a lower normal form
+? however, sometimes it is a good idea to artificially create lower-form schemas to, e.g., increase read performance
+? this is called denormalization ? denormalization sometimes increases query speed and decreases update efficiency due to the introduction of redundancy
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+80
+
+10.4 Denormalization
+? Rules of thumb
+? a good data model almost always directly leads to relational schemas in high normal forms
+? carefully design your models! ? think of dependencies and other constraints! ? have normal forms in mind during modeling!
+
+? denormalize only when faced with a performance problem that cannot be resolved by
+? ? ? ? ? ? money hardware scalability current SQL technology network optimization parallelization other performance techniques
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+81
+
+10.4 Denormalization
+? sometimes, you even can perform denormalization at the physical level of the database
+? let your RDBMS know what attributes are often accessed together, even if they are located in different tables ? state-of-the-art RDBMS can exploit this information to physically cluster data or precompute some joins, even without changing your table designs!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+82
+
+10 Next Week
+? Advanced database concepts for application programming
+? Views ? Indexes ? Transactions
+
+? Accessing databases from applications
+? Embedded SQL ? SQLJ
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+83
+
+

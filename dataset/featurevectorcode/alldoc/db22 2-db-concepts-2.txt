@@ -1,0 +1,545 @@
+Introduction to Database Systems Fundamental Concepts
+
+Werner Nutt
+
+1
+
+Characteristics of the DB Approach
+? Insulation of application programs and data from each other ? Use of a catalogue to store the schema ? Support of multiple user views
+
+How can one realise these principles?
+2
+
+A DBMS Presents Programmers and Users with a Simplified Environment
+Users/Programmers Database System Queries / Application Programs DBMS Software
+Software to Process Queries / Programs
+
+Software to Access Stored Data
+
+?Catalogue?, ?Data dictionary?
+
+Stored Database Definition (Metadata)
+
+Stored Database 3
+
+Data Model, Schema and Instance
+Schema Data Model ? A set of concepts that can ? A formal definition that fixes be used to describe the all the relevant features of structure of a database: the those parts of the real data types, relationships, world that are of interest to constraints, semantics and the users of the database operational behaviour ? The schema of a db is held ? Hides details of data in the data dictionary storage
+Student(studno,name,address) Course(courseno,lecturer) Student(123,Egger,Bozen) Course(CS321,Nutt)
+
+Schema
+(in relational data model)
+
+Instance
+
+4
+
+Other Data Models
+Relational model is good for: ? Large amounts of data and simple operations ? Limited navigation, touching only small numbers of relations/tables Difficult applications for relational model: ? VLSI design (CAD in general)
+ADDER ALU CPU
+ALU ADDER ADDER
+
+A
+FA
+
+? CASE ? Graphical data ? Bill of materials, transitive closure
+5
+
+Object Data Models
+Where number of ?relations? is large, relationships are complex ? Object Data Model ? ?Knowledge Data Model? (= Objects + Deductive Rules) Object Data Model (Principles) 1. Complex Objects ? Nested Structure (pointers or references) 2. Encapsulation, set of methods/access functions 3. Object Identity 4. Inheritance ? Defining new classes like old classes
+
+Object model: usually, objects are found via explicit navigation. Also query language in some systems.
+6
+
+XML Documents
+<addresses> <person> <name>Donald Duck</name> <tel> 0471- 82 81 45 </tel> <tel> 332- 82 88 283 </tel> <email> donald@inf.unibz.it </email> </person> <person> <name>Mickey Mouse</name> <tel> 0473 ? 42 61 14 </tel> </person> </addresses>
+
+7
+
+XML Terminology
+The segment of an XML document between an opening and a corresponding closing tag is called an element
+
+element
+
+<person> <name> Donald Duck </name> <tel> 0471- 82 81 45 </tel> <tel> 332- 82 88 283 </tel> <email> donald@inf.unibz.it </email> </person> not an element
+
+element, a sub-element of
+
+8
+
+XML Documents are Trees
+person name tel tel email
+
+Donald Duck 332- 82 88 283 0471- 82 81 45 donald@inf.unibz.it
+
+? XML documents are abstractly modeled as trees, as reflected by their nesting
+
+9
+
+<?xml version="1.0" encoding="ISO-8859-1"?> <catalog> <cd country="UK"> <title>Dark Side of the Moon</title> <artist>Pink Floyd</artist> <price>10.90</price> </cd> <cd country="UK"> <title>Space Oddity</title> <artist>David Bowie</artist> <price>9.90</price> </cd> <cd country="USA"> <title>Aretha: Lady Soul</title> <artist>Aretha Franklin</artist> <price>9.90</price> </cd> </catalog>
+
+An XML document
+
+10
+
+Document Type Definition (DTD)
+DTDs specify the format of documents <!DOCTYPE catalog [ <!ELEMENT catalog (cd*)> <!ELEMENT cd (title, artist, price)> <!ELEMENT title (#PCDATA)> <!ELEMENT artist (#PCDATA)> <!ELEMENT price (#PCDATA)> <!ATTLIST person country CDATA ID ]>
+an arbitrary number of CDs a title, followed by an artist, followed by a price title, artist, and price contain parsable character data
+
+#IMPLIED>
+
+A person element can have an (optional) country attribute
+11
+
+The XML document as a tree
+
+catalog.xml catalog cd cd
+country
+USA
+
+country
+UK
+
+cd
+
+country UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+12
+
+XPath: an XML Query Language
+? XPath expressions are evaluated over documents ? XPath operates on the abstract tree document structure ? Documents are trees with several types of nodes, such as ? element nodes ? attribute nodes ? text nodes
+
+13
+
+XPath: Path Expressions are Main Element of Syntax
+? / at the beginning of an XPath expression represents the root of the document ? / between element names represents a parent-child relationship ? // represents an ancestor-descendent relationship ? @ marks an attribute ? [condition] specifies a condition
+
+14
+
+catalog.xml catalog cd /catalog cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+Getting the root element of the document
+
+15
+
+catalog.xml catalog cd /catalog/cd cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+Finding child nodes
+
+16
+
+catalog.xml catalog cd /catalog/cd/price cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+Finding descendant nodes
+
+17
+
+catalog.xml catalog cd /catalog/cd[price<10] cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+Condition on elements
+
+18
+
+catalog.xml catalog cd
+
+/catalog//title //title cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+// represents any directed path in the document
+
+19
+
+catalog.xml catalog cd /catalog/cd/* cd
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+* represents any element name in the document
+
+20
+
+What will the following expressions return?
+
+catalog.xml catalog cd cd
+
+/*/* //* //*[price=9.90] //*[price=9.90]/*
+country
+USA
+
+country
+UK
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+* represents any element name in the document
+
+21
+
+catalog.xml catalog
+/catalog/cd/@country country
+UK
+
+cd
+
+country
+UK
+
+cd
+
+cd
+
+country
+USA
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+@ marks attributes
+
+22
+
+catalog.xml catalog cd
+/catalog/cd[@country=?UK?]
+
+country
+UK
+
+cd
+
+country
+UK
+
+cd
+
+country
+USA
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+@ marks attributes
+
+23
+
+How would you write: The price of the cds whose artist is David Bowie?
+country
+UK
+
+catalog.xml catalog cd cd
+country
+USA
+
+cd
+
+country
+UK
+
+title artist price
+
+title artist price title artist price
+Aretha: Lady Soul Aretha Franklin 9.90
+
+Dark Side of the Moon Pink Floyd 10.90
+
+Space Oddity
+
+David Bowie 9.90
+
+24
+
+Data Models
+60?s Hierarchical 70's 80's 90?s Object Models 00?s Semistructured Data, XML Semantic Web, RDF Knowledge Bases, Rules Network
+
+Relational
+
+Choice for most applications today
+
+25
+
+Sharing?Multiple views of data
+Database Management System Database
+
+26
+
+Three Levels of Abstraction
+ANSI/SPARC architecture for DBMSs (1978):
+? Many external views ? One conceptual (= logical) schema ? One physical (= internal) schema ? Views describe how users see the data ? Conceptual schema defines logical structure ? Physical schema describes the files and indexes used
+View 1 View 2 View 3
+mappings
+
+Conceptual Schema
+mapping
+
+Physical Schema
+
+27
+
+Data Independence
+New hardware New users User's view New storage techniques Linkage to other databases Change in technology New functions Change in use New data
+
+Database
+
+?
+
+?
+
+Logical data independence ? change the logical schema without having to change the external schemas Physical data independence ? change the internal schema without having to change the logical schema
+28
+
+Change the mapping, not the schema!
+
+Database Languages
+? Data Definition Language (DDL)
+? Commands for setting up the schema of a database ? The process of designing a schema can be complex, may use a design methodology and/or tool
+
+? Data Manipulation Language (DML)
+? Commands to manipulate data in database: RETRIEVE, INSERT, DELETE, MODIFY ? Also called ?query language?
+
+29
+
+Host Languages
+C, C++, Fortran, Lisp, Java, Perl, Python, ?
+Application prog.
+Calls to DB
+
+DBMS
+
+Local Vars (Memory) (Storage)
+
+Host language is completely general (Turing complete) but gives no support for data manipulation Query language?less general, ?non procedural? and optimizable
+30
+
+Building an Application with a DBMS
+? Requirements gathering (natural language, pictures) ? Requirements modeling (conceptual data model, ER) ? Decide what entities should be part of the application and how they should be related ? Schema design and implementation ? Decide on a set of tables, attributes ? Create the tables in the database system ? Populate database (insert records/tuples) ? Write application programs using the DBMS ? ? a lot easier now that the data management is taken care of
+31
+
+category name ssn Student
+
+Requirements Modeling
+cid Course Takes
+
+name
+
+quarter
+
+Advises
+Professor
+
+Teaches
+
+office
+
+name
+
+faculty
+
+32
+
+Schema Design and Implementation
+? Tables: Student:
+SSN 123-45-6789 234-56-7890 Name Charles Dan ? Category undergrad grad ?
+
+Takes:
+SSN 123-45-6789 123-45-6789 234-56-7890 CID CSE444 CSE444 CSE142 ?
+
+Course:
+CID CSE444 CSE541 Name Quarter Databases fall Operating systems winter
+
+? The logical schema separates the logical view from the physical view of the data.
+
+33
+
+Querying a Database
+? ?Find all courses that Mary takes? ? S(tructured) Q(uery) L(anguage) select c.name from Student s, Takes t, Course c where s.name = ?Mary? and s.ssn = t.ssn and t.cid = c.cid
+
+? The query processor figures out how to answer the query efficiently
+34
+
+Query Optimization
+Goal: Declarative SQL query
+select c.name from Student s, Takes t, Course c where s.name = ?Mary? and s.ssn = t.ssn and t.cid = c.cid
+sid=sid name= ?Mary?
+
+Query execution plan
+Course.name
+
+cid=cid
+
+Student
+
+Takes
+
+Course
+
+Plan: Tree of relational algebra operators, choice of algorithm for each operator Ideally: Find best plan Practically: Avoid worst plans!
+35
+
+Traditional and Novel Data Management Issues
+? Traditional Data Management: ? Relational data for enterprise applications ? Storage ? Query processing/optimization ? Transaction processing Novel Data Management: ? Integration of data from multiple databases, warehousing ? Data management for decision support, data mining ? Managing documents, audio, and visual data ? Exchange of data on the web: XML ? Data Streams ? Querying data on the Web: RDF
+36
+
+?
+
+

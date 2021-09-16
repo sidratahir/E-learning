@@ -1,0 +1,347 @@
+Review Storing Data: Disks and Files
+Lecture 5 (R&G Chapter 9) ? Aren?t Databases Great? ? Relational model ? SQL
+
+?Yea, from the table of my memory I?ll wipe away all trivial fond records.? -- Shakespeare, Hamlet
+
+Disks, Memory, and Files
+The BIG picture?
+Query Optimization and Execution Relational Operators Files and Access Methods Buffer Management Disk Space Management
+
+Disks and Files
+
+? DBMS stores information on disks.
+? In an electronic world, disks are a mechanical anachronism!
+
+? This has major implications for DBMS design!
+? READ: transfer data from disk to main memory (RAM). ? WRITE: transfer data from RAM to disk. ? Both are high-cost operations, relative to in-memory operations, so must be planned carefully!
+
+DB
+
+Why Not Store Everything in Main Memory?
+
+The Storage Hierarchy
+Smaller, Faster ?Main memory (RAM) for currently used data. ?Disk for the main database (secondary storage). ?Tapes for archiving older versions of the data (tertiary storage).
+
+? Costs too much. For ~$1000, PCConnection will sell you either
+? ~20GB of RAM ? ~40GB of flash ? ~5 TB of disk
+
+? Main memory is volatile. We want data to be saved between runs. (Obviously!)
+Bigger, Slower
+Source: Operating Systems Concepts 5th Edition
+
+1
+
+Thought Experiment: How Much RAM?
+? Say your biz has ? 100,000 customers ? 10,000 products ? Say space you need is ? 10K/customer ? 50K/product ? How much space do you need? ? 1G cust + .5G product = 1.5G ? Double it for space utilization = 3G ? Times 10 for growth = 30G ? at, say, $100/G = ? ? nothing! (to a company with 100,000 customers)
+
+Quick Review
+? 1 millisecond = 1ms = 1/1000 second ? 1 microsecond = 1us = 1/1000 ms ? 1 nanosecond = 1ns = 1/1000 us ? Clock rate 3Ghz, how long is a cycle?
+
+Jim Gray?s Storage Latency Analogy: How Far Away is the Data?
+10 9 Andromeda Tape /Optical Robot Pluto 2,000 Years
+
+Disks
+? Secondary storage device of choice for ~40 years. ? Main advantage over
+? tapes: random access vs. sequential ? RAM: persistence, easy growth
+
+10 6 Disk
+
+2 Years
+
+100
+
+Memory
+
+Sacramento
+
+1.5 hr
+
+10 On Board Cache 2 On Chip Cache 1ns Registers
+
+This Lecture Hall 10 min This Room My Head 1 min
+
+? Data is stored and retrieved in units called disk blocks or pages. ? Unlike RAM, time to retrieve a disk block varies depending upon location on disk.
+? Therefore, relative placement of blocks on disk has major impact on DBMS performance!
+
+Components of a Disk
+Spindle Disk head Tracks
+
+Accessing a Disk Page
+? Time to access (read/write) a disk block:
+Sector
+
+The platters spin (say, 120 rps). The arm assembly is moved in or out to position a head on a desired track. Tracks under heads make a cylinder (imaginary!). Only one head reads/writes at any one time.
+?
+
+? seek time (moving arms to position disk head on track) ? rotational delay (waiting for block to rotate under head) ? transfer time (actually moving data to/from disk surface)
+
+Arm movement
+
+Platters
+
+? Seek time and rotational delay dominate.
+? Seek time varies between about 0.3 and 10msec ? Rotational delay varies from 0 to 4msec ? Transfer rate .01 - .05msec per 8K block
+
+Block size is a multiple of sector size (which is fixed).
+
+Arm assembly
+
+? Key to lower I/O cost: reduce seek/rotation delays! Hardware vs. software solutions?
+
+2
+
+Arranging Pages on Disk
+? `Next? block concept:
+? blocks on same track, followed by ? blocks on same cylinder, followed by ? blocks on adjacent cylinder
+
+Thought experiment
+? What is a good disk page size?
+? 8K? ? 32K? ? 1Meg?
+
+? Blocks in a file should be arranged sequentially on disk (by `next?), to minimize seek and rotational delay. ? For a sequential scan, pre-fetching several pages at a time is a big win!
+
+? Why?
+
+Disk Space Management
+? Lowest layer of DBMS software manages space on disk (using OS file system or not?). ? Higher levels call upon this layer to:
+? allocate/de-allocate a page ? read/write a page
+
+Context
+
+Query Optimization and Execution Relational Operators Files and Access Methods Buffer Management Disk Space Management
+
+? Best if a request for a sequence of pages is satisfied by pages stored sequentially on disk!
+? Responsibility of disk space manager. ? Higher levels don?t know how this is done, or how free space is managed. ? Though they may make performance assumptions!
+? Hence disk space manager should do a decent job.
+
+DB
+
+Buffer Management in a DBMS
+Page Requests from Higher Levels
+BUFFER POOL disk page free frame MAIN MEMORY DISK
+
+When a Page is Requested ...
+? Buffer pool information table contains: <frame#, pageid, pin_count, dirty> ? If requested page is not in pool:
+? Choose a frame for replacement. Only ?un-pinned? pages are candidates! ? If frame is ?dirty?, write it to disk ? Read requested page into chosen frame
+
+DB
+
+choice of frame dictated by replacement policy
+
+? Pin the page and return its address.
+?
+
+? Data must be in RAM for DBMS to operate on it! ? Buffer Mgr hides the fact that not all data is in RAM
+
+If requests can be predicted (e.g., sequential scans) pages can be pre-fetched several pages at a time!
+
+3
+
+More on Buffer Management
+? Requestor of page must eventually unpin it, and indicate whether page has been modified:
+? dirty bit is used for this.
+
+Buffer Replacement Policy
+? Frame is chosen for replacement by a replacement policy:
+? Least-recently-used (LRU), MRU, Clock, etc.
+
+? Page in pool may be requested many times,
+? a pin count is used. ? To pin a page, pin_count++ ? A page is a candidate for replacement iff pin count == 0 (?unpinned?)
+
+? CC & recovery may entail additional I/O when a frame is chosen for replacement.
+? Write-Ahead Log protocol; more later!
+
+? Policy can have big impact on # of I/O?s; depends on the access pattern. ? For ?Transactional? workloads, notion of a ?working set? - pages that ?should? be in memory.
+
+LRU Replacement Policy
+? Least Recently Used (LRU)
+? for each page in buffer pool, keep track of time when last unpinned ? replace the frame which has the oldest (earliest) time ? very common policy: intuitive and simple
+? Works well for repeated accesses to popular pages
+
+?Clock? Replacement Policy
+D(1)
+
+A(1) B(p)
+
+? An approximation of LRU C(1) ? Arrange frames into a cycle, store one reference bit per frame
+? Can think of this as the 2nd chance bit
+
+? Problems? ? Problem: Sequential flooding
+? LRU + repeated sequential scans. ? # buffer frames < # pages in file means each page request causes an I/O. ? Idea: MRU better in this scenario?
+
+? When pin count reduces to 0, turn on ref. bit ? When replacement necessary
+do for each page in cycle { if (pincount == 0 && ref bit is on) turn off ref bit; else if (pincount == 0 && ref bit is off) choose this page for replacement; Questions: } until a page is chosen;
+
+How like LRU? Problems?
+
+DBMS vs. OS File System
+OS does disk space & buffer mgmt: why not let OS manage these tasks? ? Some limitations, e.g., files can?t span disks. ? Buffer management in DBMS requires ability to:
+? pin a page in buffer pool, force a page to disk & order writes (important for implementing CC & recovery) ? adjust replacement policy, and pre-fetch pages based on access patterns in typical DB operations.
+
+Context
+
+Query Optimization and Execution Relational Operators Files and Access Methods Buffer Management Disk Space Management
+
+DB
+
+4
+
+Files of Records
+? Blocks are the interface for I/O, but? ? Higher levels of DBMS operate on records, and files of records. ? FILE: A collection of pages, each containing a collection of records. Must support:
+? insert/delete/modify record ? fetch a particular record (specified using record id) ? scan all records (possibly with some conditions on the records to be retrieved)
+
+Unordered (Heap) Files
+? Simplest file structure contains records in no particular order. ? As file grows and shrinks, disk pages are allocated and de-allocated. ? To support record level operations, we must:
+? keep track of the pages in a file ? keep track of free space on pages ? keep track of the records on a page
+
+? There are many alternatives for keeping track of this.
+? We?ll consider 2
+
+Heap File Implemented as a List
+
+Heap File Using a Page Directory
+Header Page Data Page 1 Data Page 2
+
+Data Page Header Page Data Page
+
+Data Page
+
+Data Page
+
+Full Pages
+
+Data Page
+
+Data Page
+
+Pages with Free Space
+
+DIRECTORY
+
+Data Page N
+
+? The header page id and Heap file name must be stored someplace.
+? Database ?catalog?
+
+? The entry for a page can include the number of free bytes on the page. ? The directory is a collection of pages; linked list implementation is just one alternative.
+? Much smaller than linked list of all HF pages!
+
+? Each page contains 2 `pointers? plus data.
+
+Indexes (a sneak preview)
+
+Record Formats: Fixed Length
+
+? A Heap file allows us to retrieve records:
+? by specifying the rid, or ? by scanning all records sequentially
+
+F1 L1
+
+F2 L2
+
+F3 L3
+
+F4 L4
+
+? Sometimes, we want to retrieve records by specifying the values in one or more fields, e.g.,
+? Find all students in the ?CS? department ? Find all students with a gpa > 3
+
+Base address (B)
+
+Address = B+L1+L2
+
+? Indexes are file structures that enable us to answer such value-based queries efficiently.
+
+? Information about field types same for all records in a file; stored in system catalogs. ? Finding i?th field done via arithmetic.
+
+5
+
+Record Formats: Variable Length
+? Two alternative formats (# fields is fixed):
+F1 F2 F3 F4 Slot 1 Slot 2
+
+Page Formats: Fixed Length Records
+Slot 1 Slot 2
+
+$
+
+$
+
+$
+
+$
+Slot N
+
+...
+
+Free Space Slot N Slot M N
+
+...
+
+Fields Delimited by Special Symbols
+F1 F2 F3 F4
+
+1 . . . 0 1 1M number of records M ... 321 UNPACKED, BITMAP number of slots
+
+PACKED
+
+Array of Field Offsets ? Second offers direct access to i?th field, efficient storage of nulls (special don?t know value); small directory overhead.
+
+?Record id = <page id, slot #>. In first alternative, moving records for free space management changes rid; may not be acceptable.
+
+Page Formats: Variable Length Records
+Rid = (i,N) Rid = (i,2) Rid = (i,1) Page i
+
+System Catalogs
+? For each relation:
+? ? ? ? name, file location, file structure (e.g., Heap file) attribute name and type, for each attribute index name, for each index integrity constraints
+
+? For each index:
+20 N ... 16 2 24 N 1 # slots
+Pointer to start of free space
+
+? structure (e.g., B+ tree) and search key fields
+
+? For each view:
+? view name and definition
+
+SLOT DIRECTORY
+
+?Can move records on page without changing rid; so, attractive for fixed-length records too.
+
+? Plus statistics, authorization, buffer pool size, etc.
+?
+
+Catalogs are themselves stored as relations!
+
+Attr_Cat(attr_name, rel_name, type, position)
+attr_name attr_name rel_name type position sid name login age gpa fid fname sal rel_name Attribute_Cat Attribute_Cat Attribute_Cat Attribute_Cat Students Students Students Students Students Faculty Faculty Faculty type position string 1 string 2 string 3 integer 4 string 1 string 2 string 3 integer 4 real 5 string 1 string 2 real 3
+
+pg_attribute
+
+6
+
+Summary
+
+Summary (Contd.)
+? DBMS vs. OS File Support
+? DBMS needs features not found in many OS?s, e.g., forcing a page to disk, controlling the order of page writes to disk, files spanning disks, ability to control pre-fetching and page replacement policy based on predictable access patterns, etc.
+
+? Disks provide cheap, non-volatile storage.
+? Random access, but cost depends on location of page on disk; important to arrange data sequentially to minimize seek and rotation delays.
+
+? Buffer manager brings pages into RAM.
+? Page stays in RAM until released by requestor. ? Written to disk when frame chosen for replacement (which is sometime after requestor releases the page). ? Choice of frame to replace based on replacement policy. ? Tries to pre-fetch several pages at a time.
+
+? Variable length record format with field offset directory offers support for direct access to i?th field and null values. ? Slotted page format supports variable length records and allows records to move on page.
+
+Summary (Contd.)
+
+? File layer keeps track of pages in a file, and supports abstraction of a collection of records.
+? Pages with free space identified using linked list or directory structure (similar to how pages in file are kept track of).
+
+? Indexes support efficient retrieval of records based on the values in some fields. ? Catalog relations store information about relations, indexes and views. (Information that is common to all records in a given collection.)
+
+7
+
+

@@ -1,0 +1,320 @@
+Relational Query Languages Relational Algebra
+R & G, Chapter 4 By relieving the brain of all unnecessary work, a good notation sets it free to concentrate on more advanced problems, and, in effect, increases the mental power of the race. -- Alfred North Whitehead (1861 - 1947)
+
+?
+
+? Query languages: Allow manipulation and retrieval of data from a database. ? Relational model supports simple, powerful QLs: ? Strong formal foundation based on logic. ? Allows for much optimization. ? Query Languages != programming languages! ? QLs not expected to be ?Turing complete?. ? QLs not intended to be used for complex calculations. ? QLs support easy, efficient access to large data sets.
+
+Preliminaries Formal Relational Query Languages
+Two mathematical Query Languages form the basis for ?real? languages (e.g. SQL), and for implementation: Relational Algebra: More operational, very useful for representing execution plans. ? A query is applied to relation instances, and the result of a query is also a relation instance. ? Schemas of input relations for a query are fixed (but query will run over any legal instance) ? The schema for the result of a given query is also fixed. It is determined by the definitions of the query language constructs. ? Compare above two points to XPath, XQuery! ? Positional vs. named-field notation: ? Positional notation easier for formal definitions, named-field notation more readable. ? Both used in SQL
+? Though positional notation is not encouraged
+
+Relational Calculus: Lets users describe what they want, rather than how to compute it. (Non-procedural, declarative.)
+
+? Understanding Algebra & Calculus is key to understanding SQL, query processing!
+
+Relational Algebra: 5 Basic Operations
+? Selection ( ? ) Selects a subset of rows from relation (horizontal). ? Projection ( ? ) Retains only wanted columns from relation (vertical). ? Cross-product ( ? ) Allows us to combine two relations. ? Set-difference ( ? ) Tuples in r1, but not in r2. ? Union ( ? ) Tuples in r1 or in r2. Since each operation returns a relation, operations can be composed! (Algebra is ?closed?.)
+
+Example Instances
+
+R1
+
+sid bid day 22 101 10/10/96 58 103 11/12/96
+
+Boats
+
+S1
+
+bid 101 102 103 104
+
+bname Interlake Interlake Clipper Marine
+
+color blue red green red
+
+sid 22 31 58
+
+sname rating age dustin 7 45.0 lubber 8 55.5 rusty 10 35.0
+
+S2
+
+sid 28 31 44 58
+
+sname rating age yuppy 9 35.0 lubber 8 55.5 guppy 5 35.0 rusty 10 35.0
+
+Projection (?)
+? Examples:
+
+Projection (?)
+
+sname yuppy lubber guppy rusty
+
+rating 9 8 5 10
+
+! age(S2) ; ! sname,rating(S2)
+sid 28 31 44 58 sname rating age yuppy 9 35.0 lubber 8 55.5 guppy 5 35.0 rusty 10 35.0
+S2
+
+? Retains only attributes that are in the ?projection list?. ? Schema of result:
+? exactly the fields in the projection list, with the same names that they had in the input relation.
+
+! sname,rating (S 2)
+age 35.0 55.5
+
+? Projection operator has to eliminate duplicates arise? Why remove them?)
+
+(How do they
+
+? Note: real systems typically don?t do duplicate elimination unless the user explicitly asks for it. (Why not?)
+
+! age(S2)
+
+Selection (?)
+? Selects rows that satisfy selection condition. ? Result is a relation.
+Schema of result is same as that of the input relation.
+
+Union and Set-Difference
+? Both of these operations take two input relations, which must be union-compatible:
+? Same number of fields. ? `Corresponding? fields have the same type.
+
+? Do we need to do duplicate elimination?
+
+sid 28 31 44 58
+
+sname rating yuppy 9 lubber 8 guppy 5 rusty 10
+
+age 35.0 55.5 35.0 35.0
+
+? For which, if any, is duplicate elimination required?
+
+sname yuppy rusty
+
+rating 9 10
+
+! rating >8(S2)
+
+! sname,rating(" rating >8(S2))
+
+Union
+sid 22 31 58
+sid 28 31 44 58
+
+Set Difference
+sid 22 31 58 44 28 sname dustin lubber rusty guppy yuppy rating age 7 8 10 5 9 45.0 55.5 35.0 35.0 35.0
+
+sname rating age dustin 7 45.0 lubber 8 55.5 rusty 10 35.0
+S1
+
+sid 22 31 58
+sid 28 31 44 58
+
+sname rating age dustin 7 45.0 lubber 8 55.5 rusty 10 35.0
+S1
+
+sid 22
+
+sname dustin
+
+rating age 7 45.0
+
+S1! S2
+
+sname rating age yuppy 9 35.0 lubber 8 55.5 guppy 5 35.0 rusty 10 35.0
+S2
+
+S1! S2
+
+sname rating age yuppy 9 35.0 lubber 8 55.5 guppy 5 35.0 rusty 10 35.0
+S2
+
+sid sname rating age 28 yuppy 9 35.0 44 guppy 5 35.0
+
+S2 ? S1
+
+Cross-Product
+? S1 ? R1: Each row of S1 paired with each row of R1. ? Q: How many rows in the result? ? Result schema has one field per field of S1 and R1, with field names `inherited? if possible.
+? May have a naming conflict: Both S1 and R1 have a field with the same name. ? In this case, can use the renaming operator:
+
+Cross Product Example
+sid bid day 22 101 10/10/96 58 103 11/12/96
+R1
+(sid) sname rating age 22 dustin dustin lubber lubber rusty rusty 7 7 8 8 10 10 45.0 45.0 55.5 55.5 35.0 35.0
+
+sid sname rating age 22 31 58 dustin lubber rusty
+S1
+(sid) bid day 22 58 22 58 22 58 101 10/10/96 103 11/12/96 101 10/10/96 103 11/12/96 101 10/10/96 103 11/12/96
+
+7 8 10
+
+45.0 55.5 35.0
+
+! (C(1" sid1, 5 " sid2), S1# R1)
+
+S1 x R1 =
+
+22 31 31 58 58
+
+Compound Operator: Intersection
+? In addition to the 5 basic operators, there are several additional ?Compound Operators?
+? These add no computational power to the language, but are useful shorthands. ? Can be expressed solely with the basic ops.
+
+Intersection
+sid 22 31 58
+sid 28 31 44 58
+
+sname rating age dustin 7 45.0 lubber 8 55.5 rusty 10 35.0
+S1
+
+? Intersection takes two input relations, which must be union-compatible. ? Q: How to express it using basic operators?
+
+R ? S = R ? (R ? S)
+
+sname rating age yuppy 9 35.0 lubber 8 55.5 guppy 5 35.0 rusty 10 35.0
+S2
+
+sid 31 58
+
+sname lubber rusty
+
+rating age 8 55.5 10 35.0
+
+S1"S2
+!
+
+Compound Operator: Join
+? Joins are compound operators involving cross product, selection, and (sometimes) projection. ? Most common type of join is a ?natural join? (often just called ?join?). R S conceptually is:
+? Compute R ? S ? Select rows where attributes that appear in both relations have equal values ? Project all unique atttributes and one copy of each of the common ones.
+
+Natural Join Example
+sid bid day 22 101 10/10/96 58 103 11/12/96
+R1
+
+sid 22 31 58
+
+sname rating age dustin 7 45.0 lubber 8 55.5 rusty 10 35.0
+S1
+
+S1
+
+R1 =
+sid 22 58 sname dustin rusty rating age 7 10 45.0 35.0 bid 101 103 day 10/10/96 11/12/96
+
+? Note: Usually done much more efficiently than this.
+
+Other Types of Joins
+? Condition Join (or ?theta-join?):
+
+Examples
+
+Reserves
+
+R > c S = " c ( R ! S) <
+(sid) 58 58 bid 103 103 day 11/12/96 11/12/96
+Boats Sailors
+
+sid bid day 22 101 10/10/96 58 103 11/12/96
+
+sid sname rating age 22 31 58 dustin lubber rusty 7 8 10 45.0 55.5 35.0
+
+(sid) 22 31
+
+sname rating age dustin 7 45.0 lubber 8 55.5
+
+S1> <
+
+S1.sid < R1.sid
+
+R1
+
+? Result schema same as that of cross-product. ? May have fewer tuples than cross-product.
+? Equi-Join: Special case: condition c contains only conjunction of equalities.
+
+bid 101 102 103 104
+
+bname Interlake Interlake Clipper Marine
+
+color Blue Red Green Red
+
+Find names of sailors who?ve reserved boat #103
+? Solution 1:
+? Solution 2:
+
+Find names of sailors who?ve reserved a red boat
+? Information about boat color only available in Boats; so need an extra join:
+
+! sname (("
+! sname ("
+
+bid =103
+
+Re serves) > Sailors) <
+(Re serves > Sailors)) <
+
+bid =103
+
+! sname (("
+?
+
+color =' red '
+
+Boats) > Re serves > Sailors) < <
+
+A more efficient solution:
+
+! sname (! ((! " Boats) > Re s) > Sailors) < < sid bid color =' red '
+? A query optimizer can find this given the first solution!
+
+Find sailors who?ve reserved a red boat or a green boat
+? Can identify all red or green boats, then find sailors who?ve reserved one of these boats:
+
+Find sailors who?ve reserved a red and a green boat
+
+! (Tempboats, ("
+
+color =' red ' # color =' green '
+
+Boats))
+
+! sname(Tempboats > Re serves > Sailors) < <
+
+Find sailors who?ve reserved a red and a green boat
+? Cut-and-paste previous slide?
+
+Find sailors who?ve reserved a red and a green boat
+? Previous approach won?t work! Must identify sailors who?ve reserved red boats, sailors who?ve reserved green boats, then find the intersection (note that sid is a key for Sailors):
+
+" (Tempboats,(#
+!
+
+color='red '$color='green'
+
+Boats))
+
+! (Tempred, "
+
+! sname(Tempboats > Re serves > Sailors) < <
+
+sid
+
+((#
+
+color =' red '
+
+Boats) > Re serves)) <
+
+! (Tempgreen, "
+
+sid
+
+((#
+
+color =' green'
+
+Boats) > Re serves)) <
+
+! sname((Tempred " Tempgreen) > Sailors) <
+
+Summary
+? Relational Algebra: a small set of operators mapping relations to relations ? Operational, in the sense that you specify the explicit order of operations ? A closed set of operators! Can mix and match. ? Basic ops include: ?, ?, ?, ?, ? ? Important compound ops: ?,
+
+

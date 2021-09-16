@@ -1,0 +1,77 @@
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from numpy.linalg import norm
+from scipy import dot
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import PorterStemmer
+from nltk import pos_tag
+import os
+import csv
+from textblob import TextBlob as tb
+import math
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+'''Variables'''
+tokenizer = RegexpTokenizer(r'\w+')
+stemmer = PorterStemmer()
+path ="E:/alldoc/"
+docs = []
+
+
+'''File Reading'''
+for subdir, dirs, files in os.walk(path):
+    for file in files:
+        file_path = subdir  + file
+        shakes = open(file_path,'r')
+        text = shakes.read()
+        docs.append(text)
+        '''print(docs) '''
+
+
+
+'''Setmming for changing verbs to base form'''
+def stem_tokens(tokens, stemmer):
+    stemmed = []
+    for item in tokens:
+        stemmed.append(stemmer.stem(item))
+    return stemmed
+
+'''Converting Sentences to tokens'''
+def tokenize(text):
+    tokens = tokenizer.tokenize(text)
+
+    stems = stem_tokens(tokens, stemmer)
+    return stems
+'''Initializing Vector'''
+vectorizer = TfidfVectorizer(tokenizer=tokenize, stop_words='english')
+
+
+'''Assigning Docs To vector'''
+DocumentVectorizerArray = vectorizer.fit_transform(docs).toarray()
+
+with open('E:/toc.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    rowcount = 0
+    vocabularyIndex = 0
+    Idfscore = 0
+    for row in csv_reader:
+        if line_count == 0:
+            for docIndex,doc in enumerate(docs):
+                newrow = [0] * len(row)
+                for index,column in enumerate(row):
+                        if column in doc:
+                            vocabularyIndex = vectorizer.get_feature_names().index(column)
+                            Idfscore = DocumentVectorizerArray[docIndex][vocabularyIndex]
+                            newrow[index] = Idfscore
+                        else:
+                            newrow[index] = 0
+                with open('E:/toc.csv', 'a', newline='') as f:
+                                writer = csv.writer(f)
+                                writer.writerow(newrow)
+            line_count = line_count+1
+            f.close()
+        else:
+            csv_file.close()
+            break
+

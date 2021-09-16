@@ -1,0 +1,101 @@
+Introduc*on	  to	   Informa(on	  Retrieval	  
+CS276	   Informa*on	  Retrieval	  and	  Web	  Search	   Chris	  Manning	  and	  Pandu	  Nayak	   E?cient	  scoring	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Today’s	  focus	   §?? Retrieval	  –	  get	  docs	  matching	  query	  from	  inverted	   index	   §?? Scoring+ranking	   §?? Assign	  a	  score	  to	  each	  doc	   §?? Pick	  K	  highest	  scoring	  docs	   §?? Our	  emphasis	  today	  will	  be	  on	  doing	  this	  e?ciently,	   rather	  than	  on	  the	  quality	  of	  the	  ranking	  	  
+2	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Background	   §?? Score	  computa*on	  is	  a	  large	  (10s	  of	  %)	  frac*on	  of	   the	  CPU	  work	  on	  a	  query	   §?? Generally,	  we	  have	  a	  *ght	  budget	  on	  latency	  (say,	  250ms)	   §?? CPU	  provisioning	  doesn’t	  permit	  exhaus*vely	  scoring	   every	  document	  on	  every	  query	   §?? Today	  we’ll	  look	  at	  ways	  of	  cuWng	  CPU	  usage	  for	   scoring,	  without	  compromising	  the	  quality	  of	  results	   (much)	   §?? Basic	  idea:	  avoid	  scoring	  docs	  that	  won’t	  make	  it	  into	   the	  top	  K	  
+3	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Recap:	  Queries	  as	  vectors	   §?? Vector	  space	  scoring	   §?? We	  have	  a	  weight	  for	  each	  term	  in	  each	  doc	   §?? Represent	  queries	  as	  vectors	  in	  the	  space	   §?? Rank	  documents	  according	  to	  their	  cosine	  similarity	  to	  the	   query	  in	  this	  space	   §??Or	  something	  more	  complex:	  BM25,	  proximity,	  …	   §?? Vector	  space	  scoring	  is	   §?? En*rely	  query	  dependent	   §?? Addi*ve	  on	  term	  contribu*ons	  –	  no	  condi*onals	  etc.	   §?? Context	  insensi*ve	  (no	  interac*ons	  between	  query	  terms)	  
+Ch. 6 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+TAAT	  vs	  DAAT	  techniques	   §?? TAAT	  =	  “Term	  At	  A	  Time”	   §?? Scores	  for	  all	  docs	  computed	  concurrently,	  one	  query	  term	   at	  a	  *me	   §?? DAAT	  =	  “Document	  At	  A	  Time”	   §?? Total	  score	  for	  each	  doc	  (incl	  all	  query	  terms)	  computed,	   before	  proceeding	  to	  the	  next	   §?? Each	  has	  implica*ons	  for	  how	  the	  retrieval	  index	  is	   structured	  and	  stored	  
+5	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+E?cient	  cosine	  ranking	   §?? Find	  the	  K	  docs	  in	  the	  collec*on	  “nearest”	  to	  the	   query	  ?	  K	  largest	  query-­-doc	  cosines.	   §?? E?cient	  ranking:	   §??Choosing	  the	  K	  largest	  cosine	  values	  e?ciently.	   §??Can	  we	  do	  this	  without	  compu*ng	  all	  N	  cosines?	  
+Sec. 7.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Safe	  vs	  non-­-safe	  ranking	   §?? The	  terminology	  “safe	  ranking”	  is	  used	  for	  methods	   that	  guarantee	  that	  the	  K	  docs	  returned	  are	  the	  K	   absolute	  highest	  scoring	  documents	   §?? (Not	  necessarily	  just	  under	  cosine	  similarity)	   §?? Is	  it	  ok	  to	  be	  non-­-safe?	   §?? If	  it	  is	  –	  then	  how	  do	  we	  ensure	  we	  don’t	  get	  too	  far	   from	  the	  safe	  solu*on?	   §?? How	  do	  we	  measure	  if	  we	  are	  far?	  
+7	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Non-­-safe	  ranking	   §?? Covered	  in	  depth	  in	  Coursera	  video	  (number	  7)	   §?? Non-­-safe	  ranking	  may	  be	  okay	   §?? Ranking	  func*on	  is	  only	  a	  proxy	  for	  user	  happiness	   §?? Documents	  close	  to	  top	  K	  may	  be	  just	  ?ne	   §?? Index	  elimina*on	   §?? Only	  consider	  high-­-idf	  query	  terms	   §?? Only	  consider	  docs	  containing	  many	  query	  terms	   §?? Champion	  lists	   §?? High/low	  lists,	  *ered	  indexes	   §?? Order	  pos*ngs	  by	  g(d)	  (query-­-indep.	  quality	  score)	  
+8	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+SAFE	  RANKING	  
+9	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Safe	  ranking	   §?? When	  we	  output	  the	  top	  K	  docs,	  we	  have	  a	  proof	   that	  these	  are	  indeed	  the	  top	  K	   §?? Does	  this	  imply	  we	  always	  have	  to	  compute	  all	  N	   cosines?	   §?? We’ll	  look	  at	  pruning	  methods	   §?? So	  we	  only	  fully	  score	  some	  J	  documents	   §?? Do	  we	  have	  to	  sort	  the	  J	  cosine	  scores?	  
+10	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   Compu*ng	  the	  K	  largest	  cosines:	   selec*on	  vs.	  sor*ng	   §?? Typically	  we	  want	  to	  retrieve	  the	  top	  K	  docs	  (in	  the	   cosine	  ranking	  for	  the	  query)	   §??not	  to	  totally	  order	  all	  docs	  in	  the	  collec*on	   §?? Can	  we	  pick	  o?	  docs	  with	  K	  highest	  cosines?	   §?? Let	  J	  =	  number	  of	  docs	  with	  nonzero	  cosines	   §??We	  seek	  the	  K	  best	  of	  these	  J	   Sec. 7.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Use	  heap	  for	  selec*ng	  top	  K	   §?? Binary	  tree	  in	  which	  each	  node’s	  value	  >	  the	  values	   of	  children	   §?? Takes	  2J	  opera*ons	  to	  construct,	  then	  each	  of	  K	   “winners”	  read	  o?	  in	  O(log	  J)	  steps.	   §?? For	  J=1M,	  K=100,	  this	  is	  about	  10%	  of	  the	  cost	  of	   sor*ng.	   10 .9 .3 .8 .3 
+.1 
+.1 
+Sec. 7.1 
+.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+WAND	  scoring	   §?? An	  instance	  of	  DAAT	  scoring	   §?? Basic	  idea	  reminiscent	  of	  branch	  and	  bound	   §?? We	  maintain	  a	  running	  threshold	  score	  –	  e.g.,	  the	  Kth	   highest	  score	  computed	  so	  far	   §?? We	  prune	  away	  all	  docs	  whose	  cosine	  scores	  are	   guaranteed	  to	  be	  below	  the	  threshold	   §?? We	  compute	  exact	  cosine	  scores	  for	  only	  the	  un-­-pruned	   docs	  
+13	  
+Broder et al. Ef?cient Query Evaluation using a Two-Level Retrieval Process. 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Index	  structure	  for	  WAND	   §?? Pos*ngs	  ordered	  by	  docID	   §?? Assume	  a	  special	  iterator	  on	  the	  pos*ngs	  of	  the	  form	   “go	  to	  the	  ?rst	  docID	  greater	  than	  or	  equal	  to	  X”	   §?? Typical	  state:	  we	  have	  a	  “?nger”	  at	  some	  docID	  in	   the	  pos*ngs	  of	  each	  query	  term	   §?? Each	  ?nger	  moves	  only	  to	  the	  right,	  to	  larger	  docIDs	   §?? Invariant	  –	  all	  docIDs	  lower	  than	  any	  ?nger	  have	   already	  been	  processed,	  meaning	   §?? These	  docIDs	  are	  either	  pruned	  away	  or	   §?? Their	  cosine	  scores	  have	  been	  computed	  
+14	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Upper	  bounds	   §?? At	  all	  *mes	  for	  each	  query	  term	  t,	  we	  maintain	  an	   upper	  bound	  UBt	  on	  the	  score	  contribu*on	  of	  any	   doc	  to	  the	  right	  of	  the	  ?nger	   §?? Max	  (over	  docs	  remaining	  in	  t’s	  pos*ngs)	  of	  wt(doc)	  
+15	  
+t 3	   7	   11	   17	   29	   38	   57	   79	  
+finger 
+UBt = wt(38)  
+As finger moves right, UB drops 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Pivo*ng	   §?? Query:	  catcher	  in	  the	  rye	   §?? Let’s	  say	  the	  current	  ?nger	  posi*ons	  are	  as	  below	  
+16	  
+catcher 
+rye 
+in 
+the 
+273	  
+304	  
+589	  
+762	  
+UBcatcher = 2.3 
+UBrye = 1.8 
+UBin = 3.3 
+UBthe = 4.3 
+Threshold = 6.8 
+Pivot 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Prune	  docs	  that	  have	  no	  hope	   §?? Terms	  sorted	  in	  order	  of	  ?nger	  posi*ons	   §?? Move	  ?ngers	  to	  589	  or	  right	  
+17	  
+catcher 
+rye 
+in 
+the 
+273	  
+304	  
+589	  
+762	  
+UBcatcher = 2.3 
+UBrye = 1.8 
+UBin = 3.3 
+UBthe = 4.3 
+Threshold = 6.8 
+Pivot 
+Hopeless	  docs	  
+Hopeless	  docs	  
+Update UB’s 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Compute	  589’s	  score	  if	  need	  be	   §?? If	  589	  is	  present	  in	  enough	  pos*ngs,	  compute	  its	  full	   cosine	  score	  –	  else	  some	  ?ngers	  to	  right	  of	  589	   §?? Pivot	  again	  …	  
+18	  
+catcher 
+rye 
+in 
+the 
+589	  
+762	  
+589	  
+589	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+WAND	  summary	   §?? In	  tests,	  WAND	  leads	  to	  a	  90+%	  reduc*on	  in	  score	   computa*on	   §?? Berer	  gains	  on	  longer	  queries	   §?? Nothing	  we	  did	  was	  speci?c	  to	  cosine	  ranking	   §?? We	  need	  scoring	  to	  be	  addi)ve	  by	  term	   §?? WAND	  and	  variants	  give	  us	  safe	  ranking	   §?? Possible	  to	  devise	  “careless”	  variants	  that	  are	  a	  bit	  faster	   but	  not	  safe	  (see	  summary	  in	  Ding+Suel	  2011)	   §?? Ideas	  combine	  some	  of	  the	  non-­-safe	  scoring	  we	   considered	  
+19	  

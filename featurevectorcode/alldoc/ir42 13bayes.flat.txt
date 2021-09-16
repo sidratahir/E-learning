@@ -1,0 +1,665 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 13: Text Classi?cation & Naive Bayes
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-05-15
+
+1 / 58
+
+Overview
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+2 / 58
+
+Outline
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+3 / 58
+
+Relevance feedback: Basic idea
+
+The user issues a (short, simple) query. The search engine returns a set of documents. User marks some docs as relevant, some as nonrelevant. Search engine computes a new representation of the information need ? should be better than the initial query. Search engine runs new query and returns new results. New results have (hopefully) better recall.
+
+4 / 58
+
+Rocchio illustrated
+
+qopt ?R ?NR
+
+?R ? ?NR x
+
+x x x x
+
+x
+
+5 / 58
+
+Types of query expansion
+
+Manual thesaurus (maintained by editors, e.g., PubMed) Automatically derived thesaurus (e.g., based on co-occurrence statistics) Query-equivalence based on query log mining (common on the web as in the ?palm? example)
+
+6 / 58
+
+Query expansion at search engines
+
+Main source of query expansion at search engines: query logs Example 1: After issuing the query [herbs], users frequently search for [herbal remedies].
+? ?herbal remedies? is potential expansion of ?herb?.
+
+Example 2: Users searching for [?ower pix] frequently click on the URL photobucket.com/?ower. Users searching for [?ower clipart] frequently click on the same URL.
+? ??ower clipart? and ??ower pix? are potential expansions of each other.
+
+7 / 58
+
+Take-away today
+
+Text classi?cation: de?nition & relevance to information retrieval Naive Bayes: simple baseline text classi?er Theory: derivation of Naive Bayes classi?cation rule & analysis Evaluation of text classi?cation: how do we know it worked / didn?t work?
+
+8 / 58
+
+Outline
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+9 / 58
+
+A text classi?cation task: Email spam ?ltering
+From: ???? <takworlld@hotmail.com> Subject: real estate is the only way... gem oalvgkay Anyone can buy real estate with no money down Stop paying rent TODAY ! There is no need to spend hundreds or even thousands for similar courses I am 22 years old and I have already purchased 6 properties using the methods outlined in this truly INCREDIBLE ebook. Change your life NOW ! ================================================= Click Below to order: http://www.wholesaledaily.com/sales/nmd.htm ================================================= How would you write a program that would automatically detect and delete this type of message?
+
+10 / 58
+
+Formal de?nition of TC: Training
+Given: A document space X
+Documents are represented in this space ? typically some type of high-dimensional space.
+
+A ?xed set of classes C = {c1 , c2 , . . . , cJ }
+The classes are human-de?ned for the needs of an application (e.g., spam vs. nonspam).
+
+A training set D of labeled documents. Each labeled document d, c ? X ? C Using a learning method or learning algorithm, we then wish to learn a classi?er ? that maps documents to classes: ?:X?C
+11 / 58
+
+Formal de?nition of TC: Application/Testing
+
+Given: a description d ? X of a document Determine: ?(d) ? C, that is, the class that is most appropriate for d
+
+12 / 58
+
+Topic classi?cation
+?(d ? ) =China regions industries subject areas
+
+classes: training set:
+
+UK
+congestion London
+
+China
+
+poultry
+
+co?ee
+roasting beans
+
+elections
+recount votes
+
+sports
+
+d?
+
+Olympics Beijing
+
+feed chicken
+
+diamond baseball
+
+test set:
+
+first private Chinese airline
+
+Parliament Big Ben
+
+tourism Great Wall
+
+pate ducks
+
+arabica robusta
+
+seat run-off
+
+forward soccer
+
+Windsor the Queen
+
+Mao communist
+
+bird flu turkey
+
+Kenya harvest
+
+TV ads campaign
+
+team captain
+
+13 / 58
+
+Exercise
+
+Find examples of uses of text classi?cation in information retrieval
+
+14 / 58
+
+Examples of how search engines use classi?cation
+
+Language identi?cation (classes: English vs. French etc.) The automatic detection of spam pages (spam vs. nonspam) Sentiment detection: is a movie or product review positive or negative (positive vs. negative) Topic-speci?c or vertical search ? restrict search to a ?vertical? like ?related to health? (relevant to vertical vs. not)
+
+15 / 58
+
+Classi?cation methods: 1. Manual
+
+Manual classi?cation was used by Yahoo in the beginning of the web. Also: ODP, PubMed Very accurate if job is done by experts Consistent when the problem size and team is small Scaling manual classi?cation is di?cult and expensive. ? We need automatic methods for classi?cation.
+
+16 / 58
+
+Classi?cation methods: 2. Rule-based
+
+E.g., Google Alerts is rule-based classi?cation. There are IDE-type development enviroments for writing very complex rules e?ciently. (e.g., Verity) Often: Boolean combinations (as in Google Alerts) Accuracy is very high if a rule has been carefully re?ned over time by a subject expert. Building and maintaining rule-based classi?cation systems is cumbersome and expensive.
+
+17 / 58
+
+A Verity topic (a complex classi?cation rule)
+
+18 / 58
+
+Classi?cation methods: 3. Statistical/Probabilistic
+
+This was our de?nition of the classi?cation problem ? text classi?cation as a learning problem (i) Supervised learning of a the classi?cation function ? and (ii) application of ? to classifying new documents We will look at two methods for doing this: Naive Bayes and SVMs No free lunch: requires hand-classi?ed training data But this manual classi?cation can be done by non-experts.
+
+19 / 58
+
+Outline
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+20 / 58
+
+The Naive Bayes classi?er
+The Naive Bayes classi?er is a probabilistic classi?er. We compute the probability of a document d being in a class c as follows: P(c|d) ? P(c)
+1?k?nd
+
+P(tk |c)
+
+nd is the length of the document. (number of tokens) P(tk |c) is the conditional probability of term tk occurring in a document of class c P(tk |c) as a measure of how much evidence tk contributes that c is the correct class. P(c) is the prior probability of c. If a document?s terms do not provide clear evidence for one class vs. another, we choose the c with highest P(c).
+21 / 58
+
+Maximum a posteriori class
+
+Our goal in Naive Bayes classi?cation is to ?nd the ?best? class. The best class is the most likely or maximum a posteriori (MAP) class c map : ? ? c map = arg max P(c|d) = arg max P(c)
+c?C c?C 1?k?nd
+
+? P(tk |c)
+
+22 / 58
+
+Taking the log
+
+Multiplying lots of small probabilities can result in ?oating point under?ow. Since log(xy ) = log(x) + log(y ), we can sum log probabilities instead of multiplying probabilities. Since log is a monotonic function, the class with the highest score does not change. So what we usually compute in practice is: ? c map = arg max [log P(c) +
+c?C 1?k?nd
+
+? log P(tk |c)]
+
+23 / 58
+
+Naive Bayes classi?er
+
+Classi?cation rule: ? c map = arg max [log P(c) +
+c?C 1?k?nd
+
+? log P(tk |c)]
+
+Simple interpretation:
+? Each conditional parameter log P(tk |c) is a weight that indicates how good an indicator tk is for c. ? The prior log P(c) is a weight that indicates the relative frequency of c. The sum of log prior and term weights is then a measure of how much evidence there is for the document being in the class. We select the class with the most evidence.
+
+24 / 58
+
+Parameter estimation take 1: Maximum likelihood
+? ? Estimate parameters P(c) and P(tk |c) from train data: How? Prior: Nc ? P(c) = N Nc : number of docs in class c; N: total number of docs Conditional probabilities: ? P(t|c) = Tct
+t ? ?V
+
+Tct ?
+
+Tct is the number of tokens of t in training documents from class c (includes multiple occurrences) We?ve made a Naive Bayes independence assumption here: ? ? P(tk |c) = P(tk |c), independent of position
+25 / 58
+
+The problem with maximum likelihood estimates: Zeros
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+P(China|d) ? P(China) ? P(Beijing|China) ? P(and|China) ? P(Taipei|China) ? P(join|China) ? P(WTO|China)
+
+If WTO never occurs in class China in the train set: ? P(WTO|China) = TChina,WTO
+t ? ?V
+
+TChina,t ?
+
+=
+t ? ?V
+
+0 =0 TChina,t ?
+26 / 58
+
+The problem with maximum likelihood estimates: Zeros (cont)
+
+If there are no occurrences of WTO in documents in class China, we get a zero estimate: ? P(WTO|China) = TChina,WTO
+t ? ?V
+
+TChina,t ?
+
+=0
+
+? We will get P(China|d) = 0 for any document that contains WTO!
+
+27 / 58
+
+To avoid zeros: Add-one smoothing
+
+Before: ? P(t|c) =
+
+Tct
+t ? ?V
+
+Tct ? Tct + 1 t ? ?V Tct ? ) + B
+
+Now: Add one to each count to avoid zeros: ? P(t|c) = Tct + 1 = ( t ? ?V (Tct ? + 1)
+
+B is the number of bins ? in this case the number of di?erent words or the size of the vocabulary |V | = M
+
+28 / 58
+
+Naive Bayes: Summary
+
+Estimate parameters from the training corpus using add-one smoothing For a new document, for each class, compute sum of (i) log of prior and (ii) logs of conditional probabilities of the terms Assign the document to the class with the largest score
+
+29 / 58
+
+Naive Bayes: Training
+TrainMultinomialNB(C, D) 1 V ? ExtractVocabulary(D) 2 N ? CountDocs(D) 3 for each c ? C 4 do Nc ? CountDocsInClass(D, c) 5 prior [c] ? Nc /N 6 textc ? ConcatenateTextOfAllDocsInClass(D, c) 7 for each t ? V 8 do Tct ? CountTokensOfTerm(textc , t) 9 for each t ? V 10 do condprob[t][c] ? ?Tct +1+1) t (Tct ? 11 return V , prior , condprob
+
+30 / 58
+
+Naive Bayes: Testing
+
+ApplyMultinomialNB(C, V , prior , condprob, d) 1 W ? ExtractTokensFromDoc(V , d) 2 for each c ? C 3 do score[c] ? log prior [c] 4 for each t ? W 5 do score[c]+ = log condprob[t][c] 6 return arg maxc?C score[c]
+
+31 / 58
+
+Exercise: Estimate parameters, classify test set
+training set docID 1 2 3 4 5 words in document Chinese Beijing Chinese Chinese Chinese Shanghai Chinese Macao Tokyo Japan Chinese Chinese Chinese Chinese Tokyo Japan Nc ? P(c) = N ? P(t|c) = Tct + 1 = ( t ? ?V (Tct ? + 1) Tct + 1 t ? ?V Tct ? ) + B in c = China? yes yes yes no ?
+
+test set
+
+(B is the number of bins ? in this case the number of di?erent words or the size of the vocabulary |V | = M) ? c map = arg max [P(c) ?
+c?C 1?k?nd
+
+? P(tk |c)]
+
+32 / 58
+
+33 / 58
+
+Example: Parameter estimates
+
+? ? Priors: P(c) = 3/4 and P(c) = 1/4 Conditional probabilities: ? P(Chinese|c) = (5 + 1)/(8 + 6) = 6/14 = 3/7 ? ? P(Tokyo|c) = P(Japan|c) = (0 + 1)/(8 + 6) = 1/14 ? P(Chinese|c) = (1 + 1)/(3 + 6) = 2/9 ? ? P(Tokyo|c) = P(Japan|c) = (1 + 1)/(3 + 6) = 2/9 The denominators are (8 + 6) and (3 + 6) because the lengths of textc and textc are 8 and 3, respectively, and because the constant B is 6 as the vocabulary consists of six terms.
+
+34 / 58
+
+Example: Classi?cation
+
+? P(c|d5 ) ? 3/4 ? (3/7)3 ? 1/14 ? 1/14 ? 0.0003 ? P(c|d5 ) ? 1/4 ? (2/9)3 ? 2/9 ? 2/9 ? 0.0001 Thus, the classi?er assigns the test document to c = China. The reason for this classi?cation decision is that the three occurrences of the positive indicator Chinese in d5 outweigh the occurrences of the two negative indicators Japan and Tokyo.
+
+35 / 58
+
+Time complexity of Naive Bayes
+mode time complexity training ?(|D|Lave + |C||V |) testing ?(La + |C|M a ) = ?(|C|M a ) Lave : average length of a training doc, La : length of the test doc, M a : number of distinct terms in the test doc, D: training set, V : vocabulary, C: set of classes ?(|D|Lave ) is the time it takes to compute all counts. ?(|C||V |) is the time it takes to compute the parameters from the counts. Generally: |C||V | < |D|Lave Test time is also linear (in the length of the test document). Thus: Naive Bayes is linear in the size of the training set (training) and the test document (testing). This is optimal.
+36 / 58
+
+Outline
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+37 / 58
+
+Naive Bayes: Analysis
+
+Now we want to gain a better understanding of the properties of Naive Bayes. We will formally derive the classi?cation rule . . . . . . and make our assumptions explicit.
+
+38 / 58
+
+Derivation of Naive Bayes rule
+We want to ?nd the class that is most likely given the document: c map = arg max P(c|d)
+c?C
+
+Apply Bayes rule P(A|B) =
+
+P(B|A)P(A) : P(B)
+
+c map = arg max
+c?C
+
+P(d|c)P(c) P(d)
+
+Drop denominator since P(d) is the same for all classes: c map = arg max P(d|c)P(c)
+c?C
+
+39 / 58
+
+Too many parameters / sparseness
+
+c map = arg max P(d|c)P(c)
+c?C
+
+= arg max P( t1 , . . . , tk , . . . , tnd |c)P(c)
+c?C
+
+There are too many parameters P( t1 , . . . , tk , . . . , tnd |c), one for each unique combination of a class and a sequence of words. We would need a very, very large number of training examples to estimate that many parameters. This is the problem of data sparseness.
+
+40 / 58
+
+Naive Bayes conditional independence assumption
+
+To reduce the number of parameters to a manageable size, we make the Naive Bayes conditional independence assumption: P(d|c) = P( t1 , . . . , tnd |c) =
+1?k?nd
+
+P(Xk = tk |c)
+
+We assume that the probability of observing the conjunction of attributes is equal to the product of the individual probabilities P(Xk = tk |c). Recall from earlier the estimates for these +1 ? conditional probabilities: P(t|c) = ( ? TctT ? )+B
+t ?V ct
+
+41 / 58
+
+Generative model
+C =China
+
+X1 =Beijing
+
+X2 =and
+
+X3 =Taipei
+
+X4 =join
+
+X5 =WTO
+
+P(c|d) ? P(c)
+
+1?k?nd
+
+P(tk |c)
+
+Generate a class with probability P(c) Generate each of the words (in their respective positions), conditional on the class, but independent of each other, with probability P(tk |c) To classify docs, we ?reengineer? this process and ?nd the class that is most likely to have generated the doc.
+42 / 58
+
+Second independence assumption
+
+? ? P(Xk1 = t|c) = P(Xk2 = t|c) For example, for a document in the class UK, the probability of generating queen in the ?rst position of the document is the same as generating it in the last position. The two independence assumptions amount to the bag of words model.
+
+43 / 58
+
+A di?erent Naive Bayes model: Bernoulli model
+C =China
+
+U Alaska =0
+
+U Beijing =1
+
+U India =0
+
+U join =1
+
+U Taipei =1
+
+U WTO =1
+
+44 / 58
+
+Violation of Naive Bayes independence assumptions
+Conditional independence: P( t1 , . . . , tnd |c) =
+1?k?nd
+
+P(Xk = tk |c)
+
+Positional independence: ? ? P(Xk = t|c) = P(Xk = t|c)
+1 2
+
+The independence assumptions do not really hold of documents written in natural language. Exercise
+Examples for why conditional independence assumption is not really true? Examples for why positional independence assumption is not really true?
+
+How can Naive Bayes work if it makes such inappropriate assumptions?
+45 / 58
+
+Why does Naive Bayes work?
+Naive Bayes can work well even though conditional independence assumptions are badly violated. Example: c1 0.6 0.00099 0.99 Double counting of evidence causes and overestimation (0.99). true probability P(c|d) ? ? P(c) 1?k?nd P(tk |c) ? NB estimate P(c|d) c2 class selected 0.4 c1 0.00001 0.01 c1 underestimation (0.01)
+
+Classi?cation is about predicting the correct class and not about accurately estimating probabilities. Naive Bayes is terrible for correct estimation . . . . . . but if often performs well at accurate prediction (choosing the correct class).
+46 / 58
+
+Naive Bayes is not so naive
+Naive Bayes has won some bakeo?s (e.g., KDD-CUP 97) More robust to nonrelevant features than some more complex learning methods More robust to concept drift (changing of de?nition of class over time) than some more complex learning methods Better than methods like decision trees when we have many equally important features A good dependable baseline for text classi?cation (but not the best) Optimal if independence assumptions hold (never true for text, but true for some domains) Very fast Low storage requirements
+47 / 58
+
+Outline
+
+1
+
+Recap Text classi?cation Naive Bayes NB theory Evaluation of TC
+
+2
+
+3
+
+4
+
+5
+
+48 / 58
+
+Evaluation on Reuters
+?(d ? ) =China regions industries subject areas
+
+classes: training set:
+
+UK
+congestion London
+
+China
+
+poultry
+
+co?ee
+roasting beans
+
+elections
+recount votes
+
+sports
+
+d?
+
+Olympics Beijing
+
+feed chicken
+
+diamond baseball
+
+test set:
+
+first private Chinese airline
+
+Parliament Big Ben
+
+tourism Great Wall
+
+pate ducks
+
+arabica robusta
+
+seat run-off
+
+forward soccer
+
+Windsor the Queen
+
+Mao communist
+
+bird flu turkey
+
+Kenya harvest
+
+TV ads campaign
+
+team captain
+
+49 / 58
+
+Example: The Reuters collection
+symbol N L M statistic documents avg. # word tokens per document word types value 800,000 200 400,000
+
+type of class region industry subject area
+
+number 366 870 126
+
+examples UK, China poultry, co?ee elections, sports
+
+50 / 58
+
+A Reuters document
+
+51 / 58
+
+Evaluating classi?cation
+
+Evaluation must be done on test data that are independent of the training data, i.e., training and test sets are disjoint. It?s easy to get good performance on a test set that was available to the learner during training (e.g., just memorize the test set). Measures: Precision, recall, F1 , classi?cation accuracy
+
+52 / 58
+
+Precision P and recall R
+
+predicted to be in the class predicted to not be in the class
+
+in the class true positives (TP) false negatives (FN)
+
+not in the class false positives (FP) true negatives (TN)
+
+TP, FP, FN, TN are counts of documents. The sum of these four counts is the total number of documents. precision:P recall:R = TP/(TP + FP) = TP/(TP + FN)
+
+53 / 58
+
+A combined measure: F
+
+F1 allows us to trade o? precision against recall. F1 =
+11 2P
+
+1 +
+
+11 2R
+
+=
+
+2PR P +R
+1 F 1 = 1(P + 2 1 R)
+
+This is the harmonic mean of P and R:
+
+54 / 58
+
+Averaging: Micro vs. Macro
+
+We now have an evaluation measure (F1 ) for one class. But we also want a single number that measures the aggregate performance over all classes in the collection. Macroaveraging
+Compute F1 for each of the C classes Average these C numbers
+
+Microaveraging
+Compute TP, FP, FN for each of the C classes Sum these C numbers (e.g., all TP to get aggregate TP) Compute F1 for aggregate TP, FP, FN
+
+55 / 58
+
+F1 scores for Naive Bayes vs. other methods
+(a) micro-avg-L (90 classes) macro-avg (90 classes) (b) NB 80 47 Rocchio 85 59 kNN 86 60 trees 98 90 66 85 85 73 67 74 93 92 88 n/a SVM 89 60 SVM 98 94 75 95 89 76 78 86 92 90 92 87
+
+NB Rocchio kNN earn 96 93 97 88 65 92 acq 57 47 78 money-fx 79 68 82 grain 80 70 86 crude trade 64 65 77 65 63 74 interest 85 49 79 ship 70 69 77 wheat corn 65 48 78 micro-avg (top 10) 82 65 82 62 n/a micro-avg-D (118 classes) 75 Naive Bayes does pretty well, but some methods beat it consistently (e.g., SVM).
+
+56 / 58
+
+Take-away today
+
+Text classi?cation: de?nition & relevance to information retrieval Naive Bayes: simple baseline text classi?er Theory: derivation of Naive Bayes classi?cation rule & analysis Evaluation of text classi?cation: how do we know it worked / didn?t work?
+
+57 / 58
+
+Resources
+
+Chapter 13 of IIR Resources at http://cislmu.org
+Weka: A data mining software package that includes an implementation of Naive Bayes Reuters-21578 ? text classi?cation evaluation set Vulgarity classi?er fail
+
+58 / 58
+
+

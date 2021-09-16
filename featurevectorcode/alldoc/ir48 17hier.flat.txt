@@ -1,0 +1,819 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 17: Hierarchical Clustering
+Hinrich Sch?tze & Lucia D. Krisnawati u
+Center for Information and Language Processing, University of Munich
+
+2013-07-03
+
+1 / 66
+
+Overview
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+2 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+3 / 66
+
+Applications of clustering in IR
+Application Search result clustering What is Bene?t clustered? search more e?ective inforresults mation presentation to user (subsets alternative user interof) col- face: ?search without lection typing? collection e?ective information presentation for exploratory browsing collection higher e?ciency: faster search Example
+
+Scatter-Gather
+
+Collection clustering
+
+McKeown et al. 2002, news.google.com
+
+Cluster-based retrieval
+
+Salton 1971
+
+4 / 66
+
+K -means algorithm
+K -means({x1 , . . . , xN }, K ) 1 (s1 , s2 , . . . , sK ) ? SelectRandomSeeds({x1 , . . . , xN }, K ) 2 for k ? 1 to K 3 do ?k ? sk 4 while stopping criterion has not been met 5 do for k ? 1 to K 6 do ?k ? {} 7 for n ? 1 to N 8 do j ? arg minj ? |?j ? ? xn | 9 ?j ? ?j ? {xn } (reassignment of vectors) 10 for k ? 1 to K 1 11 do ?k ? |?k | x??k x (recomputation of centroids) 12 return {?1 , . . . , ?K }
+
+5 / 66
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better heuristics:
+Select seeds not randomly, but using some heuristic (e.g., ?lter out outliers or ?nd a set of seeds that has ?good coverage? of the document space) Use hierarchical clustering to ?nd good seeds (next class) Select i (e.g., i = 10) di?erent sets of seeds, do a K -means clustering for each, select the clustering with lowest RSS
+
+6 / 66
+
+Take-away today
+
+Introduction to hierarchical clustering Single-link and complete-link clustering Centroid and group-average agglomerative clustering (GAAC) Bisecting K-means How to label clusters automatically
+
+7 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+8 / 66
+
+Hierarchical clustering Our goal in hierarchical clustering is to create a hierarchy like the one we saw earlier in Reuters:
+TOP regions
+
+industries
+
+Kenya
+
+China
+
+UK
+
+France
+
+co?ee
+
+poultry
+
+oil & gas
+
+want to create this hierarchy automatically. We can do this either top-down or bottom-up. The best known bottom-up method is hierarchical agglomerative clustering.
+9 / 66
+
+W
+
+Hierarchical agglomerative clustering (HAC)
+
+HAC creates a hierachy in the form of a binary tree. Assumes a similarity measure for determining the similarity of two clusters. Up to now, our similarity measures were for documents. We will look at four di?erent cluster similarity measures.
+
+10 / 66
+
+HAC: Basic algorithm
+
+Start with each document in a separate cluster Then repeatedly merge the two clusters that are most similar Until there is only one cluster. The history of merging is a hierarchy in the form of a binary tree. The standard way of depicting this history is a dendrogram.
+
+11 / 66
+
+A dendrogram
+
+1.0 Ag trade reform. Back?to?school spending is up Lloyd?s CEO questioned Lloyd?s chief / U.S. grilling Viag stays positive Chrysler / Latin America Ohio Blue Cross Japanese prime minister / Mexico CompuServe reports loss Sprint / Internet access service Planet Hollywood Trocadero: tripling of revenues German unions split War hero Colin Powell War hero Colin Powell Oil prices slip Chains may raise prices Clinton signs law Lawsuit against tobacco companies suits against tobacco firms Indiana tobacco lawsuit Most active stocks Mexican markets Hog prices tumble NYSE closing averages British FTSE index Fed holds interest rates steady Fed to keep interest rates steady Fed keeps interest rates steady Fed keeps interest rates steady
+
+0.8
+
+0.6
+
+0.4
+
+0.2
+
+0.0
+
+The history of mergers can be read o? from bottom to top. The horizontal line of each merger tells us what the similarity of the merger was. We can cut the dendrogram at a particular point (e.g., at 0.1 or 0.4) to get a ?at clustering.
+
+12 / 66
+
+Divisive clustering
+
+Divisive clustering is top-down. Alternative to HAC (which is bottom up). Divisive clustering:
+Start with all docs in one big cluster Then recursively split clusters Eventually each node forms a cluster on its own.
+
+? Bisecting K -means at the end For now: HAC (= bottom-up)
+
+13 / 66
+
+Naive HAC algorithm
+SimpleHAC(d1 , . . . , dN ) 1 for n ? 1 to N 2 do for i ? 1 to N 3 do C [n][i ] ? Sim(dn , di ) 4 I [n] ? 1 (keeps track of active clusters) 5 A ? [] (collects clustering as a sequence of merges) 6 for k ? 1 to N ? 1 7 do i , m ? arg max{ i ,m :i =m?I [i ]=1?I [m]=1} C [i ][m] 8 A.Append( i , m ) (store merge) 9 for j ? 1 to N 10 do (use i as representative for < i , m >) 11 C [i ][j] ? Sim(< i , m >, j) 12 C [j][i ] ? Sim(< i , m >, j) 13 I [m] ? 0 (deactivate cluster) 14 return A
+14 / 66
+
+Computational complexity of the naive algorithm
+
+First, we compute the similarity of all N ? N pairs of documents. Then, in each of N iterations:
+We scan the O(N ? N) similarities to ?nd the maximum similarity. We merge the two clusters with maximum similarity. We compute the similarity of the new cluster with all other (surviving) clusters.
+
+There are O(N) iterations, each performing a O(N ? N) ?scan? operation. Overall complexity is O(N 3 ). We?ll look at more e?cient algorithms later.
+
+15 / 66
+
+Key question: How to de?ne cluster similarity
+
+Single-link: Maximum similarity
+Maximum similarity of any two documents
+
+Complete-link: Minimum similarity
+Minimum similarity of any two documents
+
+Centroid: Average ?intersimilarity?
+Average similarity of all document pairs (but excluding pairs of docs in the same cluster) This is equivalent to the similarity of the centroids.
+
+Group-average: Average ?intrasimilarity?
+Average similary of all document pairs, including pairs of docs in the same cluster
+
+16 / 66
+
+Cluster similarity: Example
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+17 / 66
+
+Single-link: Maximum similarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+18 / 66
+
+Complete-link: Minimum similarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+19 / 66
+
+Centroid: Average intersimilarity
+intersimilarity = similarity of two documents in di?erent clusters 4 3 2 1 0 0 1 2 3 4 5 6 7
+
+20 / 66
+
+Group average: Average intrasimilarity
+intrasimilarity = similarity of any pair, including cases where the two documents are in the same cluster 4 3 2 1 0 0 1 2 3 4 5 6 7
+
+21 / 66
+
+Cluster similarity: Larger Example
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+22 / 66
+
+Single-link: Maximum similarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+23 / 66
+
+Complete-link: Minimum similarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+24 / 66
+
+Centroid: Average intersimilarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+25 / 66
+
+Group average: Average intrasimilarity
+
+4 3 2 1 0 0 1 2 3 4 5 6 7
+
+26 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+27 / 66
+
+Single link HAC
+
+The similarity of two clusters is the maximum intersimilarity ? the maximum similarity of a document from the ?rst cluster and a document from the second cluster. Once we have merged two clusters, how do we update the similarity matrix? This is simple for single link: sim(?i , (?k1 ? ?k2 )) = max(sim(?i , ?k1 ), sim(?i , ?k2 ))
+
+28 / 66
+
+This dendrogram was produced by single-link
+
+1.0 Ag trade reform. Back?to?school spending is up Lloyd?s CEO questioned Lloyd?s chief / U.S. grilling Viag stays positive Chrysler / Latin America Ohio Blue Cross Japanese prime minister / Mexico CompuServe reports loss Sprint / Internet access service Planet Hollywood Trocadero: tripling of revenues German unions split War hero Colin Powell War hero Colin Powell Oil prices slip Chains may raise prices Clinton signs law Lawsuit against tobacco companies suits against tobacco firms Indiana tobacco lawsuit Most active stocks Mexican markets Hog prices tumble NYSE closing averages British FTSE index Fed holds interest rates steady Fed to keep interest rates steady Fed keeps interest rates steady Fed keeps interest rates steady
+
+0.8
+
+0.6
+
+0.4
+
+0.2
+
+0.0
+
+Notice: many small clusters (1 or 2 members) being added to the main cluster There is no balanced 2-cluster or 3-cluster clustering that can be derived by cutting the dendrogram.
+
+29 / 66
+
+Complete link HAC
+
+The similarity of two clusters is the minimum intersimilarity ? the minimum similarity of a document from the ?rst cluster and a document from the second cluster. Once we have merged two clusters, how do we update the similarity matrix? Again, this is simple: sim(?i , (?k1 ? ?k2 )) = min(sim(?i , ?k1 ), sim(?i , ?k2 )) We measure the similarity of two clusters by computing the diameter of the cluster that we would get if we merged them.
+
+30 / 66
+
+Complete-link dendrogram
+
+1.0
+
+0.8
+
+0.6
+
+0.4
+
+0.2
+
+0.0
+
+NYSE closing averages Hog prices tumble Oil prices slip Ag trade reform. Chrysler / Latin America Japanese prime minister / Mexico Fed holds interest rates steady Fed to keep interest rates steady Fed keeps interest rates steady Fed keeps interest rates steady Mexican markets British FTSE index War hero Colin Powell War hero Colin Powell Lloyd?s CEO questioned Lloyd?s chief / U.S. grilling Ohio Blue Cross Lawsuit against tobacco companies suits against tobacco firms Indiana tobacco lawsuit Viag stays positive Most active stocks CompuServe reports loss Sprint / Internet access service Planet Hollywood Trocadero: tripling of revenues Back?to?school spending is up German unions split Chains may raise prices Clinton signs law
+
+Notice that this dendrogram is much more balanced than the single-link one. We can create a 2-cluster clustering with two clusters of about the same size.
+
+31 / 66
+
+Exercise: Compute single and complete link clusterings
+
+d1 3 2 1 0 0 1
+?
+
+d2
+?
+
+d3
+?
+
+d4
+?
+
+d5
+?
+
+d6
+?
+
+d7
+?
+
+d8
+?
+
+2
+
+3
+
+4
+
+32 / 66
+
+Single-link clustering
+
+d1 3 2 1 0 0 1
+?
+
+d2
+?
+
+d3
+?
+
+d4
+?
+
+d5
+?
+
+d6
+?
+
+d7
+?
+
+d8
+?
+
+2
+
+3
+
+4
+
+33 / 66
+
+Complete link clustering
+
+d1 3 2 1 0 0 1
+?
+
+d2
+?
+
+d3
+?
+
+d4
+?
+
+d5
+?
+
+d6
+?
+
+d7
+?
+
+d8
+?
+
+2
+
+3
+
+4
+
+34 / 66
+
+Single-link vs. Complete link clustering
+
+d1 3 2 1 0 0 1
+?
+
+d2
+?
+
+d3
+?
+
+d4
+?
+
+d1 3 2 1 0 0
+?
+
+d2
+?
+
+d3
+?
+
+d4
+?
+
+d5
+?
+
+d6
+?
+
+d7
+?
+
+d8
+?
+
+d5
+?
+
+d6
+?
+
+d7
+?
+
+d8
+?
+
+2
+
+3
+
+4
+
+1
+
+2
+
+3
+
+4
+
+35 / 66
+
+Single-link: Chaining
+
+2 1 0
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+? ?
+
+Single-link clustering often produces long, 0 1 2 3 4 5 6 7 8 9 10 11 12 straggly clusters. For most applications, these are undesirable.
+
+36 / 66
+
+What 2-cluster clustering will complete-link produce?
+
+d1 1 0
+?
+
+d2 d3 d4 d5
+? ? ? ?
+
+01234567 1 + 2 ? ?, 4, 5 + 2 ? ?, 6, 7 ? ?.
+
+Coordinates:
+
+37 / 66
+
+Complete-link: Sensitivity to outliers
+
+d1 1 0
+?
+
+d2 d3 d4 d5
+? ? ? ?
+
+01234567 The complete-link clustering of this set splits d2 from its right neighbors ? clearly undesirable. The reason is the outlier d1 . This shows that a single outlier can negatively a?ect the outcome of complete-link clustering. Single-link clustering does better in this case.
+
+38 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+39 / 66
+
+Centroid HAC
+
+The similarity of two clusters is the average intersimilarity ? the average similarity of documents from the ?rst cluster with documents from the second cluster. A naive implementation of this de?nition is ine?cient (O(N 2 )), but the de?nition is equivalent to computing the similarity of the centroids: sim-cent(?i , ?j ) = ?(?i ) ? ?(?j ) Hence the name: centroid HAC Note: this is the dot product, not cosine similarity!
+
+40 / 66
+
+Exercise: Compute centroid clustering
+
+5 4 3 2 1 0 0
+
+? d1 ? d2
+
+? d3 ? d4
+d5 ?
+
+? d6
+6 7
+
+1
+
+2
+
+3
+
+4
+
+5
+
+41 / 66
+
+Centroid clustering
+
+5 4 3 2 1 0 0
+
+? d1
+?2
+
+? d3 ? d4
+?3 d5 ? ?1 6
+
+? d2
+
+? d6
+7
+
+1
+
+2
+
+3
+
+4
+
+5
+
+42 / 66
+
+Inversion in centroid clustering
+
+In an inversion, the similarity increases during a merge sequence. Results in an ?inverted? dendrogram. Below: Similarity of the ?rst merger (d1 ? d2 ) is -4.0, similarity of second merger ((d1 ? d2 ) ? d3 ) is ? ?3.5. 5 4 3 2 1 0 d3
+?
+
+d1
+?
+
+d2
+?
+
+?4 ?3 ?2 ?1 0
+
+012345
+
+d1
+
+d2
+
+d3
+
+43 / 66
+
+Inversions
+
+Hierarchical clustering algorithms that allow inversions are inferior. The rationale for hierarchical clustering is that at any given point, we?ve found the most coherent clustering for a given K . Intuitively: smaller clusterings should be more coherent than larger clusterings. An inversion contradicts this intuition: we have a large cluster that is more coherent than one of its subclusters. The fact that inversions can occur in centroid clustering is a reason not to use it.
+
+44 / 66
+
+Group-average agglomerative clustering (GAAC)
+
+GAAC also has an ?average-similarity? criterion, but does not have inversions. The similarity of two clusters is the average intrasimilarity ? the average similarity of all document pairs (including those from the same cluster). But we exclude self-similarities.
+
+45 / 66
+
+Group-average agglomerative clustering (GAAC)
+
+Again, a naive implementation is ine?cient (O(N 2 )) and there is an equivalent, more e?cient, centroid-based de?nition: sim-ga(?i , ?j ) = 1 [( (Ni + Nj )(Ni + Nj ? 1) dm )2 ? (Ni + Nj )]
+
+dm ??i ??j
+
+Again, this is the dot product, not cosine similarity.
+
+46 / 66
+
+Which HAC clustering should I use?
+
+Don?t use centroid HAC because of inversions. In most cases: GAAC is best since it isn?t subject to chaining and sensitivity to outliers. However, we can only use GAAC for vector representations. For other types of document representations (or if only pairwise similarities for documents are available): use complete-link. There are also some applications for single-link (e.g., duplicate detection in web search).
+
+47 / 66
+
+Flat or hierarchical clustering?
+
+For high e?ciency, use ?at clustering (or perhaps bisecting k-means) For deterministic results: HAC When a hierarchical structure is desired: hierarchical algorithm HAC also can be applied if K cannot be predetermined (can start without knowing K )
+
+48 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+49 / 66
+
+Major issue in clustering ? labeling
+
+After a clustering algorithm ?nds a set of clusters: how can they be useful to the end user? We need a pithy label for each cluster. For example, in search result clustering for ?jaguar?, The labels of the three clusters could be ?animal?, ?car?, and ?operating system?. Topic of this section: How can we automatically ?nd good labels for clusters?
+
+50 / 66
+
+Exercise
+
+Come up with an algorithm for labeling clusters Input: a set of documents, partitioned into K clusters (?at clustering) Output: A label for each cluster Part of the exercise: What types of labels should we consider? Words?
+
+51 / 66
+
+Discriminative labeling
+
+To label cluster ?, compare ? with all other clusters Find terms or phrases that distinguish ? from the other clusters We can use any of the feature selection criteria we introduced in text classi?cation to identify discriminating terms: mutual information, ?2 and frequency. (but the latter is actually not discriminative)
+
+52 / 66
+
+Non-discriminative labeling
+
+Select terms or phrases based solely on information from the cluster itself
+E.g., select terms with high weights in the centroid (if we are using a vector space model)
+
+Non-discriminative methods sometimes select frequent terms that do not distinguish clusters. For example, Monday, Tuesday, . . . in newspaper text
+
+53 / 66
+
+Using titles for labeling clusters
+
+Terms and phrases are hard to scan and condense into a holistic idea of what the cluster is about. Alternative: titles For example, the titles of two or three documents that are closest to the centroid. Titles are easier to scan than a list of phrases.
+
+54 / 66
+
+Cluster labeling: Example
+# docs 4 622 centroid oil plant mexico production crude power000re?nerygas bpd police security russian people military peace killed told groznycourt 00 000 tonnes traders futures wheat prices centsseptember tonne labeling method mutual information plant oil production barrels crude bpd mexico dolly capacitypetroleum police killed military security peace told troops forcesrebels people delivery traders futures tonne tonnes desk wheat prices 000 00 title MEXICO: Hurricane Dolly heads for Mexico coast RUSSIA: Russia?s Lebed meets rebel chief in Chechnya USA: Export Business - Grain/oilseeds complex
+
+9
+
+1017
+
+10
+
+1259
+
+Three methods: most prominent terms in centroid, di?erential labeling using MI, title of doc closest to centroid All three methods do a pretty good job.
+
+55 / 66
+
+Outline
+
+1
+
+Recap Introduction Single-link/Complete-link Centroid/GAAC Labeling clusters Variants
+
+2
+
+3
+
+4
+
+5
+
+6
+
+56 / 66
+
+Bisecting K -means: A top-down algorithm
+
+Start with all documents in one cluster Split the cluster into 2 using K -means Of the clusters produced so far, select one to split (e.g. select the largest one) Repeat until we have produced the desired number of clusters
+
+57 / 66
+
+Bisecting K -means
+
+BisectingKMeans(d1 , . . . , dN ) 1 ?0 ? {d1 , . . . , dN } 2 leaves ? {?0 } 3 for k ? 1 to K ? 1 4 do ?k ? PickClusterFrom(leaves) 5 {?i , ?j } ? KMeans(?k , 2) 6 leaves ? leaves \ {?k } ? {?i , ?j } 7 return leaves
+
+58 / 66
+
+Bisecting K -means
+
+If we don?t generate a complete hierarchy, then a top-down algorithm like bisecting K -means is much more e?cient than HAC algorithms. But bisecting K -means is not deterministic. There are deterministic versions of bisecting K -means (see resources at the end), but they are much less e?cient.
+
+59 / 66
+
+E?cient single link clustering
+SingleLinkClustering(d1 , . . . , dN , K ) 1 for n ? 1 to N 2 do for i ? 1 to N 3 do C [n][i ].sim ? SIM(dn , di ) 4 C [n][i ].index ? i 5 I [n] ? n 6 NBM[n] ? arg maxX ?{C [n][i ]:n=i } X .sim 7 A ? [] 8 for n ? 1 to N ? 1 9 do i1 ? arg max{i :I [i ]=i } NBM[i ].sim 10 i2 ? I [NBM[i1 ].index] 11 A.Append( i1 , i2 ) 12 for i ? 1 to N 13 do if I [i ] = i ? i = i1 ? i = i2 14 then C [i1 ][i ].sim ? C [i ][i1 ].sim ? max(C [i1 ][i ].sim, C [i2 ][i ].sim) 15 if I [i ] = i2 16 then I [i ] ? i1 17 NBM[i1 ] ? arg maxX ?{C [i1 ][i ]:I [i ]=i ?i =i1} X .sim 18 return A
+
+60 / 66
+
+Time complexity of HAC
+
+The single-link algorithm we just saw is O(N 2 ). Much more e?cient than the O(N 3 ) algorithm we looked at earlier! There are also O(N 2 ) algorithms for complete-link, centroid and GAAC.
+
+61 / 66
+
+Combination similarities of the four algorithms
+
+clustering algorithm single-link complete-link centroid group-average
+
+sim(?, k1 , k2 ) max(sim(?, k1 ), sim(?, k2 )) min(sim(?, k1 ), sim(?, k2 )) 1 1 ( N m vm ) ? ( N ? v? ) 1 2 (Nm +N? )(Nm +N? ?1) [(vm + v? ) ? (Nm + N? )]
+
+62 / 66
+
+Comparison of HAC algorithms
+method single-link complete-link group-average centroid combination similarity max intersimilarity of any 2 docs min intersimilarity of any 2 docs average of all sims average intersimilarity time compl. ?(N 2 ) ?(N 2 log N) ?(N 2 ?(N 2 log N) log N) optimal? yes no no no comment chaining e?ect sensitive to outliers best choice for most applications inversions can occur
+
+63 / 66
+
+What to do with the hierarchy?
+
+Use as is (e.g., for browsing as in Yahoo hierarchy) Cut at a predetermined threshold Cut to get a predetermined number of clusters K
+Ignores hierarchy below and above cutting line.
+
+64 / 66
+
+Take-away today
+
+Introduction to hierarchical clustering Single-link and complete-link clustering Centroid and group-average agglomerative clustering (GAAC) Bisecting K-means How to label clusters automatically
+
+65 / 66
+
+Resources
+
+Chapter 17 of IIR Resources at http://cislmu.org
+Columbia Newsblaster (a precursor of Google News): McKeown et al. (2002) Bisecting K -means clustering: Steinbach et al. (2000) PDDP (similar to bisecting K -means; deterministic, but also less e?cient): Saravesi and Boley (2004)
+
+66 / 66
+
+

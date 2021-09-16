@@ -1,0 +1,267 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke and José Pinto
+Lecture 12: Link Analysis July 06th , 2017
+A typical Web search engine:
+An Overview of Web Retrieval
+2
+The Web
+Users
+Web crawler
+Indexer
+User interface
+Retrieval algorithmsBusiness model
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Lecture 12: Link Analysis
+1. Link Structures 2. PageRank 3. HITS
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Networks of social interactions are formed… – Between academics by co-authoring
+– Between movie personnel by directing and acting
+Social Networks
+4Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+– Between musicians, soccer stars, friends, and relatives
+– Between countries via trading relations
+Social Networks (2)
+5Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+– Between people making phone calls
+– Between people transmitting infections
+Social Networks (3)
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+– Between scientific papers through citations
+– And, of course, between Web pages through links…
+Social Networks (4)
+7Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• It has been quite common for decades to model social networks using directed graphs:
+Models of Social Networks
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+1 2
+4 3
+A 1 2 3 4 1 0 1 0 1 2 1 0 0 0 3 0 0 0 1 4 1 1 0 0
+Directed graph Adjacency matrix Ai, j = 1 if and only if node i links to node j
+Classical research questions: – Which authors have a high prestige (or status)? – Which countries are well-connected, which are isolated? – Which people connect different communities?
+Models of Social Networks (2)
+9Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Using the graph model, it has been clear that in-degree is a good first-order indicator of prestige
+• In 1949, the sociologist John R. Seeley realized the recursive nature of prestige in a social network – A person’s status is a function of the status of those who choose him – And their status is a function of those who choose them – And so ad infinitum…
+The Recursive Nature of Prestige
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Seeley modeled prestige as follows: – Every node u has a notion of prestige p(u) associated with it, which is simply a positive real number – Recursive constraint: The prestige of each node u should be proportional to the total sum of prestige of all nodes that link to u, i.e.
+– Over all nodes, we represent the prestige score as a real column vector p having exactly one entry for each node – Equivalent fixpoint condition: p = ?? · AT · p • Task: Find numbers p and ?? such that the condition holds • This approach fits well to ideas from linear algebra (later)
+A Model of Prestige
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Example:
+Solution: p = (0.65, 0.65, 0, 0.4) ?? = 0.62
+A Model of Prestige (2)
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+p = ?? · AT · p 
+1 2
+4 3
+A 1 2 3 4 1 0 1 0 1 2 1 0 0 0 3 0 0 0 1 4 1 1 0 0
+AT 1 2 3 4 1 0 1 0 1 2 1 0 0 1 3 0 0 0 0 4 1 0 1 0
+• Another interesting notion is centrality • Definitions: – The distance d(u, v) between two nodes u and v in a directed graph is the smallest number of links via which one can go from u to v – The radius of a node u is r(u) = maxv d(u, v), i.e., the distance to u’s most distant node – The center of the graph is arg minu r(u), i.e., the node that has the smallest radius
+Centrality
+13Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• The scientific citation graph: – Link a paper u to a paper v, i.e. set u ? v, if u is cited by v – Papers having a small radius are likely to be very influential
+• The scientific collaboration graph: – Link two authors u and v, i.e. set u ? v, if they co-authored a paper – The Erdos number of an author u is his/her distance to the famous mathematician Paul Erdos
+Centrality (2)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+There are many other notions of centrality, e.g., cuts: – A cut is a (usually small) number of edges that, when removed, disconnect a given pair of vertices – One may look for a small set of vertices that, when removed, will decompose the graph into two or more connected components – This is useful for the study of epidemics, espionage, or suspected terrorist communication on telephone networks
+Centrality (3)
+15Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Another important measure is co-citation – If document u cites documents v and w, then v and w are said to be co-cited by u • If documents v and w are co-cited by many documents, then v and w are somehow related to each other • In terms of the adjacency matrix A: – Link a document u to a paper v, i.e. set u ? v, if u cites v – The number of documents co-citing v and w is the entry corresponding to v and w in the matrix ATA: Co-Citation
+16Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• The entry in the ATA matrix corresponding to [v, w] is the co-citation index of v and w and a measure of relatedness between v and w • One may use this pairwise relatedness measure in a clustering algorithm, such as multidimensional scaling • MDS is similar to the singular value decomposition • It uses a similarity matrix to embed the documents into a low-dimensional Euclidean space (e.g. a plane) • Visualizing clusters based on co-citation reveals important social structures between and within link communities
+Co-Citation (2)
+17Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+(Boyack et al., 2005) visualized similarity data based on co-citations created from over 1 million journal articles published in 2000: Co-Citation (3)
+18
+Each point represents a journal
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Classical IR: – The worth of a document with regard to a query is intrinsic to the document – Documents are self-contained units, and are generally descriptive and truthful about their contents
+• Modern Web search: – Apply ideas from network analysis to the Web graph… – Links are recommendations – Anchor texts can be used as document descriptions
+Back to the Web
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Assumption 1: A hyperlink is signal of quality or popular interest – In some sense, a link is a democratic vote
+Back to the Web (2)
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Assumption 2: The anchor text of a link (or its surrounding text) describes the target page
+Back to the Web (3)
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Excerpt from Yahoo! Directory
+IBM’s home page (does not contain the term computer!)
+• Both assumptions clearly do not hold always • But exploiting them has proved to be much better than not exploiting them
+• We will concentrate on the first assumption: “Links are quality signals”
+• Two highly popular algorithms: – PageRank (Page et al., 1998) – HITS (Kleinberg, 1999)
+Link Analysis
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• PageRank – Developed around the fall of 1996 at Stanford University by Larry Page and Sergey Brin, the founders of Google – Idea: Assign a query-independent measure of prestige to each Web resource
+• HITS – Developed at the same time at IBM Almaden Research Center by Jon Kleinberg, a famous computer scientist – Idea: For any given query, assign two measures to each Web resource, a hub score and an authority score • Hub: A compilation of links to relevant Web resources • Authority: A resource that is relevant in itself
+PageRank and HITS
+23Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Before 1993: – There are no search engines… • Archie (ftp indexing) at McGill University – Tim Berners-Lee maintains a list of Web servers:
+– In Germany: LEO, “Link Everything Online”  at TU Munich
+Brief History of Web Search
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+1993–1998: – Many new search engines, most popular: Lycos, AltaVista, Excite, Inktomi, HotBot, Ask Jeeves – All of them mainly rely on classical IR techniques and focus on the problem of scaling 1998: – Google is founded – The first engine that heavily exploits the Web’s link structure – Google’s success has a name: PageRank 1998–Today: – Large companies try to keep up with Google – Most noteworthy: Yahoo and Microsoft
+Brief History of Web Search
+25Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+The next big thing in Web search? – Clustering? – Natural language query processing? – The “Semantic Web”?  e.g. Knowledge Graph
+Brief History of Web Search
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+– Artificial Intelligence (AI) e.g. RankBrain from Google
+The next big thing…
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+“top level of the food chain”
+– Something else?
+Lecture 12: Link Analysis
+1. Link Structures 2. PageRank 3. HITS
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Problem: – How to assign a query-independent measure of prestige to each Web resource?
+• A good but infeasible solution: – Rank Web resources by their popularity (measured by traffic?)
+• The PageRank solution: – Apply John R. Seeley’s model of prestige to the Web graph! – The number of in-links is correlated to a resource’s prestige – Links from good resources should count more than links from bad ones
+PageRank
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Imagine a Web surfer doing a random walk on the Web:
+• 90% of the time, the surfer clicks a random hyperlink • 10% of the time, the surfer types in a random URI • PageRank = The long-term visit rate of each node
+This is a crude, but useful, Web surfing model • No one chooses links with equal probability, surfing usually is topic-driven • How to surf to a random page? • What about the back button or bookmarks?
+The Random Surfer Model
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+A more detailed version of the model:
+1. Start at a random page, chosen uniformly 2. Flip a coin that shows “tails” with probability ?? 3. If the coin shows “heads” AND the current page has a positive out-degree: – Randomly follow one of the pages out-links – Continue at (2) If the coin shows “tails” OR the current page has no out-links: – Surf to a random Web page, chosen uniformly – Continue at (2)
+The Random Surfer Model (2)
+31Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Example: The Random Surfer Model (3)
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+A 1 2 3 4 5 1 1 2 1 3 1 4 1 1 5 1 1 1 Adjacency matrix:
+T 1 2 3 4 5 1 0.05 0.05 0.05 0.05 0.75 + 0.05 2 0.75 + 0.05 0.05 0.05 0.05 0.05 3 0.05 0.75 + 0.05 0.05 0.05 0.05 4 0.375 + 0.05 0.05 0.375 + 0.05 0.05 0.05 5 0.05 0.25 + 0.05 0.25 + 0.05 0.25 + 0.05 0.05 Transition matrix: Set ?? = 0.25
+1 2
+4 3
+5
+Example (continued):
+• If the surfer is at page 3 in step t – He/she will be at page 1 in step t + 1 with a probability of 5% – He/she will be at page 2 in step t + 1 with a probability of 80% – He/she will be at page 3 in step t + 1 with a probability of 5% – He/she will be at page 4 in step t + 1 with a probability of 5% – He/she will be at page 5 in step t + 1 with a probability of 5%
+The Random Surfer Model (4)
+33Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Transition matrix:
+1 2
+4 3
+5
+T 1 2 3 4 5 1 0.05 0.05 0.05 0.05 0.8 2 0.8 0.05 0.05 0.05 0.05 3 0.05 0.8 0.05 0.05 0.05 4 0.425 0.05 0.425 0.05 0.05 5 0.05 0.3 0.3 0.3 0.05
+Example (continued): • Let’s do a simulation • If we start in state 1, what’s the probability of being in state i after t steps? The Random Surfer Model (5)
+34
+1 2 3 4 5 t = 0 1 0 0 0 0 t = 1 0.05 0.05 0.05 0.05 0.8 t = 2 0.11 0.29 0.27 0.25 0.09 t = 3 0.36 0.27 0.17 0.07 0.13 t = 4 0.28 0.21 0.11 0.08 0.32 t = 5 0.24 0.21 0.16 0.13 0.26 t = 6 0.26 0.24 0.16 0.12 0.23 t = 7 0.27 0.23 0.15 0.11 0.24 t = 8 0.26 0.22 0.15 0.11 0.25 t = 9 0.26 0.23 0.15 0.11 0.25
+The probability vector seems to converge…
+1 2
+4 3
+5
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• And indeed, the probability vector converges as t goes to infinity, for any initial probability vector • To make this point clear, we need some linear algebra and some theory of stochastic processes • Definitions: – Let n denote the number of nodes – A probability vector is an n-dimensional vector such that (a) all entries are non-negative and (b) the sum of entries is 1 – A stochastic matrix is an n × n matrix such that (a) all entries are non-negative and (b) the sum of each row is 1
+Convergence
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Stochastic matrices are closely related to Markov chains: – A Markov chain consists of n states and an n × n stochastic matrix T – Each row and column of T corresponds to a state, respectively – At any point in time, the Markov chain is in exactly one of these states – Time is discrete, i.e. it runs in discrete steps: t = 0, 1, 2, … – From time step to time step, the chain’s current state changes according to the stochastic matrix T: Pr(state v at time t + 1 | state u at time t) = T[u, v]
+Convergence (2)
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig u v T[u, v]
+• In essence, a Markov chain is a probabilistic finite state machine • Knowledge about the current state of a Markov chain can be expressed by probability vectors of length n • Remember our example: – Knowing for sure that the current state of the chain is state u, can be expressed by a probability vector that is 1 at u’s place – For example, (0.2, 0.5, 0.3) means that the chain’s probability to be in the first, second, and third state is 20%, 50%, and 30%, respectively
+Convergence (3)
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• State transitions can be formalized using matrix–vector multiplication • Let T be a transition matrix and p a probability vector that models the chain’s state probabilities at time t • What are the state probabilities p’ at time t + 1?
+• Example (n = 2):
+Convergence (4)
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+1 2 T2, 1 T1, 2 T2, 2T 1, 1
+p = (p1, p2) p’ = (p1’, p2’)
+p1’ = T1, 1 · p1 + T2, 1 · p2 p2’ = T1, 2 · p1 + T2, 2 · p2
+• Now we have everything we need to talk about convergence properties of the Markov chain • Let p0 be some initial probability state vector • Let pt denote the probability state vector at time t • Then, for any t, we have pt + 1 = TT · pt • Clearly, convergence of pt as t ? 8 means that pt converges to a vector p such that p = TT · p • Well, what we are looking for is an eigenvector of TT corresponding to the eigenvalue 1
+Convergence (5)
+39Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• According to the Perron–Frobenius theorem from linear algebra the following is true: – Every stochastic matrix containing only positive entries has 1 as one of its eigenvalues – Furthermore, 1 is the largest eigenvalue of the matrix – There is only one eigenvector having the eigenvalue 1 • Since we do a random teleport with probability ?? > 0 in the random surfer model, the theorem applies • Therefore, we can be sure that there is a probability vector p satisfying p = TT · p • Such a vector p is called the Markov chain’s stationary probability vector 
+Convergence (6)
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• In the random surfer model there is a unique stationary probability vector p
+• Node u’s PageRank is its stationary probability p[u]
+• This fits Seeley’s notion of prestige:
+PageRank
+41Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+1 2 3 4 5 t = 0 1 0 0 0 0 t = 1 0.05 0.05 0.05 0.05 0.8 t = 2 0.11 0.29 0.27 0.25 0.09 t = 3 0.36 0.27 0.17 0.07 0.13 … t ? 8 0.26 0.23 0.15 0.11 0.25
+1 2
+4 3
+5
+• PageRank was invented by Larry Page at Stanford • PageRank is patented as US patent 6,285,999 – “Method for node ranking in a linked database” • The method for computing the PageRank and related stuff are patented! – Patent was assigned to Stanford University (not to Google) – Google has exclusive license rights – Stanford received 1.8 million shares in Google in exchange for use of the patent – These shares were sold in 2005 for 336 million dollars
+PageRank (2)
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+PageRank (3)
+43
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Result list sorted using IR methodsResult list sorted by PageRank
+Query: “university”
+A Web graph:
+Which of the following node lists is ordered by PageRank? a) E > B = D > A = C b) B = E = D > A = C
+PageRank Quiz
+44Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+A B
+C D E
+c) E > D > B = A > C d) D > E > A = C > B
+• How to compute the PageRank? • A very simple method for eigenvalue and eigenvector computation is the so-called power iteration, which can be applied to any quadratic matrix A: 1. Start with an arbitrary initial vector b0 2. Set i = 0 3. Set bi + 1 = A · bi 4. Set bi + 1 = bi + 1 / |bi + 1|, i.e. normalize bi + 1 to unit length 5. Set i = i + 1 6. GOTO 3
+PageRank Computation
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• One can prove that the power iteration converges to the eigenvector of A having the largest eigenvalue • In our case, the largest eigenvalue is 1 – The power iteration finds the stationary probability vector p
+• How many iterations are needed? – Actually, the number is quite low since we don’t need a perfect result anyway…
+PageRank Computation (2)
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• How to compute the PageRank for a Web graph containing 60 billion nodes? – Use a highly scalable distributed algorithm – Actually, this is one of Google’s secrets…
+PageRank Computation (3)
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• A search engine myth: “PageRank is the most important component of ranking”
+• The reality: – There are several components that are at least as important: Anchor text, phrases, proximity, … – Google uses hundreds of different features for ranking – There are rumors that PageRank in its original form (as presented here) has a negligible effect on ranking – However, variants of PageRank are still an essential part of ranking – Addressing link spam is difficult and crucial!
+Importance of PageRank
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• A disadvantage of PageRank is that it computes only a single overall score for each web resource – A web resource might be unimportant from a global view but highly important for a specific topic
+• Topic-sensitive PageRank tries to address this issue: – Define a set of popular topics (e.g. football, Windows, Obama) – Use classification algorithms to assign each Web resource to one (or more) of these topics – For each topic, compute a topic-sensitive PageRank by limiting the random teleports to pages of the current topic – At query time, detect the query’s topics and use the corresponding PageRank scores…
+Topic-Sensitive PageRank
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Example (query: bicycling): Topic-Sensitive PageRank (2)
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Comparison to PageRank (precision at 10):
+Topic-Sensitive PageRank (3)
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Eliminate navigational links: – Most web pages contain navigational structures – The quality assumption does only hold if a hyperlink was created as a result of editorial judgment – Therefore, navigational links should be removed before computing the PageRank • Eliminate nepotistic links: – Nepotism = favoritism based on kinship – Links between pages authored by the same person also are problematic – Again, they should be removed before doing any computations – Unfortunately, it’s much harder to detect them than detecting navigational links…
+Possible Enhancements
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Lecture 12: Link Analysis
+1. Link Structures 2. PageRank 3. HITS
+53Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• HITS stands for hyperlink induced topic search • Invented by Jon Kleinberg
+• Problem setting: – For any information need, there are hubs and authorities • Authority: Definitive high-quality information (query-dependent!) • Hub: Comprehensive lists of links to authorities (query-dependent!) – To a certain degree, each page is a hub as well as an authority • Task: – Given a query, estimate the degree of authority and hubness of each Web page
+HITS
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Obvious: The authority and hubness scores are query-dependent, therefore the computation has to be done at query time
+• Idea: – Given: A query q – Send q to a standard IR system to collect a root set R of nodes in the Web graph – Collect the base set Vq of nodes, which includes R as well as all nodes that are connected to R by an in-link or out-link
+Root set
+HITS (2)
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Idea (continued): – Finally, compute hub and authority scores on the base set • Hubs and authority scores are defined similar to prestige: – Let A be the base set’s adjacency matrix – Denote the nodes’ hub scores by a vector h and their authority scores by a vector a – A recursive definition of h and a:
+– Again, ?? and ?? are proportionality constants – The authority score of a page is proportional to the sum of hub scores of the pages linking to it – The hub score of a page is proportional to the sum of authority scores of the pages to which it links
+HITS (3)
+56Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• By combining both equations we arrive at:
+• As we see: – The authority vector a is an eigenvector of ATA – The hub vector h is an eigenvector of AAT • Kleinberg decided to take the principal eigenvectors in each case, i.e. the eigenvectors corresponding to the eigenvalues with the highest absolute values • Again, they can be computed using the power iteration
+HITS (4)
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+Example (query: japan elementary schools):
+HITS (5)
+58Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• As PageRank, HITS has been patented: – US patent 6,112,202 – “Method and system for identifying authoritative information resources in an environment with content-based links between information resources” – Inventor: Jon Kleinberg – Assignee: IBM
+HITS (6)
+59Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• There is a direct mapping between finding the singular value decomposition of A and finding an eigen-decomposition of ATA and AAT • A short recap from Lecture 4: – Let A = USV be the SVD of A – Theorem: U’s columns are the eigenvectors of AAT, the matrix S2 contains the corresponding eigenvalues – Similarly, V’s rows are the eigenvectors of ATA, S2 again contains the eigenvalues • Therefore, HITS is equivalent to running the SVD on the adjacency matrix of the base set
+Connection to LSI/SVD
+60Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• If the query is ambiguous (e.g. “Java” or “jaguar”) or polarized (e.g. “abortion” or “cold fusion”), the base set will contain a few, almost disconnected, link communities
+• Then, the principal eigenvectors found by HITS will reveal hubs and authorities in the largest link community
+• One can tease of this structure by computing not only the principal eigenvectors but some more
+Extensions
+61Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• PageRank can be precomputed, HITS has to be computed at query time – HITS is very expensive • Different choices regarding the formal model – HITS models hubs and authorities – HITS uses a subset of the Web graph – But: We could also apply PageRank to a subset and HITS on the whole Web graph… • On the Web, a good hub usually is also a good authority • The difference between HITS and PageRank is not that large…
+HITS vs. PageRank
+62Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto — Technische Universität Braunschweig
+• Spam detection • Metasearch • Privacy issues
+Next Lecture
+63

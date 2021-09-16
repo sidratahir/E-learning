@@ -1,0 +1,247 @@
+Query Languages for XML
+
+Common Querying Tasks
+? Filter, select XML values
+
+? XPath ? XQuery ? XSLT (not being covered today!)
+
+? Navigation, selection, extraction
+? Merge, integrate values from multiple XML sources
+
+? Joins, aggregation
+? Transform XML values from one schema to another
+
+? XML construction
+
+(Slides courtesy Wenfei Fan, Univ Edinburgh and Bell Labs)
+QSX (LN 3) 1 QSX (LN 3) 2
+
+Query Languages
+? XPath
+
+XML data: Running example
+XML input: www.a.b/bib.xml <book year=?1996?> <title> HTML </title> <author> <last> Lee </last> <first> T. </first></author> <author> <last> Smith</last> <first>C.</first></author> <publisher> Addison-Wesley </publisher> <price> 59.99 </price> </book> <book year=?2003?> <title> WMD </title> <author> <last> Bush</last> <first> G.</first></author> <publisher> white house </publisher> </book>
+3 QSX (LN 3) 4
+
+? Common language for navigation, selection, extraction ? Used in XSLT, XQuery, XML Schema, . . .
+? XQuery 1.0: XML ? XML
+
+? Strongly-typed query language ? Large-scale database access ? Safety/correctness of operations on data
+? XSLT: XML ? XML, HTML, Text
+
+? Loosely-typed scripting language ? Format XML in HTML for display in browser ? Highly tolerant of variability/errors in data
+
+QSX (LN 3)
+
+DTD
+<!ELEMENT <!ELEMENT <!ATTLIST <!ELEMENT <!ELEMENT <!ELEMENT ?.
+last
+QSX (LN 3) 5
+
+Data model
+Node-labeled, ordered tree
+bib
+
+bib book book
+
+(book*) > (title, (author+ | editor+), publisher?, price?) > year CDATA #required >
+
+author (last, first)> editor (last, first, affiliation)>
+
+book
+
+book
+
+title author author publisher phone @year
+
+publisher (#PCDATA) >
+
+@year title author publisher
+
+first
+
+last
+
+first
+QSX (LN 3)
+
+last
+
+first
+6
+
+1
+
+XPath
+W3C standard: www.w3.org/TR/xpath
+? Navigating an XML tree and finding parts of the tree (node
+
+XPath constructs
+XPath query Q: ? Tree traversal: downward, upward, sideways ? Relational/Boolean expressions: qualifiers (predicates) ? Functions: aggregation (e.g., count), string functions //author[last=?Bush?] //book[author/last=?Bush?]/title | //book[author/last=?Blair?]/title
+bib book title author author publisher phone @year book @year title author publisher last first
+
+selection and value extraction) Given an XML tree T and a context node n, an XPath query Q returns ? the set of nodes reachable via Q from the node n in T ? if Q is a unary query ? truth value indicating whether Q is true at n in T ? if Q is a Boolean query.
+? Implementations: XALAN, SAXON, Berkeley DB XML, Monet
+
+XML ? freeware, which you can play with
+? A major element of XSLT, XQuery and XML Schema
+QSX (LN 3) 7
+
+last
+
+first
+
+last
+
+first
+
+QSX (LN 3)
+
+8
+
+Downward traversal
+Syntax: Q ::= . | q ::= Q | l | @l Q op c | Q/Q | Q|Q | | //Q | /Q | Q[q] | q and q q or q | not(q)
+
+Examples:
+? parent/child: /bib/book ? ancestor//descendant: bib//last, //last ? wild card: ? attributes:
+
+bib/book/* bib/book/@year
+
+? .: self, the current node ? l: either a tag (label) or *: wildcard that matches any label ? @l: attribute ? /, |: concatenation (child), union ? //: descendants or self, ?recursion? ? [q]: qualifier (filter, predicate)
+
+? attributes with wild cards: //book/@* ? union: editor | author
+
+Are book/author and //author ?equivalent? at context nodes (1) root, (2) book, (3) author?
+bib book title author author publisher phone @year
+9 QSX (LN 3)
+
+? op: =, !=, <=, <, >, >=, > ? c: constant ? and, or, not(): conjunction, disjunction, negation Existential semantics: /bib/book[author/last=?Bush?] QSX (LN 3)
+
+book @year title author publisher
+10
+
+last
+
+first
+
+last
+
+first
+
+last
+
+first
+
+Filters (qualifiers)
+Syntax:
+? //book[price]/title ? //book[@year > 1991]/title
+
+Upward traversal
+Q ::= ... | ../Q | ancestor ::Q | ancestor-or-self::Q
+
+-- titles of books with a price -- titles of books published after
+
+1991
+? //book[title and author and not(price)]/title
+
+? ../: parent ? ancestor, ancestor-or-self: recursion
+
+titles of books with authors, title but no price
+? //book[author/last = ?Bush?]/title
+
+Example:
+? //author[../title = ?WMD?]/last
+
+titles of books with an author whose last name is Bush
+? //book[author or editor]/title
+
+find the last names of authors of books with the title ?WMD?
+? ancestor :: book[//last=?Bush?]
+
+titles of books with either an author or an editor Existential semantics: What is /[//@id]? /[//[not(@id)]]? /[not(//[not(@id))]] ?
+11 QSX (LN 3)
+
+find book ancestors with ?Bush? as its last descendant Are the following equivalent to each other (context node: a book)? ../book/author, ./author
+QSX (LN 3) 12
+
+2
+
+Sideways
+Syntax: Q ::= ... | following-sibling ::Q | preceding-sibling::Q
+
+Query Languages for XML
+
+? XPath ? XQuery ? XSLT
+
+? following-sibling: the right siblings ? preceding-sibling: the left siblings ? position function (starting from 1): e.g., //author[position( ) < 2]
+
+Example:
+? following-sibling :: book [//last=?Bush?]
+
+find the books that are right siblings and are written by Bush
+? preceding-sibling :: book[//last=?Bush?]
+
+find the books that are left siblings and are written by Bush
+QSX (LN 3) 13 QSX (LN 3) 14
+
+XQuery
+W3C working draft www.w3.org/TR/xquery Functional, strongly typed query language: Turing-complete
+? XQuery = XPath + ?
+
+FLWR Expressions
+For, Let, Where, OrderBy, return Q1: Find titles and authors of all books published by AddisonWesley after 1991.
+<answer>{ for $book in /bib/book where $book/@year > 1991 and $book/publisher=?Addison-Wesley? return <book> <title> {$book/title } </title>, for $author in $book/author return <author> {$author } </author> </book> }</answer> ? for loop; $x: variable
+15
+
+for-let-where-return (FLWR) ~ SQL?s SELECT-FROM-WHERE
+Sort-by
+
+XML construction (Transformation) Operators on types (Compile & run-time type tests) + User-defined functions Modularize large queries Process recursive data + Strong typing Enforced statically or dynamically
+? Implementation: GALAX, SAXON
+
+http://www-db.research.bell-labs.com/galax/ http://www.saxonica.com QSX (LN 3)
+
+? where: condition test; selection
+
+? return: evaluate an expression and return its value
+
+QSX (LN 3)
+
+16
+
+join
+Find books that cost more at Amazon than at BN <answer>{ let $amazon := doc(?http://www.amozon.com/books.xml?), $bn := doc(?http://www.BN.com/books.xml?) for $a in $amozon/books/book, $b in $bn/books/book where }</answer>
+? let clause ? join: of two documents
+QSX (LN 3) 17
+
+Conditional expression
+Q2: Find all book titles, and prices where available <answer>{ for $book in /bib/book return <book> <title> {$book/title } </title>, $a/price > $b/price { if $book[price] then <price> {$book/price } </price> else ( ) } </book> }</answer>
+
+$a/isbn = $b/isbn
+
+and
+
+return <book> {$a/title, $a/price, $b/price } <book>
+
+QSX (LN 3)
+
+18
+
+3
+
+Summary and Review
+Query languages for XML
+? XPath: navigating an XML tree ? XQuery: XML query language
+
+Very powerful (as opposed to relational algebra); however, query processing/optimization is hard ? open issue! For thought:
+? Write queries on the school document you created, using
+
+XPath, XSLT and XQuery; display the query answers in HTML
+? Find some queries in XPath, XSLT and XQuery that are not
+
+expressible in SQL, even when relational data is considered (i.e., relational data represented in a canonical form in XML)
+QSX (LN 3) 19
+
+4
+
+

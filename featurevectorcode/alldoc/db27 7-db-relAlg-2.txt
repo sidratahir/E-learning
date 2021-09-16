@@ -1,0 +1,510 @@
+Introduction to Database Systems Relational Algebra
+
+Werner Nutt
+
+1
+
+Motivation
+? We know how to store data ? ? How can we retrieve (interesting) data? ? We need a query language
+? declarative (to allow for abstraction) ? optimisable ( less expressive than a programming language, not Turing-complete) ? relations as input and output
+
+E.F. Codd (1970): Relational Algebra
+2
+
+Characteristics of an Algebra
+? Expressions
+? Are constructed with operators from atomic operands (constants, variables, ?.) ? can be evaluated
+
+? Expressions can be equivalent
+? ?if they return the same result for all values of the variables ? Equivalence gives rise to identities between (schemas of) expressions
+
+? The value of an expression is independent of its context
+? e.g., 5 + 3 has the same value, no matter whether it occurs as 10 - (5 + 3) or 4 ? (5 + 3)
+
+? Consequence: subexpressions can be replaced by equivalent expressions without changing the meaning of the entire expression
+
+3
+
+Example: Algebra of Arithmetic
+? Atomic expressions: numbers and variables ? Operators: ? Identitities: x+y=y+x x ? (y + z) = x ? y + x ? z ?
+4
+
++, -, ?, :
+
+Relational Algebra: Principles
+Atoms are relations Operators are defined for arbitrary instances of a relation Two results have to be defined for each operator 1. result schema (depending on the schemas of the argument relations) 2. result instance (depending on the instances of the arguments) ? ?Equivalent? to SQL query language ? Relational Algebra concepts reappear in SQL ? Used inside a DBMS, to express query plans
+5
+
+Classification of Relational Algebra Operators
+? Set theoretic operators
+union ???, intersection ???, difference ?\?
+
+? Renaming operator ? ? Removal operators
+projection ?, selection ?
+
+? Combination operators
+Cartesian product ???, joins ? ?
+
+? Extended operators
+duplicate elimination, grouping, aggregation, sorting, outer joins, etc.
+6
+
+Set Theoretic Operators
+Observations: ? Instances of relations are sets we can form unions, intersections, and differences ? Results of algebra operations must be relations, i.e., results must have a schema
+Would it make sense to apply these operators to bags (= multisets)?
+
+Hence: ? Set theoretic algebra operators can only be applied to relations with identical attributes, i.e., ? same number of attributes ? same names ? same domains
+
+7
+
+Union
+CS-Student Studno s1 s3 s4 Name Year Egger 5 Rossi 4 Maurer 2 Master-Student Studno Name Year s1 Egger 5 s2 Neri 5 s3 Rossi 4
+
+CS-Student ? Master-Student Studno Name Year Note: relations are sets s1 Egger 5 ? no duplicates s2 Neri 5 are eliminated s3 Rossi 4 s4 Maurer 2 8
+
+Intersection
+CS-Student Studno s1 s3 s4 Name Year Egger 5 Rossi 4 Maurer 2 Master-Student Studno Name Year s1 Egger 5 s2 Neri 5 s3 Rossi 4
+
+CS-Student ? Master-Student Studno Name Year s1 Egger 5 s3 Rossi 4
+9
+
+Difference
+CS-Student Studno s1 s3 s4 Name Year Egger 5 Rossi 4 Maurer 2 Master-Student Studno Name Year s1 Egger 5 s2 Neri 5 s3 Rossi 4
+
+CS-Student \ Master-Student Studno Name Year s4 Maurer 2
+10
+
+Not Every Union That Makes Sense is Possible
+Father-Child Father Adam Adam Abraham Child Abel Cain Isaac Mother-Child Mother Eve Eve Sara Child Abel Seth Isaac
+
+Father-Child ? Mother-Child ??
+11
+
+Renaming
+? ? The renaming operator ? changes the name of one or more attributes It changes the schema, but not the instance of a relation
+
+Father-Child Father Adam Adam Abraham Child Abel Cain Isaac
+
+? Parent ? Father (Father-Child)
+Parent Adam Adam Abraham Child Abel Cain Isaac
+
+12
+
+Father-Child Father Adam Adam Abraham Child Abel Cain Isaac
+
+? Parent ? Father (Father-Child)
+Parent Adam Adam Abraham Child Abel Cain Isaac
+
+Mother-Child Mother Eve Eve Sara Child Abel Seth Isaac
+
+? Parent ? Mother (Mother-Child)
+Parent Eve Eve Sara Child Abel Seth Isaac
+13
+
+? Parent ? Father (Father-Child)
+Parent Adam Adam Abraham Child Abel Cain Isaac
+
+? Parent ? Father (Father-Child) ? Parent ? Mother (Mother-Child)
+Parent Adam Adam Abraham Eve Eve Sara Child Abel Cain Isaac Abel Seth Isaac
+14
+
+?
+
+? Parent ? Mother (Mother-Child)
+Parent Eve Eve Sara Child Abel Seth Isaac
+
+Projection and Selection
+Two ?orthogonal? operators ? Selection: ? horizontal decomposition ? Projection: ? vertical decomposition
+
+Selection
+
+Projection
+
+15
+
+Projection
+General form:
+
+?A1,?,Ak(R)
+
+where R is a relation and A1,?,Ak are attributes of R. Result: ? Schema: (A1,?,Ak) ? Instance: the set of all subtuples t[A1,?,Ak] where t?R Intuition: Deletes all attributes that are not in projection list In general, needs to eliminate duplicates ? but not if A1,?,Ak comprises a key (why?)
+Real systems do projection without this!
+16
+
+Projection: Example
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3
+
+?tutor(STUDENT)
+
+=
+
+tutor bush kahn goble zobel
+
+Note: result relations don?t have a name
+17
+
+Selection
+General form:
+
+?C(R)
+
+with a relation R and a condition C on the attributes of R. Result: ? Schema: the schema of R ? Instance: the set of all t?R that satisfy C Intuition: Filters out all tuples that do not satisfy C No need to eliminate duplicates (Why?)
+18
+
+Selection: Example
+STUDENT studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3
+
+?name=?bloggs?(STUDENT)
+
+=
+
+studno s4
+
+name hons bloggs ca
+
+tutor goble
+
+year 1
+
+Selection Conditions
+Elementary conditions: <attr> op <val> or <attr> op <attr> or <expr> op <expr> where op is ?=?, ?<?, ???, (on numbers and strings) ?LIKE? (for string comparisons),? Example: age ? 24, phone LIKE ?0039%?, salary + commission ? 24 000 No specific set of elementary conditions is built into rel alg ?
+
+Combined conditions (using Boolean connectives): C1 and C2 or C1 or C2 or not C
+20
+
+Operators Can Be Nested
+Who is the tutor of the student named ?Bloggs??
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3
+
+?tutor ( ?name=?bloggs? (STUDENT) ) =
+tutor goble
+
+21
+
+Operator Applicability
+Not every operator can be applied to every relation: ? Projection: ?A1,?,Ak is applicable to R if R has attributes with the names A1,?, Ak ? Selection: ?C is applicable to R if all attributes mentioned in C appear as attributes of R and have the right types
+22
+
+Identities for Selection and Projection
+For all conditions C1, C2 and relations R we have:
+
+? ?C1(?C2(R)) = ?C2(?C1(R)) = ?C1 and C2(R))
+What about ?
+
+?A1,?,Am(?B1,?,Bn(R)) = ?B1,?,Bn(?A1,?,Am(R)) ?
+
+And what about ?
+
+?A1,?,Am(?C(R)) = ?C(?A1,?,Am(R)) ?
+Any ideas for more identities?
+23
+
+Selection Conditions and ?null?
+Does the following identity hold: Student = ?year ? 3(Student) ? ?year > 3(Student) ? What if Student contains a tuple t with t[year] = null ? Convention: Only comparisons with non-null values are TRUE or FALSE. Conceptually, comparisons involving null yield a value UNKNOWN. To test, whether a value is null or not null, there are two conditions: <attr> IS NULL <attr> IS NOT NULL
+
+24
+
+Identities with ?null?
+Thus, the following identities hold: Student = ?year ? 3(Student) ? ?year > 3(Student) ? ?year IS NULL(Student) = ?year ? 3 OR year > 3 OR year IS NULL(Student)
+
+25
+
+Exercises
+Write relational algebra queries that retrieve: 1. All staff members that lecture or tutor 2. All staff members that lecture and tutor 3. All staff members that lecture, but don?t tutor
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+TEACH courseno cs250 cs250 cs260 cs260 cs270 cs270 cs280
+
+lecturer lindsey capon kahn bush zobel woods capon
+
+26
+
+Cartesian Product
+General form:
+
+R?S
+
+where R and S are arbitrary relations Result: ? Schema: (A1,?,Am,B1,?,Bn), if (A1,?,Am) is the schema of R and (B1,?,Bn) is the schema of S. (If A is an attribute of both, R and S, then R ? S contains the disambiguated attributes R.A and S.A.) ? Instance: the set of all concatenated tuples (t,s) where t?R and s?S
+27
+
+Cartesian Product: Student ? Course
+STUDENT studno name s1 jones s2 brown s6 peters
+
+COURSE courseno cs250 cs150 cs390
+
+subject prog prog specs
+
+equip sun sun sun
+
+STUDENT ? COURSE
+studno s1 s1 s1 s2 s2 s2 s6 s6 s6 name jones jones jones brown brown brown peters peters peters courseno cs250 cs150 cs390 cs250 cs150 cs390 cs250 cs150 cs390 subject prog prog specs prog prog specs prog prog specs equip sun sun sun sun sun sun sun sun sun
+
+28
+
+Cartesian Product: Student ? Staff
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3
+studno s1 s1 s1 s1 s1 s1 s1 s1 s1 s2 s2 s2 s2 s2 s2 s2 s2 s2 s3 s3 s3 s3 s3 s3 s3 s3 s3 s4 name jones jones jones jones jones jones jones jones jones brown brown brown brown brown brown brown brown brown smith smith smith smith smith smith smith smith smith bloggs hons ca ca ca ca ca ca ca ca ca cis cis cis cis cis cis cis cis cis cs cs cs cs cs cs cs cs cs ca tutor bush bush bush bush bush bush bush bush bush kahn kahn kahn kahn kahn kahn kahn kahn kahn goble goble goble goble goble goble goble goble goble goble year 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 lecturer kahn bush goble zobel watson woods capon lindsey barringer kahn bush goble zobel watson woods capon lindsey barringer kahn bush goble zobel watson woods capon lindsey barringer kahn roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 IT206
+
+STAFF lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+What?s the point of this?
+
+?
+
+29
+
+?Where is the Tutor of Bloggs??
+To answer the query ?For each student, identified by name and student number, return the name of the tutor and their office number? we have to ? combine tuples from Student and Staff ? that satisfy ?Student.tutor=Staff.lecturer? ? and keep the attributes studno, name, tutor and lecturer. In relational algebra:
+
+?studno,name,lecturer,roomno(?tutor=lecturer(Student ? Staff))
+The part
+
+?tutor=lecturer(Student ? Staff)
+
+is a ?join?.
+30
+
+Example: Student Marks in Courses
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3
+
+?For each student, show the courses in which they are enrolled and their marks!?
+
+ENROL stud course no no s1 cs250 s1 cs260 s1 cs270 s2 cs250 s2 cs270 s3 cs270 s4 cs280 s5 cs250 s6 cs250
+
+lab mark 65 80 47 67 65 49 50 0 2
+
+exam mark 52 75 34 55 71 50 51 3 7
+
+First, do R ? ?Student.studno= Enrol.studno (Student ? Enrol), then Result ? ?studno,name, ?,exam_mark(R)
+31
+
+Natural Join
+Suppose: R, S are two relations with attributes A1,?,Am and B1,?,Bn, resp. and with common attributes D1,?,Dk The natural join of R and S is a relation that has as Schema: all attributes occurring in R or S, where common attributes occur only once, i.e., the set of attributes Attr = {A1,?,Am,B1,?,Bn} Instance: all tuples t over the attributes Att such that t[A1,?,Am] ? R and t[B1,?,Bn] ? S Notation: R S
+32
+
+Natural Join is a Derived Operation
+The natural join of R and S can be written using ? Cartesian Product ? Selection ? Projection R S = ?Attr(?R.D1=S.D1 and ? and R.Dk=S.Dk (R ? S)
+
+33
+
+?-Joins (read, Theta-Joins), Equi-Joins
+Most general form of join ? First, form Cartesian product of R and S ? Then, filter R ? S with operators (abstractly written ???) relating attributes of R and S Notation: R
+C
+
+S = ?C (R ? S)
+
+Special case: If C is a conjunction of equalities, i.e., C = R.A1=S.B1 and ? and R.Al=S.Bl then the ?-Join with condition C is called an equi-join. Example:
+
+?tutor=lecturer(Student ? Staff) = Student
+
+tutor=lecturer
+
+Staff 34
+
+STUDENT studno name s1 jones s2 brown s3 smith s4 bloggs s5 jones s6 peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+STAFF lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+Student
+stud no s1 s2 s3 s4 s5 s6
+
+tutor=lecturer
+
+Staff (= ?tutor=lecturer(Student ? Staff) )
+year 2 2 2 1 1 3 lecturer roomno bush kahn goble goble zobel kahn 2.26 IT206 2.82 2.82 2.34 IT206
+
+name hons tutor jones brown smith bloggs jones peters ca cis cs ca cs ca bush kahn goble goble zobel kahn
+
+35
+
+Self Joins
+For some queries we have to combine data coming from a single relation. ?Give all pairings of lecturers and appraisers, including their room numbers!? We need two identical versions of the STAFF relation. Question: How can we distinguish between the versions and their attributes? Idea: ? Introduce temporary relations with new names ? Disambiguate attributes by prefixing them with the relation names LEC ? STAFF, APP ? STAFF
+36
+
+Self Joins (cntd.)
+?Give all pairings of lecturers and appraisers, including their room numbers!?
+
+R ? ?LEC.lecturer,LEC.roomno, (LEC
+LEC.appraiser,APP.roomno
+
+LEC.appraiser=APP.lecturer
+
+APP)
+
+Result ? ? lecturer ? LEC.lecturer,roomno ? LEC.roomno,
+STAFF lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+(R)
+
+appraiser ? LEC.appraiser,approom ? APP.roomno
+lecturer kahn bush goble zobel watson woods capon lindsey roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 appraiser watson capon capon watson barringer barringer watson woods approom IT212 A14 A14 IT212 2.125 2.125 IT212 IT204
+37
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+
+Exercises
+Consider the University db with the tables: student(studno,name,hons,tutor,year) staff(lecturer,roomno) enrolled(studno,courseno,labmark,exammark) Write queries in relational algebra that return the following: 1. The numbers of courses where a student had a better exam mark than lab mark. 2. The names of the lecturers who are tutoring a student who had an exam mark worse than the lab mark. 3. The names of the lecturers who are tutoring a 3rd year student. 4. The room numbers of the lecturers who are tutoring a 3rd year student. 5. The names of the lecturers who are tutoring more than one student 6. The names of the lecturers who are tutoring no more than one student (?!)
+
+38
+
+Exercise: Cardinalities
+Consider relations R and S. Suppose X is a set of attributes of R. What is the minimal and maximal cardinality of the following relations, expressed in cardinalities of R and S?
+
+? ? ? ? ?
+
+?C(R) ?X(R) ?X(R),
+R?S R ? S, if both R and S are nonempty
+39
+
+if X is a superkey of R
+
+Cardinalities (cntd.)
+Suppose Z is the set of common attributes of R and S. What is the minimal and maximal cardinality of the following relations, expressed in cardinalities of R and S?
+
+?R ?R ?R
+
+S S, if Z is a superkey of R S, if Z is the primary key of R,
+and there is a foreign key constraint S(Z) REFERENCES R(Z)
+
+40
+
+Duplicate Elimination
+Real DBMSs implement a version of relational algebra that operates on multisets (?bags?) instead of sets. (Which of these operators may return bags, even if the input consists of sets?) For the bag version of relational algebra, there exists a duplicate elimination operator ?.
+
+If R =
+
+A 1 3 3 1
+
+B 2 4 4 2
+
+, then
+
+?(R) =
+
+AB 12 34
+
+41
+
+Aggregation
+? Often, we want to retrieve aggregate values, like the ?sum of salaries? of employees, or the ?average age? of students. This is achieved using aggregation functions, such as SUM, AVG, MIN, MAX, or COUNT. Such functions are applied by the grouping and aggregation operator
+
+? ?
+
+?.
+
+If R =
+
+A 1 3 3 1
+
+B 2 4 5 1
+
+, then
+
+?SUM(A)(R) = ?AVG(B)(R) =
+
+SUM(A) 8 AVG(B) 3
+42
+
+and
+
+Grouping and Aggregation
+? More often, we want to retrieve aggregate values for groups, like the ?sum of employee salaries? per department, or the ?average student age? per faculty. As additional parameters, we give ? attributes that specify the criteria according to which the tuples of the argument are grouped. E.g., the operator ?A,SUM(B) (R) ? partitions the tuples of R in groups that agree on A, ? returns the sum of all B values for each group. A 1 3 3 1 B 2 4 5 3
+
+? ?
+
+If R =
+
+,
+
+then
+
+?A,SUM(B)(R) =
+
+A SUM(B) 1 5 3 9
+43
+
+Exercise: Identities
+Consider relations R(a,b), R1(a,b), R2(a,b), and S(c,d). For each identity below, find out whether or not it holds for all possible instances of the relations above.
+
+1. ?d>5(R a=c S) = R a=c ?d>5(S) 2. ?a(R1) ? ?a(R2) = ?a(R1 ? R2) 3. (R1 ? R2) a=c S = (R1 a=cS) ? (R2 4. ?c(?d>5(S)) = ?d>5(?c(S))
+? ?
+
+a=cS)
+
+If an identity holds, provide an argument why this is the case. If an identity does not hold, provide a counterexample, consisting of an instance of the relations concerned and an explanation why the two expressions have different values for that instance.
+
+44
+
+Join: An Observation
+Employee Department Brown A Jones B Smith B Department Head B Black C White
+
+Employee Department Head Jones B Black Smith B Black Some tuples don?t contribute to the result, they get lost.
+45
+
+Outer Join
+? An outer join extends those tuples with null values that would get lost by an (inner) join. ? The outer join comes in three versions ? left: keeps the tuples of the left argument, extending them with nulls if necessary ? right: ... of the right argument ... ? full: ... of both arguments ...
+
+46
+
+(Natural) Left Outer Join
+Employee Employee Department Brown A Jones B Smith B Department Department Head B Black C White
+
+Employee
+
+Left
+
+Department
+
+Employee Department Head Brown A null Jones B Black Smith B Black
+47
+
+(Natural) Right Outer Join
+Employee Employee Department Brown A Jones B Smith B Department Department Head B Black C White
+
+Employee
+
+Right
+
+Department
+
+Employee Department Head Jones B Black Smith B Black null C White
+48
+
+(Natural) Full Outer Join
+Employee Employee Department Brown A Jones B Smith B Employee
+Full
+
+Department Department Head B Black C White
+
+Department
+
+Employee Department Head Brown A null Jones B Black Smith B Black null C White
+49
+
+Summary
+? Relational algebra is a query language for the relational data model ? Expressions are built up from relations and unary and binary operators ? Operators can be divided into set theoretic, renaming, removal and combination operators (plus extended operators) ? Relational algebra is the target language into which user queries are translated by the DBMS ? Identities allow one to rewrite expressions into equivalent ones, which may be more efficiently executable (? query optimization)
+50
+
+References
+In preparing these slides I have used several sources. The main ones are the following: Books: ? A First Course in Database Systems, by J. Ullman and J. Widom ? Fundamentals of Database Systems, by R. Elmasri and S. Navathe Slides from Database courses held by the following people: ? Enrico Franconi (Free University of Bozen-Bolzano) ? Carol Goble and Ian Horrocks (University of Manchester) ? Diego Calvanese (Free University of Bozen-Bolzano) and Maurizio Lenzerini (University of Rome, ?La Sapienza?) In particular, a number of figures are taken from their slides.
+51
+
+

@@ -1,0 +1,230 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke
+Lecture 3: Probabilistic Retrieval Models April 20th , 2017
+• Probabilistic IR models use Pr(document d is useful for the user asking query q) as underlying measure of similarity between queries and documents • Advantages: – Probability theory is the right tool to reason under uncertainty in a formal way – Methods from probability theory can be re-used
+Probabilistic Retrieval Models
+2Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 3: Probabilistic Retrieval Models
+1. The Probabilistic Ranking Principle 2. Probabilistic Indexing 3. Binary Independence Retrieval Model 4. Properties of Document Collections
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Probabilistic information retrieval rests upon the Probabilistic Ranking Principle (Robertson, 1977)
+“If a reference retrieval system’s response to each request is a ranking of the documents in the collection in order of decreasing probability of usefulness for the user who submitted the request, where the probabilities are estimated as accurately as possible on the basis of whatever data has been made available to the system for this purpose, then the overall effectiveness of the system to its users will be the best that is obtainable on the basis of that data.”
+The Probabilistic Ranking Principle
+4Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Characterizing usefulness is really tricky, we will discuss this later… • Instead of usefulness we will consider relevance • Given a document representation d and a query q, one can objectively determine whether d is relevant with respect to q or not • This means in particular: – Relevance is a binary concept – Two documents having the same representation are either both relevant or both irrelevant
+Usefulness and Relevance
+5Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Denote the set of all document representations contained in our current collection by C • For any query q, denote the set of relevant documents contained in our collection by Rq, i.e. Rq = {d ? C | d is relevant with respect to q}
+Relevance
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Our task then becomes: – Input: The user’s query q and a document d – Output: Pr(d ? Rq) • Precisely what does this probability mean? – As we have defined it, it is either d ? Rqor d ? Rq – Is Pr(d ? Rq) a sensible concept?
+• What does probability in general mean? – Maybe we should deal with that first…
+Probability of Relevance
+7Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• There are different interpretations of “probability,” we will look at the two most common ones • Frequentists vs. Bayesians • Frequentists – Probability = expected frequency on the long run – Neyman, Pearson, Wald, … • Bayesians: – Probability = degree of belief – Bayes, Laplace, de Finetti, …
+Interpretations of Probability
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• An event can be assigned a probability only if 1. it is based on a repeatable(!) random experiment, and 2. within this experiment, the event occurs at a persistent rate on the long run, its relative frequency • An event’s probability is the limit of its relative frequency in a large number of trials • Examples: – Events in dice rolling – The probability that it will rain tomorrow in the whether forecast (if based on historically collected data)
+The Frequency Interpretation
+9Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Probability is the degree of belief in a proposition • The belief can be: – subjective, i.e. personal, or – objective, i.e. justified by rational thought • Unknown quantities are treated probabilistically • Knowledge can always be updated • Named after Thomas Bayes • Examples: – The probability that there is life on other planets – The probability that you pass this course’s exam
+The Bayesian Interpretation
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• There is a book lying on my desk • I know it is about one of the following two topics: – Information retrieval – Animal health • What’s Pr(“the book is about IR”)?
+Frequentist vs. Bayesian
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Frequentist Bayesian
+That question is stupid! There is no randomness here!
+That’s a valid question! I only know that the book is either about IR or AH. So let’s assume the probability is 0.5!
+• But: Let’s assume that the book is lying on my desk due to a random draw from my bookshelf… • Let X be the “topic result” of a random draw • What’s Pr(“X is about IR”)
+Frequentist vs. Bayesian (2)
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Frequentist
+That question is valid! This probability is equal to the proportion of IR books in your shelf.
+• Back to the book lying on my desk • What’s Pr(“the book is about IR”)? Frequentist vs. Bayesian (3)
+13Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Even if I assume that you got this book by drawing randomly from your shelf, the question stays stupid. I have no idea what this book is about. But I can tell you what properties a random book has.
+This guy is strange…
+Frequentist Bayesian
+• A more practical example: Rolling a dice • Let x be the (yet hidden) number on the dice that lies on the table Note: x is a number, not a random variable! • What’s Pr(x = 5)?
+Frequentist vs. Bayesian (4)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Frequentist Bayesian
+Stupid question again. As I told you: There is no randomness involved!
+Since I do not know what x is, this probability expresses my degree of belief. I know the dice’s properties, therefore the probability is 1/6.
+• What changes if I show you the value of x?
+Frequentist vs. Bayesian (5)
+15Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Frequentist Bayesian
+Nothing changes. Uncertainty and probability have nothing in common.
+Now the uncertainty is gone. The probability (degree of belief) is either 1 or 0, depending whether the dice shows a 5.
+“When the facts change, I change my mind. What do you do, sir?” –John M. Keynes
+• How to interpret Pr(d ? Rq)? – Clearly: Bayesian (expressing uncertainty regarding Rq) • Although there is a crisp set Rq (by assumption), we do not know what Rq looks like • Bayesian approach: Express uncertainty in terms of probability • Probabilistic models of information retrieval: – Start with Pr(d ? Rq) and relate it to other probabilities, which might be more easily accessible – On this way, make some reasonable assumptions – Finally, estimate Pr(d ? Rq) using other probabilities’ estimates
+Probability of Relevance, Again
+16Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 3: Probabilistic Retrieval Models
+1. The Probabilistic Ranking Principle 2. Probabilistic Indexing 3. Binary Independence Retrieval Model 4. Properties of Document Collections
+17Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Presented by Maron and Kuhns in 1960 • Goal: Improve automatic search on manually indexed document collections • Basic notions: – k index terms – Documents = vectors over [0, 1]k, i.e. terms are weighted – Queries = vectors over {0, 1}k, i.e. binary queries – Rq = relevant documents with respect to query q (as above) • Task: Given a query q, estimate Pr(d ? Rq), for each document d
+Probabilistic Indexing
+18Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Let Q be a random variable ranging over the set of all possible queries • Q’s distribution corresponds to the sequence of all queries asked in the past – Example (k = 2): Ten queries have been asked to the system previously:
+Then, Q’s distribution is given by:
+Probabilistic Indexing (2)
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+(0, 0) (1, 0) (0, 1) (1, 1) 0 2 7 1
+Pr(Q = (0, 0)) Pr(Q = (1, 0)) Pr(Q = (0, 1)) Pr(Q = (1, 1)) 0 0.2 0.7 0.1
+• If Q is a random query, then RQ is a random set of documents • We can use RQ to express our initial probability Pr(d ? Rq):
+• This means: If we restrict our view to events where Q is equal to q, then Pr(d ? Rq) is equal to Pr(d ? RQ)
+Probabilistic Indexing (3)
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Now, let’s apply Bayes’ Theorem:
+• Combined:
+Probabilistic Indexing (4)
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(Q = q) is the same for all documents d • Therefore, the document ranking induced by Pr(d ? Rq) is identical to the ranking induced by Pr(d ? RQ) · Pr(Q = q | d ? RQ) • Since we are only interested in the ranking, we can replace Pr(Q = q) by a constant:
+Probabilistic Indexing (5)
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(d ? RQ) can be estimated from user feedback – Give the users a mechanism to rate whether the document they read previously has been relevant with respect to their query – Pr(d ? RQ) is the relative frequency of positive relevance ratings
+• Finally, we must estimate Pr(Q = q | d ? RQ)
+Probabilistic Indexing (6)
+23Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to estimate Pr(Q = q | d ? RQ)? • Assume independence of query terms:
+• Is this assumption reasonable? – Obviously not (co-occurrence, think of synonyms)!
+Probabilistic Indexing (7)
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• What’s next? Split up the product by qi’s value!
+• Look at complementary events:
+Probabilistic Indexing (8)
+25Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Only Pr(Qi = 1 | d ? RQ) remains unknown • It corresponds to the following: Given that document d is relevant for some query, what is the probability that the query contained term i?
+Probabilistic Indexing (9)
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Given that document d is relevant for some query, what is the probability that the query contained term i? • Maron and Kuhns argue that Pr(Qi = 1 | d ? RQ) can be estimated by the weight of term i assigned to d by the human indexer • Is this assumption reasonable? Yes! 1. The indexer knows that the current document to be indexed definitely is relevant with respect to some topics 2. She/he then tries to find out what these topics are • Topics correspond to index terms • Term weights represent degrees of belief
+Probabilistic Indexing (10)
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Taken all together, we arrive at:
+• c(q) doesn’t matter • Pr(d ? RQ) can be estimated from query logs
+• Possible modification: – Remove the (1 - di) factors, since most users leave out query terms unintentionally
+Probabilistic Indexing (11)
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(d ? RQ) models the “general relevance” of d – Pr(d ? Rq) is proportional to Pr(d ? RQ) – This is reasonable – Think of the following example: • You want to buy a book at a book store • Book A’s description almost perfectly fits what you are looking for • Book B’s description perfectly fits what you are looking for • Book A is a bestseller • Nobody else is interested in book B • Which book is better?
+Reality Check
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 3: Probabilistic Retrieval Models
+1. The Probabilistic Ranking Principle 2. Probabilistic Indexing 3. Binary Independence Retrieval Model 4. Properties of Document Collections
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Presented by van Rijsbergen in 1977 • Basic notions: – k index terms – Documents = vectors over {0, 1}k, i.e. set of words model – Queries = vectors over {0, 1}k, i.e. set of words model – Rq = relevant documents with respect to query q • Task: Given a query q, estimate Pr(d ? Rq), for any document d
+Binary Independence Retrieval
+31Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Let D be a uniformly distributed random variable ranging over the set of all documents in the collection • We can use D to express our initial probability Pr(d ? Rq):
+• This means: If we restrict our view to events where D is equal to d, then Pr(d ? Rq) is equal to Pr(D ? Rq) • Note the similarity to probabilistic indexing:
+Binary Independence Retrieval (2)
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Again, let’s apply Bayes’ Theorem:
+• Combined:
+Binary Independence Retrieval (3)
+33Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(D ? Rq) is identical for all documents d • Since we are only interested in the probability ranking, we can replace Pr(D ? Rq) by a constant:
+Binary Independence Retrieval (4)
+34Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(D = d) represents the proportion of documents in the collection having the same representation as d • Although we know this probability, it basically is an artifact of our approach to transforming Pr(d ? Rq) into something Bayes’ Theorem can be applied on • Unconditionally reducing highly popular documents in rank simply makes no sense
+Binary Independence Retrieval (5)
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to get rid of Pr(D = d)? • Instead of Pr(d ? Rq) we look at its odds:
+• As we will see on the next slide, ordering documents by this odds results in the same ranking as ordering by probability
+Binary Independence Retrieval (6)
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• This graph depicts probability versus (log) odds:
+Binary Independence Retrieval (7)
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Applying Bayes’ Theorem on Pr(d ? Rq) yields:
+• Again, c(q) is a constant that is independent of d
+Binary Independence Retrieval (8)
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Putting it all together we arrive at:
+Binary Independence Retrieval (9)
+39Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• It looks like we need an assumption • Assumption of linked dependence:
+(slightly weaker than assuming independent terms) • Is this assumption reasonable? – No, think of synonyms…
+Binary Independence Retrieval (10)
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Let’s split it up by term occurrences within d:
+• Replace Pr(Di = 0 | …) by 1 - Pr(Di = 1 | …):
+Binary Independence Retrieval (11)
+41Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Let’s split it up by term occurrences within q:
+Binary Independence Retrieval (12)
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Looks like we heavily need an assumption… • Assume that Pr(Di = 1 | D ? Rq) = Pr(Di = 1 | D ? Rq), for any i such that qi = 0 • Idea: Relevant and non-relevant documents have identical term distributions for non-query terms • Consequence: Two of the four product blocks cancel out
+Binary Independence Retrieval (13)
+43Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• This leads us to:
+• Multiply by 1 and regroup:
+Binary Independence Retrieval (14)
+44Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Fortunately, the first product block is independent of d, so we can replace it by a constant:
+Binary Independence Retrieval (15)
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to estimate the second quotient? • Since usually most documents in the collection will not be relevant to q, we can assume the following:
+• Reasonable assumption?
+Binary Independence Retrieval (16)
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to estimate Pr(Di = 1)? • Pr(Di = 1) is roughly the proportion of documents in the collection containing term i:
+• N: collection size • df(ti): document frequency of term i
+Binary Independence Retrieval (17)
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• This leads us to the final estimate:
+Binary Independence Retrieval (18)
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pr(Di = 1 | D ? Rq) cannot be estimated that easy… • There are several options: – Estimate it from user feedback on initial result lists – Estimate it by a constant (Croft and Harper, 1979), e.g. 0.9 – Estimate it by df(ti) / N (Greiff, 1998)
+Binary Independence Retrieval (19)
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Are there any other probabilistic models? • Of course: – Extension of the Binary Independence Retrieval model • Learning from user feedback • Different types of queries • Accounting for dependencies between terms – Poisson model – Belief networks – Many more…
+Probabilistic Models
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pros – Very successful in experiments – Probability of relevance as intuitive measure – Well-developed mathematical foundations – All assumptions can be made explicit
+• Cons – Estimation of parameters usually is difficult – Doubtful assumptions – Much less flexible than the vector space model – Quite complicated
+Pros and Cons
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 3: Probabilistic Retrieval Models
+1. The Probabilistic Ranking Principle 2. Probabilistic Indexing 3. Binary Independence Retrieval Model 4. Properties of Document Collections
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Some data for two test collections:
+Some Statistics
+53Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Newswire Web Size 1 GB 100 GB Documents 400,000 12,000,000 Posting entries 180,000,000 11,000,000,000 Vocabulary size (after stemming) 400,000 16,000,000 Index size (uncompressed, without word positions) 450 MB 21 GB Index size (uncompressed, with word positions) 800 MB 43 GB Index size (compressed, with word positions) 130 MB ?
+Source: (Zobel and Moffat, 2006)
+• How big is the term vocabulary? • Clearly, there must be an upper bound – The number of all “reasonable” words – When the collection grows, the vocabulary size will converge to this number • Sorry, this is simply wrong…
+• k and b are positive constants, collection-dependent • Typical values: 30 = k = 100,  b ˜ 0.5 • Empirically verified for many different collections
+Heaps’ Law
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Heaps’ law:  #terms = k · (#tokens)b
+• Example: – Looking at a collection of web pages, you find that there are 3,000 different terms in the first 10,000 tokens and 30,000 different terms in the first 1,000,000 tokens – Assume a search engine indexes a total of 20,000,000,000 pages, containing 200 tokens on average – What is the size of the vocabulary of the indexed collection as predicted by Heaps’ law? 3,000 = k · 10,000b 30,000 = k · 1,000,000b ? k = 30,  b = 0.5 ? The vocabulary size is 30 · 4,000,000,000,0000.5 = 60,000,000
+Heaps’ Law (2)
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Heaps’ law:  #terms = k · (#tokens)b
+• Key insights: – Few frequent terms – Many rare terms
+• Zipf’s law is an example of a power law: Pr(x) = a · xb – a is a normalization constant (total probability mass must be 1) – In Zipf’s law: b ˜ -1
+Zipf’s Law
+56Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Zipf’s law:  The i-th most frequent term has frequency proportional to 1 / i
+A heavily skewed data distribution! That’s why compression of posting lists works so well in practice!
+• Zipf analyzed samples of natural language – Letter frequencies – Term frequencies
+• Letter frequencies in English language:
+Zipf’s Law (2)
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+E T A I N O S R H D L U C 0.120 0.085 0.077 0.076 0.067 0.067 0.067 0.059 0.050 0.042 0.042 0.037 0.032
+F M W Y P B G V K Q J X Z 0.024 0.024 0.022 0.022 0.020 0.017 0.017 0.012 0.007 0.005 0.004 0.004 0.002
+• Term frequencies in Moby Dick:
+Zipf’s Law (3)
+58Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Source: http://searchengineland.com/the-long-tail-of-search-12198
+• The same is true for many other languages…
+• Zipf’s own explanation: – Principle of least effort: Do the job while minimizing total effort – Cognitive effort of reading and writing should be small ? Pressure towards unification of vocabulary such that ? choosing and understanding words is easy (small vocabulary) – Diversity of language has to be high ? Pressure towards diversification of vocabulary such that ? complex concepts can be expressed and distinguished – The “economy of language” leads to the balance observed and formalized by Zipf’s law
+Zipf’s Law (4)
+59Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Similar relationships hold in many different contexts: – Distribution of letter frequencies – Distribution of accesses per Web page – Distribution of links per Web page – Distribution of wealth – Distribution of population for US cities – …
+Zipf’s Law (5)
+60Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Zipf’s law:  The i-th most frequent term has frequency proportional to 1 / i
+Zipf’s Law (6)
+61Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Indexing • Document normalization – Stemming – Stopwords – … • Statistical properties of document collections
+Next Lecture
+62Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig

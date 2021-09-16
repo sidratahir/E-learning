@@ -1,0 +1,322 @@
+Introduction to Information Retrieval
+Introducing Information Retrieval and Web Search
+Information Retrieval
+•Information Retrieval (IR) is finding material (usually documents) of an unstructurednature (usually text) that satisfies an information need from within large collections(usually stored on computers).
+–These days we frequently think first of web search, but there are many other cases: •E-mail search •Searching your laptop •Corporate knowledge bases •Legal information retrieval
+2
+Unstructured (text) vs. structured (database) data in the mid-nineties
+3
+0
+50
+100
+150
+200
+250
+Data volumeMarket Cap
+Unstructured
+Structured
+Unstructured (text) vs. structured (database) data today
+4
+0
+50
+100
+150
+200
+250
+Data volumeMarket Cap
+Unstructured
+Structured
+Basic assumptions of Information Retrieval
+•Collection: Aset of documents –Assume it is a static collection for the moment
+•Goal: Retrieve documents with information that is relevantto the user’s information need and helps the user complete a task
+5
+Sec. 1.1
+how trap mice alive
+The classic search model
+Collection
+User task
+Info need
+Query
+Results
+Search engine
+Query refinement 
+Get rid of mice in a politically correct way
+Info about removing mice without killing them 
+Misconception?
+Misformulation?
+Searc h
+How good are the retrieved docs?
+Precision : Fraction of retrieved docs that are relevant to the user’s information need Recall: Fraction of relevant docs in collection that are retrieved
+More precise definitions and measurements to follow later
+7
+Sec. 1.1
+Introduction to Information Retrieval
+Term-document incidence matrices
+Unstructured data in 1620
+•Which plays of Shakespeare contain the words BrutusANDCaesarbut NOTCalpurnia? •One could grepall of Shakespeare’s plays for Brutusand Caesar,then strip out lines containing Calpurnia? •Why is that not the answer? –Slow (for large corpora) –NOTCalpurniais non-trivial –Other operations (e.g., find the word Romans near countrymen) not feasible –Ranked retrieval (best documents to return) •Later lectures
+9
+Sec. 1.1
+Term-document incidence matrices
+Antony and CleopatraJulius CaesarThe TempestHamletOthelloMacbeth
+Antony110001
+Brutus110100
+Caesar110111
+Calpurnia010000
+Cleopatra100000
+mercy101111
+worser101110
+1 if playcontains word, 0 otherwise
+BrutusANDCaesarBUTNOT Calpurnia
+Sec. 1.1
+Incidence vectors
+•So we have a 0/1 vector for each term. •To answer query: take the vectors for Brutus, Caesarand Calpurnia(complemented)  bitwise AND. –110100 AND –110111 AND –101111 = –100100
+11
+Sec. 1.1
+Antony and CleopatraJulius CaesarThe TempestHamletOthelloMacbeth
+Antony110001
+Brutus110100
+Caesar110111
+Calpurnia010000
+Cleopatra100000
+mercy101111
+worser101110
+Answers to query
+•Antony and Cleopatra,Act III, Scene ii Agrippa[Aside to DOMITIUS ENOBARBUS]: Why, Enobarbus, When Antony found Julius Caesardead, He cried almost to roaring; and he wept When at Philippi he found Brutusslain.
+•Hamlet, Act III, Scene ii Lord Polonius:I did enact Julius CaesarI was killed i’ the Capitol; Brutuskilled me.
+12
+Sec. 1.1
+Bigger collections
+•Consider N = 1 million documents, each with about 1000 words. •Avg6 bytes/word including spaces/punctuation –6GB of data in the documents. •Say there are M = 500K distinctterms among these.
+13
+Sec. 1.1
+Can’t build the matrix
+•500K x 1M matrix has half-a-trillion 0’s and 1’s.
+•But it has no more than one billion 1’s. –matrix is extremely sparse.
+•What’s a better representation? –We only record the 1 positions.
+14
+Why?
+Sec. 1.1
+Introduction to Information Retrieval
+The Inverted Index The key data structure underlying modern IR
+Inverted index
+•For each term t, we must store a list of all documents that contain t. –Identify each doc by a docID, a document serial number •Can we used fixed-size arrays for this?
+16
+What happens if the word Caesar is added to document 14? 
+Sec. 1.2
+Brutus
+Calpurnia
+Caesar124561657132
+124113145173
+231
+174
+54101
+Inverted index
+•We need variable-size postings lists –On disk, a continuous run of postings is normal and best –In memory, can use linked lists or variable length arrays •Some tradeoffs in size/ease of insertion
+17
+DictionaryPostings Sorted by docID (more later on why).
+Posting
+Sec. 1.2
+Brutus
+Calpurnia
+Caesar124561657132
+124113145173
+231
+174
+54101
+Tokenizer
+Token streamFriendsRomansCountrymen
+Inverted index construction
+Linguistic modules
+Modified tokensfriendromancountryman
+Indexer
+Inverted index
+friend
+roman
+countryman
+24
+2
+1316
+1
+Documents to be indexed
+Friends, Romans, countrymen.
+Sec. 1.2
+Initial stages of text processing
+•Tokenization –Cut character sequence into word tokens •Deal with “John’s”, a state-of-the-art solution •Normalization –Map text and query term to same form •You want U.S.A.and USA to match •Stemming –We may wish different forms of a root to match •authorize,authorization •Stop words –We may omit very common words (or not) •the, a, to, of
+Indexer steps: Token sequence
+•Sequence of (Modified token, Document ID) pairs.
+I did enact Julius Caesar I was killed i’ the Capitol; Brutus killed me.
+Doc 1
+So let it be with Caesar. The noble Brutus hath told you Caesar was ambitious
+Doc 2
+Sec. 1.2
+Indexer steps: Sort
+•Sort by terms –And then docID 
+Core indexing step
+Sec. 1.2
+Indexer steps: Dictionary & Postings
+•Multiple term entries in a single document are merged. •Split into Dictionary and Postings •Doc. frequency information is added.
+Why frequency? Will discuss later.
+Sec. 1.2
+Where do we pay in storage?
+23 Pointers
+Terms and countsIR system implementation •How do we index efficiently? •How much storage do we need?
+Sec. 1.2
+Lists of docIDs
+Introduction to Information Retrieval
+Query processing with an inverted index
+The index we just built
+•How do we process a query? –Later -what kinds of queries can we process?
+25
+Our focus
+Sec. 1.3
+Query processing: AND
+•Consider processing the query: BrutusANDCaesar –Locate Brutusin the Dictionary; •Retrieve its postings. –Locate Caesarin the Dictionary; •Retrieve its postings. –“Merge” the two postings (intersect the document sets):
+26
+128
+34
+248163264
+123581321
+Brutus Brutus Brutus Brutus
+Caesar Caesar Caesar Caesar
+Sec. 1.3
+The merge
+•Walk through the two postings simultaneously, in time linear in the total number of postings entries
+27
+34
+128 2 48163264
+123581321
+Brutus Brutus Brutus Brutus
+Caesar Caesar Caesar Caesar
+If the list lengths are xand y, the merge takes O(x+y) operations. Crucial: postings sorted by docID.
+Sec. 1.3
+Intersecting two postings lists (a “merge” algorithm)
+28
+Introduction to Information Retrieval
+The Boolean Retrieval Model & Extended Boolean Models
+Boolean queries: Exact match
+•The Boolean retrieval modelis being able to ask a query that is a Boolean expression: –Boolean Queries are queries using AND, ORand NOT to join query terms •Views each document as a setof words •Is precise: document matches condition or not. –Perhaps the simplest model to build an IR system on •Primary commercial retrieval tool for 3 decades. •Many search systems you still use are Boolean: –Email, library catalog, Mac OS X Spotlight
+30
+Sec. 1.3
+Example: WestLawhttp://www.westlaw.com/
+•Largest commercial (paying subscribers) legal search service (started 1975; ranking added 1992; new federated search added 2010) •Tens of terabytes of data; ~700,000 users •Majority of users still use booleanqueries •Example query: –What is the statute of limitations in cases involving the federal tort claims act? –LIMIT! /3 STATUTE ACTION /S FEDERAL /2 TORT /3 CLAIM •/3 = within 3 words, /S = in same sentence
+31
+Sec. 1.4
+Example: WestLaw   http://www.westlaw.com/
+•Another example query: –Requirements for disabled people to be able to access a workplace –disabl! /p access! /s work-site work-place (employment /3 place •Note that SPACE is disjunction, not conjunction! •Long, precise queries; proximity operators; incrementally developed; not like web search •Many professional searchers still like Boolean search –You know exactly what you are getting •But that doesn’t mean it actually works better….
+Sec. 1.4
+Boolean queries: More general merges
+•Exercise: Adapt the merge for the queries: BrutusAND NOTCaesar BrutusOR NOTCaesar
+•Can we still run through the merge in time O(x+y)?   What can we achieve?
+33
+Sec. 1.3
+Merging
+What about an arbitrary Boolean formula? (BrutusOR Caesar) AND NOT (Antony OR Cleopatra) •Can we always merge in “linear” time? –Linear in what? •Can we do better?
+34
+Sec. 1.3
+Query optimization
+•What is the best order for query processing? •Consider a query that is an ANDof nterms. •For each of the nterms, get its postings, then ANDthem together. Brutus
+Caesar
+Calpurnia
+12358162134
+248163264128
+1316
+Query:BrutusANDCalpurniaANDCaesar
+35
+Sec. 1.3
+Query optimization example
+•Process in order of increasing freq: –start with smallest set, then keepcutting further.
+36
+This is why we kept document freq. in dictionary
+Execute the query as (CalpurniaANDBrutus)AND Caesar.
+Sec. 1.3
+Brutus
+Caesar
+Calpurnia
+12358162134
+248163264128
+1316
+More general optimization
+•e.g., (maddingOR crowd) AND (ignobleOR strife) •Get doc. freq.’s for all terms. •Estimate the size of each ORby the sum of its doc. freq.’s (conservative). •Process in increasing order of ORsizes.
+37
+Sec. 1.3
+Exercise
+•Recommend a query processing order for
+•Which two terms should we process first?
+ TermFreq    eyes213312  kaleidoscope87009  marmalade107913  skies271658  tangerine46653  trees316812
+38
+(tangerine ORtrees) AND (marmalade ORskies) AND (kaleidoscope OReyes)
+Query processing exercises
+•Exercise: If the query is friendsAND romansAND (NOT countrymen), how could we use the freq of countrymen? •Exercise: Extend the merge to an arbitrary Boolean query.  Can we always guarantee execution in time linear in the total postings size? •Hint: Begin with the case of a Boolean formula query: in this, each query term appears only once in the query.
+39
+Exercise
+•Try the search feature at http://www.rhymezone.com/shakespeare/ •Write down five search features you think it could do better
+40
+Introduction to Information Retrieval
+Phrase queries and positional indexes
+Phrase queries
+•We want to be able to answer queries such as “stanforduniversity” –as a phrase •Thus the sentence “I went to university at Stanford”is not a match. –The concept of phrase queries has proven easily understood by users; one of the few “advanced search” ideas that works –Many more queries are implicit phrase queries •For this, it no longer suffices to store only <term : docs> entries
+Sec. 2.4
+A first attempt: Biword indexes
+•Index every consecutive pair of terms in the text as a phrase •For example the text “Friends, Romans, Countrymen” would generate the biwords –friends romans –romans countrymen •Each of these biwordsis now a dictionary term •Two-word phrase query-processing is now immediate.
+Sec. 2.4.1
+Longer phrase queries
+•Longer phrases can be processed by breaking them down •stanforduniversity paloalto can be broken into the Boolean query on biwords: stanforduniversity ANDuniversity paloANDpalo alto
+Without the docs, we cannot verify that the docs matching the above Boolean query do contain the phrase.
+Can have false positives!
+Sec. 2.4.1
+Issues for biword indexes
+•False positives, as noted before •Index blowup due to bigger dictionary –Infeasible for more than biwords, big even for them
+•Biword indexes are not the standard solution (for all biwords) but can be part of a compound strategy
+Sec. 2.4.1
+Solution 2: Positional indexes
+•In the postings, store, for each term the position(s) in which tokens of it appear:
+<term, number of docs containing term; doc1: position1, position2 … ; doc2: position1, position2 … ; etc.>
+Sec. 2.4.2
+Positional index example
+•For phrase queries, we use a merge algorithm recursively at the document level •But we now need to deal with more than just equality
+<be: 993427; 1: 7, 18, 33, 72, 86, 231; 2: 3, 149; 4: 17, 191, 291, 430, 434; 5: 363, 367, …>
+Which of docs 1,2,4,5 could contain “to be or not to be”?
+Sec. 2.4.2
+Processing a phrase query
+•Extract inverted index entries for each distinct term: to, be, or, not. •Merge their doc:positionlists to enumerate all positions with “to be or not to be”.
+–to: 
+•2:1,17,74,222,551;4:8,16,190,429,433;7:13,23,191; ...
+–be:  
+•1:17,19; 4:17,191,291,430,434;5:14,19,101; ... •Same general method for proximity searches
+Sec. 2.4.2
+Proximity queries
+•LIMIT! /3 STATUTE /3 FEDERAL /2 TORT –Again, here, /kmeans “within kwords of”. •Clearly, positional indexes can be used for such queries; biwordindexes cannot. •Exercise: Adapt the linear merge of postings to handle proximity queries.  Can you make it work for any value of k? –This is a little tricky to do correctly and efficiently –See Figure 2.12 of IIR
+Sec. 2.4.2
+Positional index size
+•A positional index expands postings storage substantially –Even though indices can be compressed •Nevertheless, a positional index is now standardly used because of the power and usefulness of phrase and proximity queries … whether used explicitly or implicitly in a ranking retrieval system.
+Sec. 2.4.2
+Positional index size
+•Need an entry for each occurrence, not just once per document •Index size depends on average document size –Average web page has <1000 terms –SEC filings, books, even some epic poems … easily 100,000 terms •Consider a term with frequency 0.1% Why?
+100 1 100,000
+1 1 1000
+Positional postings Postings Document size
+Sec. 2.4.2
+Rules of thumb
+•A positional index is 2–4 as large as a nonpositional index
+•Positional index size 35–50% of volume of original text
+–Caveat: all of this holds for “English-like” languages
+Sec. 2.4.2
+Combination schemes
+•These two approaches can be profitably combined –For particular phrases (“Michael Jackson”, “Britney Spears”) it is inefficient to keep on merging positional postings lists •Even more so for phrases like “The Who” •Williams et al. (2004) evaluate a more sophisticated mixed indexing scheme –A typical web query mixture was executed in ¼ of the time of using just a positional index –It required 26% more space than having a positional index alone
+Sec. 2.4.3
+Introduction to Information Retrieval
+Structured vs. Unstructured Data
+IR vs. databases: Structured vs unstructured data
+•Structured data tends to refer to information in “tables”
+55
+EmployeeManagerSalary
+SmithJones50000
+ChangSmith60000
+50000 IvySmith
+Typically allows numerical range and exact match (for text) queries, e.g., Salary < 60000 AND Manager = Smith.
+Unstructured data
+•Typically refers to free text •Allows –Keyword queries including operators –More sophisticated “concept” queries e.g., •find all web pages dealing with drug abuse •Classic model for searching text documents
+56
+Semi-structured data
+•In fact almost no data is “unstructured” •E.g., this slide has distinctly identified zones such as the Titleand Bullets •… to say nothing of linguistic structure •Facilitates “semi-structured” search such as –Titlecontains dataAND Bulletscontain search •Or even –Titleis about Object Oriented ProgrammingAND Authorsomething like stro*rup –where * is the wild-card operator
+57

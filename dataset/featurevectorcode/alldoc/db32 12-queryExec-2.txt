@@ -1,0 +1,704 @@
+Query Execution
+
+Werner Nutt
+Introduction to Databases Free University of Bozen-Bolzano
+
+Example Database
+2
+
+Our example queries will be based on the relations Sailors and Reserves ? Sailors: Each tuple 50 bytes long 80 tuples per page 500 pages ? Reserves: Each tuple 40 bytes long 100 tuples per page 1000 pages S=
+
+sid 22 31 58 sid
+
+sname Dustin Lubber Rusty bid 101 103
+
+rating 7 8 10 day
+
+age 45.0 55.5 35.0 rcode Hoho 007
+
+R=
+
+22 58
+
+10/10/96 11/12/96
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Query Processor: Architecture
+3
+
+Query Query Parser Parsed Query Query Optimizer
+Plan Generator Plan Cost Estimator
+
+Catalog Manager
+
+Evaluation Plan Query Plan Evaluator
+
+Queries are parsed, optimized, evaluated
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Query Parser
+4
+
+SELECT S.sname FROM Reserves R, Sailors S WHERE R.sid = S.sid AND R.bid = 100 AND S.rating > 5
+
+sname
+
+bid=100
+
+rating > 5
+
+sid=sid
+
+Reserves
+
+Sailors
+
+Parser creates relational algebra expression of the form
+
+?Attributes (?Conditions (R1 1 ? ? ? 1 Rn ))
+i.e., ?rst join, then select, then project
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Plan Generator
+5
+
+The Plan Generator ? generates a set of equivalent algebra expressions ? annotates the operators with procedures to compute them. Example:
+sname
+
+(On?the?fly)
+
+bid=100
+
+rating > 5
+
+(On?the?fly)
+
+(Simple Nested Loop Join)
+sid=sid
+
+Reserves
+
+Sailors
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+The Cost of Plans
+6
+
+The optimizer ? estimates for each generated plan the cost, ? then chooses the cheapest plan Important: Avoid the worst plans!
+
+We will study 1. ?rst, implementations of operators, 2. then, plans that combine operator implementations.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Relational Operators
+7
+
+We will consider how to implement: ? Selection ???: selects a subset of rows from relation ? Projection ???: deletes unwanted columns from relation ? Join ?1?: allows us to combine two relations Each operator returns a relation ; operators can be composed! First cover operator, then discuss how to optimize queries formed by composing them.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+What is the Cost of an Operator Implementation?
+8
+
+Two parameters: ? Time: How many I/O operations are needed? Depends on ? #pages of input relations ? #records per page ? existence of index etc. ? Result Size: What is the size of the result? Factors as above plus ? selectivity of conditions in a selection or join ? size of attributes projected out Usually expressed as a ?reduction factor? Both are combined to estimate overall cost of an evaluation plan
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Simple Selections
+9
+
+SELECT * FROM Reserves R WHERE R.rcode < ?C%? General form
+
+?R.A op Val (R)
+
+Assumption: M pages of R, pR tuples per page ? Size of result approximated as: (size of R) ? (reduction factor) ? No index, unsorted: Relation scan ; cost is M (= #pages in R) ? With index on selection attribute: Use index to ?nd qualifying data entries, then retrieve corresponding data records.
+(Hash index useful only for equality selections.)
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Using an Index for Selections
+10
+
+Cost depends on #qualifying tuples, and clustering: Cost of ?nding qualifying data entries
+
++
+
+(typically small)
+
+Cost of retrieving records
+
+(could be large w/o clustering)
+
+Example: Uniform distribution of code names ; ? 10% of tuples qualify (100 pages, 10,000 tuples) clustered index ; cost ? 100 IO?s unclustered index ; cost up to 10,000 IO?s !
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Using an Index for Selections: Re?nement
+11
+
+Important re?nement for unclustered indexes: 1. Find qualifying data entries 2. Sort the rid?s of the data records to be retrieved 3. Fetch rid?s in order. This ensures that each data page is looked at just once (though # of such pages likely to be higher than with clustering).
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+More General Selection Conditions
+12
+
+(day<8/9/94 AND rcode=?Hiho?) OR bid=5 OR sid=3
+
+? Each disjunct (i.e, part connected by OR) is processed separately, . . . then the union is taken of the results. ? An index matches (a conjunction of) conditions if they involve only attributes in a pre?x of the search key, and if all, but possibly the last, are involved in equality conditions ? E.g., index on a, b, c matches a=5 AND b=3 but not b=3
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+First Approach to General Selection
+13
+
+Find the most selective access path, retrieve tuples using it, and apply any remaining terms that don?t match the index
+? Most selective access path: An index or ?le scan that we estimate will require the fewest page I/O?s. ? Conditions that match this index reduce the number of tuples retrieved ? Other terms are used to discard some retrieved tuples, but do not a?ect number of tuples/pages fetched.
+
+Example:
+
+day<8/9/94 AND bid=5 AND sid=3
+
+? First B+-tree index on day, then check bid=5 and sid=3, or ? First hash-based index on bid, sid then check day<8/9/94
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Second Approach: Intersection of Rid?s
+14
+
+Applicable if we have 2 or more matching indexes that use Alternatives (2) or (3) for data entries Using each matching index, get sets of rid?s Intersect these sets of rid?s (; How?) Retrieve the records and apply any remaining terms
+
+Example:
+
+day < 8/9/94 AND bid=5 AND sid = 3
+(both using Alternative (2))
+
+Assumption: B+-tree index on day and hash-based index on sid ? using the B+-tree, get rid?s of records satisfying day<8/9/94 ? using the hash-based index, get rid?s satisfying sid=3 ? intersect, retrieve records and check bid=5
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+A Useful Technique: External Sorting
+15
+
+Example: 2-Way External Sorting with 3 Bu?ers ? Pass 0: Read a page, sort it, write it ? only one bu?er page is used ? Pass 1, 2, 3, . . . , etc. ? three bu?er pages used.
+
+INPUT 1 OUTPUT INPUT 2
+
+Disk
+
+Main memory buffers
+
+Disk
+
+Generalisations use more bu?ers
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+2-Way External Sorting: Example
+16
+
+? Each pass we read and write each page in ?le ? M pages in the ?le ? number of passes ? log2 M ? Total cost is ? M ? log2 M ? Idea: Divide and conquer i.e., sort sub?les and merge
+
+3,4
+
+6,2
+
+9,4
+
+8,7
+
+5,6
+
+3,1 1,3 1,3 5,6
+
+2
+
+Input file
+PASS 0
+
+3,4
+
+2,6
+
+4,9 4,7 8,9
+
+7,8
+
+5,6
+
+2
+
+1?page ?run?s
+PASS 1
+
+2,3 4,6
+
+2
+
+2?page ?run?s
+PASS 2
+
+2,3 4,4 6,7 8,9 1,2 3,5 6 PASS 3
+
+4?page ?run?s
+
+1,2 2,3 3,4 4,5 6,6 7,8 9
+
+8?page ?run?s
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+General External Merge Sort
+17
+
+More than 3 bu?er pages. How can we utilize them? To sort a ?le with N pages using B bu?er pages: ? Pass 0: use B bu?er pages; produce N/B sorted runs of B pages each ? Pass 1, 2,. . . , etc.: merge B ? 1 runs
+
+INPUT 1 INPUT 2 OUTPUT
+
+INPUT B?1
+
+Disk
+
+Disk B main memory buffers
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Cost of External Merge Sort
+18
+
+? Number of passes: 1 + logB?1 N/B ? Cost = 2N ? #passes Example: Sort 108 page ?le with 5 bu?er pages Pass 0: 108/5 = 22 sorted runs of 5 pages each (last run is only 3 pages) Pass 1: 22/4 = 6 sorted runs of 20 pages each (last run is only 8 pages) Pass 2: 2 sorted runs, 80 pages and 28 pages Pass 3: Sorted ?le of 108 pages
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Number of Passes of External Merge Sort
+19
+
+N 100 1,000 10,000 100,000 1,000,000 10,000,000 100,000,000 1,000,000,000
+
+B=3 7 10 13 17 20 23 26 30
+
+B=5 4 5 7 9 10 12 14 15
+
+B=9 3 4 5 6 7 8 9 10
+
+B = 17 2 3 4 5 5 6 7 8
+
+B = 129 1 2 2 3 3 4 4 5
+
+B = 257 1 2 2 3 3 3 4 4
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Sorting: Summary
+20
+
+? External sorting is important: DBMS may dedicate part of bu?er pool for sorting! ? External merge sort minimizes disk I/O cost: ? Pass 0: produces sorted runs of size B ( = #bu?er pages). Later passes: merge runs. ? #runs merged at a time depends on B ? In practice, #passes rarely more than 2 or 3
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+The Projection Operator
+21
+
+SELECT DISTINCT R.sid, R.bid FROM Reserves R Approach based on sorting ? Modify Pass 0 of external sort to eliminate unwanted ?elds ; tuples in runs are smaller than input tuples ? Modify merging passes to eliminate duplicates ; number of result tuples smaller than input ? Cost ? Pass 0: read original relation (size M pages), write out same number of smaller tuples ? In merging passes: fewer tuples written out in each pass
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Discussion of Projection
+22
+
+? Sort-based approach is the standard
+. . . but there are also hash-based techniques
+
+? If an index contains all wanted attributes in its search key , do an index-only scan.
+? Apply projection techniques to data entries (much smaller!)
+
+? If a tree-based (i.e., ordered) index contains all wanted attributes as pre?x of search key, do even better:
+? Retrieve data entries in order (index-only scan), ? Discard unwanted ?elds, ? Compare adjacent tuples to check for duplicates.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Equality Joins With One Join Column
+23
+
+SELECT * FROM Reserves R, Sailors S WHERE R.sid = S.sid ? In algebra: R 1 S. Common! Must be carefully optimized R ? S is large ; R ? S followed by selection is ine?cient ? Assume: M pages of R, pR tuples per page, N pages of S, pS tuples per page. ? In examples, R is Reserves and S is Sailors ? Cost metric: # of I/O?s
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Simple Nested Loops Join
+24
+
+foreach tuple r in R do foreach tuple s in S do if ri = sj then add r, s to result ? For each tuple in the outer relation R we scan the entire inner relation S
+? Cost: M + pR ? M ? N = 1000 + 100 ? 1000 ? 500 I/O?s.
+
+Page-oriented Nested Loops join: ? For each page of R, get each page of S, and write out matching pairs of tuples r, s where r is in R-page and s is in S-page.
+? Cost: M + M ? N = 1000 + 1000 ? 500 I/O?s.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Index Nested Loops Join: Idea
+25
+
+R 1R.i = S.j S !
+Suppose, there is an index on attribute j of S ; make S inner relation of nested loops join ; exploit index!
+
+foreach tuple r in R do foreach tuple s in S where ri = sj do add r, s to result
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Cost of Index Nested Loops Join
+26
+
+Overall cost is M + (M ? pR ? cost of ?nding matching tuples in S) What is the ?cost of ?nding matching tuples in S?? ? For each tuple in R, probe into S-index ? hash index: ? 1.2 I/O ? B+-tree: 2?4 I/O?s ? Then, retrieve all matching S-tuples ? clustered index: 1 I/O typically ? unclustered: up to 1 I/O per tuple
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Block Nested Loops Join
+27
+
+Why keep only one page of R in bu?er? Better: ? one page as input bu?er for scanning the inner S ? one page as the output bu?er ? all remaining pages hold block of outer R
+Relations R and S Join Result
+
+Hash table for block R l (k =< B?2 pages)
+
+Input buffer (to scan all of S)
+
+Output buffer
+
+Disk
+
+B main memory buffers
+
+Disk
+
+For each matching tuple r in R-block, s in S-page, add r, s to result. Then read next R-block, scan S, etc.
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Sort-Merge Join (1)
+28
+
+R 1R.i = S.j S !
+Idea: Sort R on R.i and S on S.j then scan R and S to do a ?merge? on join colums . . . and output result tuples
+
+After sorting, how do we ?nd the next pair of matching tuples?
+while (R.i = S.j) {while (R.i < S.j) advance scan of R; while (R.i > S.j) advance scan of S;} Under which assumption is this code correct?
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Sort-Merge Join (2)
+29
+
+At this point:
+
+(R.i = S.j)
+
+From here on, ? all R tuples with the same value in R.i (the current R group) ? and all S tuples with same value in S.j (the current S group) match! ; output r, s for all pairs of such tuples! Then resume scanning R and S
+
+Total cost: sorting (R) + sorting (S) + M + N
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Hash Join: Principles
+30
+
+Two phases ? Partitioning (or ?building?): Each of R and S are divided into partitions R1 , . . . , Rk and S1 , . . . , Sk , using a hash function h ? Probing (or ?matching?): Tuples in Ri and Si are matched using a di?erent hash function h2
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Hash Join: Partitioning
+31
+
+Partition R and S using a hash function h ? R tuples in partition i will only match S tuples in partition i
+
+Original Relation
+OUTPUT INPUT hash function
+
+Partitions 1 2 1 2
+
+h B?1 Disk B main memory buffers Disk B?1
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Hash Join: Probing
+32
+
+? Read in a partition of R, hash it using h2 ( = h!) ? Scan matching partition of S, search for matches
+
+Partitions of R and S
+hash function
+
+Join Result
+
+h2
+
+h2
+
+Hash table for partition Ri (k < B?1 pages)
+
+Input buffer (To scan Si)
+
+Output buffer
+
+Disk
+
+B main memory buffers
+
+Disk
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+How Much Bu?er Space Do We Need?
+33
+
+Constraints: ? k (= # partitions) ? B ? 1 ? size of largest partition to be held in memory ? B ? 2 Assumption: all partitions have equal size. Then: ? k =B?1 and M/(B ? 1) ? B ? 2 ? B? ? M
+
+Optimisation: Use an in-memory hash to compute matching tuples ? more memory is needed Possible Problem: The hash function does not partition uniformly ? one or more R partitions may not ?t into memory Solution: Apply hash-join technique recursively to join this R-partition with corresponding S-partition
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Hash Join: Analysis
+34
+
+Cost: ? Partitioning phase: read and write both R and S ? 2(M + N ) I/Os ? Probing phase: read both R and S ? M + N I/Os ? In the running example: 4500 I/Os in total Sort-Merge Join vs. Hash Join ? Both have cost of 3(M + N ) I/Os if su?cient(?) memory is available ? Hash Join is superior if relation sizes di?er greatly (proof needs some assumptions about internal sorting method) ? Hash Join can be parallelized ? Sort-Merge is less sensitive to data skew
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Query Optimization: Example
+35
+sname
+
+SELECT S.sname FROM Reserves R, Sailors S WHERE R.sid = S.sid AND R.bid = 100 AND S.rating > 5
+
+bid=100
+
+rating > 5
+
+sid=sid
+
+Reserves
+
+Sailors
+
+? Cost of this plan: 500 + 500 ? 1000 I/O?s ? Missed opportunities: ? selections have not been ?pushed? ? no indexes are used
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Alternative Plans: No Indexes
+36
+
+Main di?erence: selections pushed down
+
+sname
+
+(On?the?fly)
+
+(Sort?Merge Join)
+sid=sid
+
+Cost of plan (with 5 bu?ers):
+
+(Scan; write to temp T1)
+
+bid=100
+
+rating > 5
+
+(Scan; write to temp T2)
+
+Reserves
+
+Sailors
+
+scan Reserves (1, 000 pages) + write temporary T1 (10 pages, if #boats = 100 and uniform distribution) scan Sailors (500 pages) + write temporary T2 (250 pages, if #ratings = 10) sort T1 (2 ? 2 ? 10 I/O?s) + sort T2 (2 ? 4 ? 250 I/O?s) + merge T1 and T2 (10 + 250 I/O?s) 4, 060 page I/O?s
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Alternative Plan with Indexes
+37
+
+With clustered index on bid of Reserves:
+100, 000/100 = 1, 000 tuples on 1, 000/100 = 10 pages
+sname
+
+(On?the?fly)
+
+Index nested loops join with ?pipelining?
+(i.e., outer relation is not materialized ; projection doesn?t help)
+rating > 5
+
+(On?the?fly)
+
+Join attribute sid is a key for Sailors
+at most one tuple in Sailors matches ; clustering wouldn?t help)
+bid=100 sid=sid
+
+(Index Nested Loops, with pipelining )
+
+Sailors
+
+Selection ?rating>5 is not pushed
+because join is based on index for sid
+Reserves Use index; do not write result to temp)
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Alternative Plan with Indexes (Cntd.)
+38
+
+Cost: ? Selection of Reserves tuples: 10 I/O?s ? For each, retrieve matching tuples from Sailors: 1, 000 ? 1.2 I/O?s ? Total: 1, 210 I/O?s
+bid=100 sname
+
+(On?the?fly)
+
+rating > 5
+
+(On?the?fly)
+
+sid=sid
+
+(Index Nested Loops, with pipelining )
+
+Sailors
+
+Reserves
+
+Use index; do not write result to temp)
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Summary
+39
+
+? Query optimization (QO) is an important task in a relational DBMS ? Understanding of QO is necessary to understand the impact ; of a given database design (relations, indexes) ; on the workload (= set of queries) ? QO has two parts: ? Enumeration of alternative plans ; pruning of search space: left-deep plans only ? Estimation of cost of enumerated plans ; size of results ; cost of each plan node Key issues: Statistics, indexes, operator implementations
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+References
+40
+
+These slides are based on Chapters 12, 13, 14, and 15 of the book Database Management Systems by R. Ramakrishnan and J. Gehrke, and on slides by the authors published at
+www.cs.wisc.edu/~dbbook/openAccess/thirdEdition/slides/slides3ed.html
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+

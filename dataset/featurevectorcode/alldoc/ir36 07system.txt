@@ -1,0 +1,3218 @@
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 7: Scores in a Complete Search System
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-05-07
+
+Sch?tze: Scores in a complete search system u
+
+1 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Overview
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+2 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Outline
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+3 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term frequency weight
+
+The log frequency weight of term t in d is de?ned as follows wt,d = 1 + log10 tft,d 0 if tft,d > 0 otherwise
+
+Sch?tze: Scores in a complete search system u
+
+4 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+idf weight
+
+The document frequency dft is de?ned as the number of documents that t occurs in. We de?ne the idf weight of term t as follows: idft = log10 N dft
+
+idf is a measure of the informativeness of the term.
+
+Sch?tze: Scores in a complete search system u
+
+5 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+tf-idf weight
+
+The tf-idf weight of a term is the product of its tf weight and its idf weight. wt,d = (1 + log tft,d ) ? log N dft
+
+Sch?tze: Scores in a complete search system u
+
+6 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Cosine similarity between query and document
+
+q d = cos(q, d) = sim(q, d) = ? |q| |d|
+
+|V |
+
+qi
+|V | 2 i =1 qi
+
+i =1
+
+?
+
+di
+|V | 2 i =1 di
+
+qi is the tf-idf weight of term i in the query. di is the tf-idf weight of term i in the document. q/|q| and d/|d | are length-1 vectors (= normalized). |q| and |d| are the lengths of q and d.
+
+Sch?tze: Scores in a complete search system u
+
+7 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Cosine similarity illustrated
+
+poor
+1
+
+v(d1 ) v (q) v(d2 ) ?
+
+0 0
+
+v(d3 )
+1
+
+rich
+
+Sch?tze: Scores in a complete search system u
+
+8 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+tf-idf example: lnc.ltn
+Query: ?best car insurance?. Document: ?car insurance auto insurance?. word tf-raw 0 1 1 1 tf-wght 0 1 1 1 query df 5000 50000 10000 1000 idf 2.3 1.3 2.0 3.0 tf-idf weight 0 1.3 2.0 3.0 tf-raw 1 0 1 2 document tf-wght 1 0 1 1.3 tf-wght 1 0 1 1.3 n?lized 0.52 0 0.52 0.68 product
+
+auto best car insurance
+
+0 0 1.04 2.04
+
+Key to columns: tf-raw: raw (unweighted) term frequency, tf-wght: logarithmically weighted term frequency, df: document frequency, idf: inverse document frequency, weight: the ?nal weight of the term in the query or document, n?lized: document weights after cosine normalization, product: the product of ?nal query weight and ?nal document weight ? 12 + 02 + 12 + 1.32 ? 1.92 1/1.92 ? 0.52 1.3/1.92 ? 0.68 Final similarity score between query and document:
+i
+
+wqi ? wdi = 0 + 0 + 1.04 + 2.04 = 3.08
+
+Sch?tze: Scores in a complete search system u
+
+9 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+Sch?tze: Scores in a complete search system u
+
+10 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+The importance of ranking: User studies at Google
+
+Sch?tze: Scores in a complete search system u
+
+10 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+The importance of ranking: User studies at Google Length normalization: Pivot normalization
+
+Sch?tze: Scores in a complete search system u
+
+10 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+The importance of ranking: User studies at Google Length normalization: Pivot normalization The complete search system
+
+Sch?tze: Scores in a complete search system u
+
+10 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+The importance of ranking: User studies at Google Length normalization: Pivot normalization The complete search system Implementation of ranking
+
+Sch?tze: Scores in a complete search system u
+
+10 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Outline
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+11 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+Users want to look at a few results ? not thousands.
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+Users want to look at a few results ? not thousands. It?s very hard to write queries that produce a few results.
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+Users want to look at a few results ? not thousands. It?s very hard to write queries that produce a few results. Even for expert searchers
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+Users want to look at a few results ? not thousands. It?s very hard to write queries that produce a few results. Even for expert searchers ? Ranking is important because it e?ectively reduces a large set of results to a very small one.
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why is ranking so important?
+
+Last lecture: Problems with unranked retrieval
+Users want to look at a few results ? not thousands. It?s very hard to write queries that produce a few results. Even for expert searchers ? Ranking is important because it e?ectively reduces a large set of results to a very small one.
+
+Next: More data on ?users only look at a few results?
+
+Sch?tze: Scores in a complete search system u
+
+12 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google.
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is?
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them Ask them to ?think aloud?
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them Ask them to ?think aloud? Interview them
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them Ask them to ?think aloud? Interview them Eye-track them
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them Ask them to ?think aloud? Interview them Eye-track them Time them
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Empirical investigation of the e?ect of ranking
+
+The following slides are from Dan Russell?s JCDL 2007 talk ? Dan Russell was the ?Uber Tech Lead for Search Quality & User Happiness? at Google. How can we measure how important ranking is? Observe what searchers do when they are searching in a controlled setting
+Videotape them Ask them to ?think aloud? Interview them Eye-track them Time them Record and count their clicks
+
+Sch?tze: Scores in a complete search system u
+
+13 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10).
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking In 1 out of 2 cases, users click on the top-ranked page.
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking In 1 out of 2 cases, users click on the top-ranked page. Even if the top-ranked page is not relevant, 30% of users will click on it.
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking In 1 out of 2 cases, users click on the top-ranked page. Even if the top-ranked page is not relevant, 30% of users will click on it. ? Getting the ranking right is very important.
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking In 1 out of 2 cases, users click on the top-ranked page. Even if the top-ranked page is not relevant, 30% of users will click on it. ? Getting the ranking right is very important. ? Getting the top-ranked page right is most important.
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Importance of ranking: Summary
+
+Viewing abstracts: Users are a lot more likely to read the abstracts of the top-ranked pages (1, 2, 3, 4) than the abstracts of the lower ranked pages (7, 8, 9, 10). Clicking: Distribution is even more skewed for clicking In 1 out of 2 cases, users click on the top-ranked page. Even if the top-ranked page is not relevant, 30% of users will click on it. ? Getting the ranking right is very important. ? Getting the top-ranked page right is most important.
+
+Sch?tze: Scores in a complete search system u
+
+20 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Exercise
+
+Ranking is also one of the high barriers to entry for competitors to established players in the search engine market. Why?
+
+Sch?tze: Scores in a complete search system u
+
+21 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Outline
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+22 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Why distance is a bad idea
+poor 1 d1: Ranks of starving poets swell q: [rich poor] d2: Rich poor gap grows
+
+0 0
+
+1
+
+d3: Record baseball salaries in 2010 rich
+
+The Euclidean distance of q and d2 is large although the distribution of terms in the query q and the distribution of terms in the document d2 are very similar. That?s why we do length normalization or, equivalently, use cosine to compute query-document matching scores.
+Sch?tze: Scores in a complete search system u 23 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Exercise: A problem for cosine normalization
+
+Query q: ?anti-doping rules Beijing 2008 olympics? Compare three documents
+d1 : a short document on anti-doping rules at 2008 Olympics d2 : a long document that consists of a copy of d1 and 5 other news stories, all on topics di?erent from Olympics/anti-doping d3 : a short document on anti-doping rules at the 2004 Athens Olympics
+
+What ranking do we expect in the vector space model? What can we do about this?
+
+Sch?tze: Scores in a complete search system u
+
+24 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+Cosine normalization produces weights that are too large for short documents and too small for long documents (on average).
+
+Sch?tze: Scores in a complete search system u
+
+25 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+Cosine normalization produces weights that are too large for short documents and too small for long documents (on average). Adjust cosine normalization by linear adjustment: ?turning? the average normalization on the pivot
+
+Sch?tze: Scores in a complete search system u
+
+25 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+Cosine normalization produces weights that are too large for short documents and too small for long documents (on average). Adjust cosine normalization by linear adjustment: ?turning? the average normalization on the pivot E?ect: Similarities of short documents with query decrease; similarities of long documents with query increase.
+
+Sch?tze: Scores in a complete search system u
+
+25 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+Cosine normalization produces weights that are too large for short documents and too small for long documents (on average). Adjust cosine normalization by linear adjustment: ?turning? the average normalization on the pivot E?ect: Similarities of short documents with query decrease; similarities of long documents with query increase. This removes the unfair advantage that short documents have.
+
+Sch?tze: Scores in a complete search system u
+
+25 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Predicted and true probability of relevance
+
+Sch?tze: Scores in a complete search system u
+
+26 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Predicted and true probability of relevance
+
+source: Lillian Lee
+
+Sch?tze: Scores in a complete search system u
+
+26 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+Sch?tze: Scores in a complete search system u
+
+27 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivot normalization
+
+source: Lillian Le
+Sch?tze: Scores in a complete search system u 27 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivoted normalization: Amit Singhal?s experiments
+
+Sch?tze: Scores in a complete search system u
+
+28 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Pivoted normalization: Amit Singhal?s experiments
+
+(relevant documents retrieved and (change in) average precision)
+
+Sch?tze: Scores in a complete search system u
+
+28 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Outline
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+29 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Complete search system
+
+Sch?tze: Scores in a complete search system u
+
+30 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user If we?ve only found < k hits: repeat for next index in tier cascade
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user If we?ve only found < k hits: repeat for next index in tier cascade
+
+Example: two-tier system
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user If we?ve only found < k hits: repeat for next index in tier cascade
+
+Example: two-tier system
+Tier 1: Index of all titles
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user If we?ve only found < k hits: repeat for next index in tier cascade
+
+Example: two-tier system
+Tier 1: Index of all titles Tier 2: Index of the rest of documents
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+Basic idea:
+Create several tiers of indexes, corresponding to importance of indexing terms During query processing, start with highest-tier index If highest-tier index returns at least k (e.g., k = 100) results: stop and return results to user If we?ve only found < k hits: repeat for next index in tier cascade
+
+Example: two-tier system
+Tier 1: Index of all titles Tier 2: Index of the rest of documents Pages containing the search words in the title are better hits than pages containing the search words in the body of the text.
+
+Sch?tze: Scores in a complete search system u
+
+31 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered index
+
+Sch?tze: Scores in a complete search system u
+
+32 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered index
+auto Doc2
+
+Tier 1
+
+best
+
+car insurance
+
+Doc1
+
+Doc3
+
+Doc2
+
+Doc3
+
+auto
+
+best Tier 2 car insurance
+
+Doc1
+
+Doc3
+
+auto
+
+Doc1
+
+Tier 3
+
+best
+
+car insurance
+
+Doc2
+
+Sch?tze: Scores in a complete search system u
+
+32 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+
+Sch?tze: Scores in a complete search system u
+
+33 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+
+The use of tiered indexes is believed to be one of the reasons that Google search quality was signi?cantly higher initially (2000/01) than that of competitors.
+
+Sch?tze: Scores in a complete search system u
+
+33 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Tiered indexes
+
+The use of tiered indexes is believed to be one of the reasons that Google search quality was signi?cantly higher initially (2000/01) than that of competitors. (along with PageRank, use of anchor text and proximity constraints)
+
+Sch?tze: Scores in a complete search system u
+
+33 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Complete search system
+
+Sch?tze: Scores in a complete search system u
+
+34 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Components we have introduced thus far
+
+Document preprocessing (linguistic and otherwise) Positional indexes Tiered indexes Spelling correction k-gram indexes for wildcard queries and spelling correction Query processing Document scoring
+
+Sch?tze: Scores in a complete search system u
+
+35 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Components we haven?t covered yet
+
+Document cache: we need this for generating snippets (= dynamic summaries) Zone indexes: They separate the indexes for di?erent zones: the body of the document, all highlighted text in the document, anchor text, text in metadata ?elds etc Machine-learned ranking functions Proximity ranking (e.g., rank documents in which the query terms occur in the same local window higher than documents in which the query terms occur far from each other) Query parser
+
+Sch?tze: Scores in a complete search system u
+
+36 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval?
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why?
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why? How do we combine Boolean retrieval with vector space retrieval?
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why? How do we combine Boolean retrieval with vector space retrieval? For example: ?+?-constraints and ?-?-constraints
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why? How do we combine Boolean retrieval with vector space retrieval? For example: ?+?-constraints and ?-?-constraints Post?ltering is simple, but can be very ine?cient ? no easy answer.
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why? How do we combine Boolean retrieval with vector space retrieval? For example: ?+?-constraints and ?-?-constraints Post?ltering is simple, but can be very ine?cient ? no easy answer. How do we combine wild cards with vector space retrieval?
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Vector space retrieval: Interactions
+How do we combine phrase retrieval with vector space retrieval? We do not want to compute document frequency / idf for every possible phrase. Why? How do we combine Boolean retrieval with vector space retrieval? For example: ?+?-constraints and ?-?-constraints Post?ltering is simple, but can be very ine?cient ? no easy answer. How do we combine wild cards with vector space retrieval? Again, no easy answer
+
+Sch?tze: Scores in a complete search system u
+
+37 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Exercise
+Design criteria for tiered system
+Each tier should be an order of magnitude smaller than the next tier. The top 100 hits for most queries should be in tier 1, the top 100 hits for most of the remaining queries in tier 2 etc. We need a simple test for ?can I stop at this tier or do I have to go to the next one??
+There is no advantage to tiering if we have to hit most tiers for most queries anyway.
+
+Consider a two-tier system where the ?rst tier indexes titles and the second tier everything. Question: Can you think of a better way of setting up a multitier system? Which ?zones? of a document should be indexed in the di?erent tiers (title, body of document, others?)? What criterion do you want to use for including a document in tier 1?
+Sch?tze: Scores in a complete search system u 38 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Outline
+
+1
+
+Recap Why rank? More on cosine The complete search system Implementation of ranking
+
+2
+
+3
+
+4
+
+5
+
+Sch?tze: Scores in a complete search system u
+
+39 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Now we also need term frequencies in the index
+
+Sch?tze: Scores in a complete search system u
+
+40 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Now we also need term frequencies in the index
+
+Brutus Caesar Calpurnia
+
+?? ?? ??
+
+1,2 1,1 7,1
+
+7,3 5,1 8,2
+
+83,1 13,1 40,1
+
+87,2 17,1 97,3
+
+... ...
+
+Sch?tze: Scores in a complete search system u
+
+40 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Now we also need term frequencies in the index
+
+Brutus Caesar Calpurnia
+
+?? ?? ??
+
+1,2 1,1 7,1
+
+7,3 5,1 8,2
+
+83,1 13,1 40,1
+
+87,2 17,1 97,3
+
+... ...
+
+term frequencies
+
+Sch?tze: Scores in a complete search system u
+
+40 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Now we also need term frequencies in the index
+
+Brutus Caesar Calpurnia
+
+?? ?? ??
+
+1,2 1,1 7,1
+
+7,3 5,1 8,2
+
+83,1 13,1 40,1
+
+87,2 17,1 97,3
+
+... ...
+
+term frequencies We also need positions. Not shown here.
+
+Sch?tze: Scores in a complete search system u
+
+40 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term frequencies in the inverted index
+
+Thus: In each posting, store tft,d in addition to docID d.
+
+Sch?tze: Scores in a complete search system u
+
+41 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term frequencies in the inverted index
+
+Thus: In each posting, store tft,d in addition to docID d. As an integer frequency, not as a (log-)weighted real number ...
+
+Sch?tze: Scores in a complete search system u
+
+41 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term frequencies in the inverted index
+
+Thus: In each posting, store tft,d in addition to docID d. As an integer frequency, not as a (log-)weighted real number ... . . . because real numbers are di?cult to compress.
+
+Sch?tze: Scores in a complete search system u
+
+41 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term frequencies in the inverted index
+
+Thus: In each posting, store tft,d in addition to docID d. As an integer frequency, not as a (log-)weighted real number ... . . . because real numbers are di?cult to compress. Overall, additional space requirements are small: a byte per posting or less
+
+Sch?tze: Scores in a complete search system u
+
+41 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking.
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100).
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k?
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+Compute scores for all N documents
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+Compute scores for all N documents Sort
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+Compute scores for all N documents Sort Return the top k
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+Compute scores for all N documents Sort Return the top k
+
+Not very e?cient
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+How do we compute the top k in ranking?
+
+We usually don?t need a complete ranking. We just need the top k for a small k (e.g., k = 100). If we don?t need a complete ranking, is there an e?cient way of computing just the top k? Naive:
+Compute scores for all N documents Sort Return the top k
+
+Not very e?cient Alternative: min heap
+
+Sch?tze: Scores in a complete search system u
+
+42 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Use min heap for selecting top k ouf of N
+
+Sch?tze: Scores in a complete search system u
+
+43 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Use min heap for selecting top k ouf of N
+
+A binary min heap is a binary tree in which each node?s value is less than the values of its children.
+
+Sch?tze: Scores in a complete search system u
+
+43 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Use min heap for selecting top k ouf of N
+
+A binary min heap is a binary tree in which each node?s value is less than the values of its children. Takes O(N log k) operations to construct (where N is the number of documents) . . .
+
+Sch?tze: Scores in a complete search system u
+
+43 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Use min heap for selecting top k ouf of N
+
+A binary min heap is a binary tree in which each node?s value is less than the values of its children. Takes O(N log k) operations to construct (where N is the number of documents) . . . . . . then read o? k winners in O(k log k) steps
+
+Sch?tze: Scores in a complete search system u
+
+43 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Binary min heap
+0.6
+
+0.85
+
+0.7
+
+0.9
+
+0.97
+
+0.8
+
+0.95
+
+Sch?tze: Scores in a complete search system u
+
+44 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Selecting top k scoring documents in O(N log k)
+
+Goal: Keep the top k documents seen so far Use a binary min heap To process a new document d ? with score s ? :
+Get current minimum hm of heap (O(1)) If s ? ? hm skip to next document If s ? > hm heap-delete-root (O(log k)) Heap-add d ? /s ? (O(log k))
+
+Sch?tze: Scores in a complete search system u
+
+45 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Even more e?cient computation of top k?
+
+Ranking has time complexity O(N) where N is the number of documents.
+
+Sch?tze: Scores in a complete search system u
+
+46 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Even more e?cient computation of top k?
+
+Ranking has time complexity O(N) where N is the number of documents. Optimizations reduce the constant factor, but they are still O(N), N > 1010
+
+Sch?tze: Scores in a complete search system u
+
+46 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Even more e?cient computation of top k?
+
+Ranking has time complexity O(N) where N is the number of documents. Optimizations reduce the constant factor, but they are still O(N), N > 1010 Are there sublinear algorithms?
+
+Sch?tze: Scores in a complete search system u
+
+46 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Even more e?cient computation of top k?
+
+Ranking has time complexity O(N) where N is the number of documents. Optimizations reduce the constant factor, but they are still O(N), N > 1010 Are there sublinear algorithms? What we?re doing in e?ect: solving the k-nearest neighbor (kNN) problem for the query vector (= query point).
+
+Sch?tze: Scores in a complete search system u
+
+46 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Even more e?cient computation of top k?
+
+Ranking has time complexity O(N) where N is the number of documents. Optimizations reduce the constant factor, but they are still O(N), N > 1010 Are there sublinear algorithms? What we?re doing in e?ect: solving the k-nearest neighbor (kNN) problem for the query vector (= query point). There are no general solutions to this problem that are sublinear.
+
+Sch?tze: Scores in a complete search system u
+
+46 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . .
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Idea 2: Heuristics to prune the search space
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Idea 2: Heuristics to prune the search space
+Not guaranteed to be correct . . .
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Idea 2: Heuristics to prune the search space
+Not guaranteed to be correct . . . . . . but fails rarely.
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Idea 2: Heuristics to prune the search space
+Not guaranteed to be correct . . . . . . but fails rarely. In practice, close to constant time.
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+More e?cient computation of top k: Heuristics
+
+Idea 1: Reorder postings lists
+Instead of ordering according to docID . . . . . . order according to some measure of ?expected relevance?.
+
+Idea 2: Heuristics to prune the search space
+Not guaranteed to be correct . . . . . . but fails rarely. In practice, close to constant time. For this, we?ll need the concepts of document-at-a-time processing and term-at-a-time processing.
+
+Sch?tze: Scores in a complete search system u
+
+47 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID.
+
+Sch?tze: Scores in a complete search system u
+
+48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID. Alternative: a query-independent measure of ?goodness? of a page
+
+Sch?tze: Scores in a complete search system u
+
+48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID. Alternative: a query-independent measure of ?goodness? of a page Example: PageRank g (d) of page d, a measure of how many ?good? pages hyperlink to d (chapter 21)
+
+Sch?tze: Scores in a complete search system u
+
+48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID. Alternative: a query-independent measure of ?goodness? of a page Example: PageRank g (d) of page d, a measure of how many ?good? pages hyperlink to d (chapter 21) Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . .
+
+Sch?tze: Scores in a complete search system u
+
+48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID. Alternative: a query-independent measure of ?goodness? of a page Example: PageRank g (d) of page d, a measure of how many ?good? pages hyperlink to d (chapter 21) Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d)
+
+Sch?tze: Scores in a complete search system u
+
+48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists
+So far: postings lists have been ordered according to docID. Alternative: a query-independent measure of ?goodness? of a page Example: PageRank g (d) of page d, a measure of how many ?good? pages hyperlink to d (chapter 21) Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d) This scheme supports early termination: We do not have to process postings lists in their entirety to ?nd top k.
+Sch?tze: Scores in a complete search system u 48 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists (2)
+Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d)
+
+Sch?tze: Scores in a complete search system u
+
+49 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists (2)
+Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d) Suppose: (i) g ? [0, 1]; (ii) g (d) < 0.1 for the document d we?re currently processing; (iii) smallest top k score we?ve found so far is 1.2
+
+Sch?tze: Scores in a complete search system u
+
+49 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists (2)
+Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d) Suppose: (i) g ? [0, 1]; (ii) g (d) < 0.1 for the document d we?re currently processing; (iii) smallest top k score we?ve found so far is 1.2 Then all subsequent scores will be < 1.1.
+
+Sch?tze: Scores in a complete search system u
+
+49 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists (2)
+Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d) Suppose: (i) g ? [0, 1]; (ii) g (d) < 0.1 for the document d we?re currently processing; (iii) smallest top k score we?ve found so far is 1.2 Then all subsequent scores will be < 1.1. So we?ve already found the top k and can stop processing the remainder of postings lists.
+
+Sch?tze: Scores in a complete search system u
+
+49 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Non-docID ordering of postings lists (2)
+Order documents in postings lists according to PageRank: g (d1 ) > g (d2 ) > g (d3 ) > . . . De?ne composite score of a document: net-score(q, d) = g (d) + cos(q, d) Suppose: (i) g ? [0, 1]; (ii) g (d) < 0.1 for the document d we?re currently processing; (iii) smallest top k score we?ve found so far is 1.2 Then all subsequent scores will be < 1.1. So we?ve already found the top k and can stop processing the remainder of postings lists. Questions?
+Sch?tze: Scores in a complete search system u 49 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Document-at-a-time processing
+
+Sch?tze: Scores in a complete search system u
+
+50 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Document-at-a-time processing
+
+Both docID-ordering and PageRank-ordering impose a consistent ordering on documents in postings lists.
+
+Sch?tze: Scores in a complete search system u
+
+50 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Document-at-a-time processing
+
+Both docID-ordering and PageRank-ordering impose a consistent ordering on documents in postings lists. Computing cosines in this scheme is document-at-a-time.
+
+Sch?tze: Scores in a complete search system u
+
+50 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Document-at-a-time processing
+
+Both docID-ordering and PageRank-ordering impose a consistent ordering on documents in postings lists. Computing cosines in this scheme is document-at-a-time. We complete computation of the query-document similarity score of document di before starting to compute the query-document similarity score of di +1 .
+
+Sch?tze: Scores in a complete search system u
+
+50 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Document-at-a-time processing
+
+Both docID-ordering and PageRank-ordering impose a consistent ordering on documents in postings lists. Computing cosines in this scheme is document-at-a-time. We complete computation of the query-document similarity score of document di before starting to compute the query-document similarity score of di +1 . Alternative: term-at-a-time processing
+
+Sch?tze: Scores in a complete search system u
+
+50 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress)
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress) Documents in the top k are likely to occur early in these ordered lists.
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress) Documents in the top k are likely to occur early in these ordered lists. ? Early termination while processing postings lists is unlikely to change the top k.
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress) Documents in the top k are likely to occur early in these ordered lists. ? Early termination while processing postings lists is unlikely to change the top k. But:
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress) Documents in the top k are likely to occur early in these ordered lists. ? Early termination while processing postings lists is unlikely to change the top k. But:
+We no longer have a consistent ordering of documents in postings lists.
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Weight-sorted postings lists
+Idea: don?t process postings that contribute little to ?nal score Order documents in postings list according to weight Simplest case: normalized tf-idf weight (rarely done: hard to compress) Documents in the top k are likely to occur early in these ordered lists. ? Early termination while processing postings lists is unlikely to change the top k. But:
+We no longer have a consistent ordering of documents in postings lists. We no longer can employ document-at-a-time processing.
+
+Sch?tze: Scores in a complete search system u
+
+51 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Sch?tze: Scores in a complete search system u
+
+52 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Simplest case: completely process the postings list of the ?rst query term
+
+Sch?tze: Scores in a complete search system u
+
+52 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Simplest case: completely process the postings list of the ?rst query term Create an accumulator for each docID you encounter
+
+Sch?tze: Scores in a complete search system u
+
+52 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Simplest case: completely process the postings list of the ?rst query term Create an accumulator for each docID you encounter Then completely process the postings list of the second query term
+
+Sch?tze: Scores in a complete search system u
+
+52 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Simplest case: completely process the postings list of the ?rst query term Create an accumulator for each docID you encounter Then completely process the postings list of the second query term . . . and so forth
+
+Sch?tze: Scores in a complete search system u
+
+52 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+
+Sch?tze: Scores in a complete search system u
+
+53 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Term-at-a-time processing
+CosineScore(q) 1 ?oat Scores[N] = 0 2 ?oat Length[N] 3 for each query term t 4 do calculate wt,q and fetch postings list for t 5 for each pair(d, tft,d ) in postings list 6 do Scores[d]+ = wt,d ? wt,q 7 Read the array Length 8 for each d 9 do Scores[d] = Scores[d]/Length[d] 10 return Top k components of Scores[] The elements of the array ?Scores? are called accumulators.
+
+Sch?tze: Scores in a complete search system u
+
+53 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Accumulators
+
+For the web (20 billion documents), an array of accumulators A in memory is infeasible. Thus: Only create accumulators for docs occurring in postings lists This is equivalent to: Do not create accumulators for docs with zero scores (i.e., docs that do not contain any of the query terms)
+
+Sch?tze: Scores in a complete search system u
+
+54 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Accumulators: Example
+
+Brutus Caesar Calpurnia
+
+?? ?? ??
+
+1,2 1,1 7,1
+
+7,3 5,1 8,2
+
+83,1 13,1 40,1
+
+87,2 17,1 97,3
+
+... ...
+
+For query: [Brutus Caesar]: Only need accumulators for 1, 5, 7, 13, 17, 83, 87 Don?t need accumulators for 3, 8 etc.
+
+Sch?tze: Scores in a complete search system u
+
+55 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Enforcing conjunctive search
+
+Sch?tze: Scores in a complete search system u
+
+56 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Enforcing conjunctive search
+
+We can enforce conjunctive search (a la Google): only consider documents (and create accumulators) if all terms occur.
+
+Sch?tze: Scores in a complete search system u
+
+56 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Enforcing conjunctive search
+
+We can enforce conjunctive search (a la Google): only consider documents (and create accumulators) if all terms occur. Example: just one accumulator for [Brutus Caesar] in the example above . . .
+
+Sch?tze: Scores in a complete search system u
+
+56 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Enforcing conjunctive search
+
+We can enforce conjunctive search (a la Google): only consider documents (and create accumulators) if all terms occur. Example: just one accumulator for [Brutus Caesar] in the example above . . . . . . because only d1 contains both words.
+
+Sch?tze: Scores in a complete search system u
+
+56 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Ranking is very expensive in applications where we have to compute similarity scores for all documents in the collection.
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Ranking is very expensive in applications where we have to compute similarity scores for all documents in the collection. In most applications, the vast majority of documents have similarity score 0 for a given query ? lots of potential for speeding things up.
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Ranking is very expensive in applications where we have to compute similarity scores for all documents in the collection. In most applications, the vast majority of documents have similarity score 0 for a given query ? lots of potential for speeding things up. However, there is no fast nearest neighbor algorithm that is guaranteed to be correct even in this scenario.
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Implementation of ranking: Summary
+
+Ranking is very expensive in applications where we have to compute similarity scores for all documents in the collection. In most applications, the vast majority of documents have similarity score 0 for a given query ? lots of potential for speeding things up. However, there is no fast nearest neighbor algorithm that is guaranteed to be correct even in this scenario. In practice: use heuristics to prune search space ? usually works very well.
+
+Sch?tze: Scores in a complete search system u
+
+57 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Take-away today
+
+The importance of ranking: User studies at Google Length normalization: Pivot normalization The complete search system Implementation of ranking
+
+Sch?tze: Scores in a complete search system u
+
+58 / 59
+
+Recap
+
+Why rank?
+
+More on cosine
+
+The complete search system
+
+Implementation of ranking
+
+Resources
+
+Chapters 6 and 7 of IIR Resources at http://cislmu.org
+How Google tweaks its ranking function Interview with Google search guru Udi Manber Amit Singhal on Google ranking SEO perspective: ranking factors Yahoo Search BOSS: Opens up the search engine to developers. For example, you can rerank search results. Compare Google and Yahoo ranking for a query How Google uses eye tracking for improving search
+
+Sch?tze: Scores in a complete search system u
+
+59 / 59
+
+

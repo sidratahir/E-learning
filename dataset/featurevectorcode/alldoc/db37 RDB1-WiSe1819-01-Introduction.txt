@@ -1,0 +1,885 @@
+Relational Database Systems 1
+Wolf-Tilo Balke Hermann Kroll Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+0. Organizational Issues
+? Who is who ?
+? Wolf-Tilo Balke
+? lecture, exams
+
+? Hermann Kroll
+? detours
+
+? Janus Wawrzinek
+? detours
+
+? Stephan Mennicke
+? tutorials
+
+? Regine Dalkiran
+? office
+
+? In case of questions, feel free to ask us.
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+2
+
+0. Organizational Issues
+? Lecture
+? October 18, 2018 to January 31, 2019 ? 15:00 ? 17:15 (including a break) ? integrated lecture (theory and detours) ? 5 credits ? Written exam on March 8, 2019
+
+? Homework
+? weekly assignments
+? ? can be downloaded from our website / StudIP ? ? must (!) be completed in groups of two students
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+3
+
+0. Organizational Issues
+? Tutorial groups
+? led by our HiWis ? homework discussion
+
+? In order to pass this module you need to
+1) ? achieve 50% of homework points (Studienleistung, ungraded 1 CP) 2) ? pass the exam (Pr?fungsleistung, graded 4 CP)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+4
+
+0 Homework
+? Weekly homework assignments
+? can be downloaded from our website
+
+? Homework has to be completed within groups of two students (no larger groups, please!) ? To be handed in before the next lecture
+? drop your homework into the mailbox at our institute (Informatikzentrum, 2nd floor) ? or just give it to us right before the next lecture ? no email submissions! ? Mark each sheet of paper with
+? your names and matriculation numbers ? And your tutorial group number
+
+? If you have multiple pages, staple them together
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+5
+
+0 Exercises - Example
+Name #1 Name #2 MatNr #1 MatNr #2 GroupNo (assigned to you via registration system )
+
+What is this thing? (RDB1, 3rd Exercise) Answers
+
+Mailbox on IfIS floor (opposite of elevator)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+6
+
+0 Homework
+? Of course, you can discuss the homework assignment with other people, but do not copy it
+? Always answer in your own words
+? Also copying answers from the slides does not count
+
+? Homework is graded and corrected/commented by our hiwis and returned to you in your tutorial group
+? for any questions regarding the grading, contact your HiWi directly
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+7
+
+0 Tutorial Groups
+? The tutorial groups start in two weeks
+? but: Registration is required! ? registration is done via StudIP
+? Subscribe yourself with your partner to a group ? Subscribing will be possible starting at 8 pm today (18.10)
+
+? registration possible until October 22 (next Monday)
+
+? Fixed pairs of two students
+? no more, no less? ? you may choose a preferred partner
+? if you do not, you get a random partner
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+8
+
+0 Tutorial Groups
+Starting at 8pm 18.10!
+
+2. 3.
+
+1.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+9
+
+0. Why should you be here?
+? Its mandatory in your course of study?. ? Database system are an integral part of most businesses, workflows and software products
+
+? There is an abundance of jobs for people with good database skills
+? help yourself to put you into a good position within the job market ? prepare for a sunny and wealthy future!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+10
+
+0. Why should you be here?
+Job descriptions also exactly describe this course?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+11
+
+0. Instructional Objectives
+? After successfully completing this course students should be able to
+? explain the fundamental terms of
+databases in general the relational model theoretical and practical aspects of query languages conceptual and logical design of databases including normalization ? application programming ? further concepts like constraints, views, indexes, transactions and object databases ? ? ? ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+12
+
+0. Instructional Objectives
+? They should furthermore be able to
+? design and implement a database for any specified domain using ER-Diagrams or UML-Diagrams, the Relational Model and SQL-DDL ? normalize a given relational database schema ? enhance the database with views, indexes, constraints, and triggers ? formulate data retrieval queries in SQL, Relational Algebra, and Relational Calculi ? write programs accessing databases using JDBC
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+13
+
+0. Courses at ifis
+? Basic course in databases
+? Relational Databases I (Bachelor)
+? What can we do with an DBMS? ? Conceptual modeling, data retrieval, relational model, SQL, building applications, basic data models
+
+? Relational Databases II (Master)
+? How can we implement a DBMS? ? Storage models, query optimization, transactions, concurrency control, recovery, data security
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+14
+
+0. Contents this Course
+1 2 3 4 5 Introduction Data Modeling 1 Data Modeling 2 View Integration Relational Model
+
+6
+7 8
+
+Relational Algebra
+Relational Calculus SQL 1
+
+9
+10 11
+
+SQL 2
+Normalization Application Programming 1
+
+12
+13 14
+
+Application Programming 2
+Object Persistence Active Databases
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+15
+
+0. Courses at ifis
+? Advanced courses in Information Systems (Master)
+? Information Retrieval and Web Search Engines ? Multimedia Databases ? Distributed Data Management ? Knowledge-Based Systems and Deductive Databases ? Data Warehousing and Data Mining Techniques
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+16
+
+0. Recommended Literature
+? Fundamentals of Database Systems (EN)
+? Elmasri and Navathe ? Addison-Wesley
+
+? Database System Concepts (SKS)
+? Silberschatz, Korth, and Sudarshan ? McGraw Hill
+
+? Database Systems (GUW)
+? Garcia-Molina, Ullman, and Widom ? Prentice Hall
+
+? Datenbanksysteme (KE)
+? Kemper, and Eickler ? Oldenbourg
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+17
+
+0. Recommended Literature
+? Database Modeling and Design: Logical Design
+? Teorey, Lightstone, and Nadeau ? Morgan Kaufmann
+? http://www.sciencedirect.com/science/book/9780123820204
+
+? SQL Cookbook
+? Molinaro ? O?Reilly
+
+? Using the New DB2
+? Chamberlin ? AP Professional
+
+? W3Schools SQL
+? http://www.w3schools.com/sql/
+EN 1.1 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+18
+
+1 Introduction
+? What is a Database? ? Characteristics of a Database ? History of Databases
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+19
+
+1.1 What is a Database?
+? Managing large amounts of data is an integral part of most nowadays business and governmental activities
+? collecting taxes ? bank account management ? bookkeeping ? airline reservations ? human resource management ??
+EN 1.1 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+20
+
+1.1 What is a Database?
+? Databases are needed to manage that vast amount of data ? A database (DB) is a collection of related data
+? represents some aspects of the real world
+? universe of discourse
+
+? data is logically coherent ? is provided for an intended group of users and applications
+EN 1.1 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+21
+
+1.1 What is a Database?
+? As for today, the database industry is one of the most successful branches of computer science
+? constantly growing since the 1960s ? more than $8 billion revenue per year ? DB systems found in nearly any application ? ranging from large commercial transaction-processing systems to small open-source systems for your Web site
+EN 1.1 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+22
+
+1.1 What is a Database?
+? Databases are maintained by using a collection of programs called a database management system (DBMS), that deals with
+? definition of data and structure ? physical construction ? manipulation ? sharing/protecting ? persistence/recovery
+
+EN 1.1
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+23
+
+1.1 File Systems
+? A file system is not a database! ? File management systems are physical interfaces
+
+Customer Data
+
+File System
+
+Account Data
+
+App 1
+
+Customer Letters
+
+Money Transfer App 2
+
+Balance Sheets
+
+Loans
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+24
+
+1.1 File Systems
+? Advantages
+? fast and easy access
+
+? Disadvantages
+? uncontrolled redundancy ? manual maintenance of consistency ? limited data sharing and access rights ? poor enforcement of standards ? excessive data and access paths maintenance
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+25
+
+1.1 Databases
+? Databases are logical interfaces
+? retrieval of data using data semantics ? controlled redundancy ? data consistency & integrity constraints ? effective and secure data sharing ? backup and recovery
+
+? However?
+? more complex ? more expensive data access
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+26
+
+1.1 Databases
+? DBMS replaced previously dominant file-based systems in banking due to special requirements
+? simultaneous and quick access is necessary ? failures and loss of data cannot be tolerated ? data always has to remain in a consistent state ? frequent queries and modifications
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+27
+
+1 Introduction
+? ? ? ? What is a Database? Characteristics of a Database History of Databases Organizational Issues
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+28
+
+1.2 Characteristics of DBs
+? Databases control redundancy
+? same data used by different applications or tasks is stored only once ? access via a single interface provided by DBMS ? redundancy only purposefully used to speed up data access (e.g. materialized views)
+
+? Problems of uncontrolled redundancy
+? updating data may result in inconsistent data
+
+EN 1.6.1
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+29
+
+1.2 Characteristics of DBs
+? Databases are well-structured (e.g. ER model)
+? simple banking system
+id number
+has
+
+firstname
+lastname
+
+customer
+address
+
+account
+type
+
+balance
+
+? Relational Databases provide
+? catalog (data dictionary) contains all meta data ? defines the structure of the data in the database
+EN 1.3 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+30
+
+1.2 Characteristics of DBs
+? Databases support declarative querying
+? just specify what you want, not how and from where to get it ? queries are separated and abstracted from the actual physical organization and storage of data
+
+? Get the firstname of all customers with lastname Smith
+? file system: trouble with physical organization of data
+? ? Load file c:\datasets\customerData.csv. Build a regular expression and iterate over lines: If 2nd word in line equals Smith, then return 1st word. Stop when end-of-file marker is reached. SELECT firstname FROM data WHERE lastname=?Smith?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+?
+?
+
+? database system: simply query
+
+31
+
+1.2 Characteristics of DBs
+? Databases aim at efficient manipulation of data
+? physical tuning allows for good data allocation ? indexes speed up search and access ? query plans are optimized to improve performance
+
+? Example: Simple Index
+Index File (checking accounts)
+number 4543032 7809849 8942214
+
+Data File
+number type balance
+
+1278945
+2437954 4543032 5539783 7809849 8942214 9134354 9543252
+
+saving
+saving checking saving checking checking saving saving
+
+? 312.10
+? 1324.82 ? -43.03 ? 12.54 ? 7643.89 ? -345.17 ? 2.22 ? 524.89
+32
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+1.2 Characteristics of DBs
+? Isolation between applications and data
+? database employs data abstraction by providing data models ? applications work only on the conceptual representation of data
+? Data is strictly typed (Integer, Float, Timestamp, Varchar, ?) ? Details on where data is actually stored and how it is accessed are hidden by the DBMS ? Applications can access and manipulate data by invoking abstract operations (e.g. SQL statements)
+
+? DBMS-controlled parts of the file system are protected against external manipulations (tablespaces)
+EN 1.3 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+33
+
+1.2 Characteristics of DBs
+? Example: Schema can be changed and tablespace moved without adjusting the Application?s SELECT
+Application SELECT number FROM account WHERE balance>0 DBMS Disk 1
+number 1278945 2437954 balance ? 312.10 ? 1324.82
+
+Disk 2
+
+4543032
+5539783
+
+? -43.03
+? 12.54
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+34
+
+1.2 Characteristics of DBs
+? Example: Schema can be changed and tablespace moved without adjusting the Application?s SELECT
+Application SELECT number FROM account WHERE balance>0 DBMS Disk 1
+number 1278945 2437954 balance ? 312.10 ? 1324.82 number type balance
+
+Disk 2
+
+1278945
+2437954 4543032 5539783
+
+saving
+saving checking saving
+
+? 312.10
+? 1324.82 ? -43.03 ? 12.54
+
+4543032
+5539783
+
+? -43.03
+? 12.54
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+35
+
+1.2 Characteristics of DBs
+? Supports multiple views of the data
+? views provide a different perspective of the DB
+? a user?s conceptual understanding or task-based excerpt of the data (e.g. aggregations) ? security considerations and access control (e.g. projections)
+
+? for applications, a view does not differ from a table ? views may contain subsets of a DB and/or contain virtual data
+? virtual data is derived from the DB (mostly by simple SQL statements, e.g. joins over several tables) ? can either be computed at query time or materialized upfront
+
+EN 1.3
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+36
+
+1.2 Characteristics of DBs
+? Example views: Projection
+? saving account clerk vs. checking account clerk
+Saving View Original Table
+number 1278945 2437954 4543032 5539783 7809849 8942214 9134354 9543252 type saving saving checking saving checking checking saving saving balance ? 312.10 ? 1324.82 ? -43.03 ? 12.54 ? 7643.89 ? -345.17 ? 2.22 ? 524.89 number 1278945 2437954 5539783 9134354 9543252 balance ? 312.10 ? 1324.82 ? 12.54 ? 2.22 ? 524.89
+
+Checking View
+number balance
+
+4543032
+7809849 8942214
+
+? -43.03
+? 7643.89 ? -345.17
+37
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+1.2 Characteristics of DBs
+? Sharing of data and support for atomic multi-user transactions
+? transactions are a series of database operations executed as one logical operation ? concurrency control is necessary for maintaining consistency
+? multiple users and applications may access the DB at the same time
+
+? transactions need to be atomic and isolated from each other
+EN 1.3 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+38
+
+1.2 Characteristics of DBs
+? Example: Atomic transactions
+? Program: Transfer x Euros from Account 1 to Account 2
+1. Debit amount x from Account 1 2. Credit amount x to Account 2
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+39
+
+1.2 Characteristics of DBs
+? Example: Atomic transactions
+? Program: Transfer x Euros from Account 1 to Account 2
+1. Debit amount x from Account 1 2. Credit amount x to Account 2
+
+? But what happens if the system fails after performing the first step?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+40
+
+1.2 Characteristics of DBs
+? Example: multi-user transactions
+? Program: Withdraw x Euros from Account 1
+1. Read old balance from DB 2. Set new balance to old balance ? x 3. Write new balance back to the DB
+
+? Problem: Dirty Read
+? Account 1 has ?500 ? User 1 deduces ?20 ? User 2 deduces ?80 at the same time
+
+? Without multi-user transactions, Account 1 will have either ?480 or ?420, but not the correct ?400
+? Both users read old value of ?500 simultaneously, both deduce either ?20 or ?80, both write back new value (in random order)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+41
+
+1.2 Characteristics of DBs
+? Persistence of data and disaster recovery
+? data needs to be persistent and accessible at all times ? quick recovery from system crashes without data loss ? recovery from natural disasters (fire, earthquake, ?)
+
+EN 1.3
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+42
+
+1.2 Database Users
+? Usually several groups of persons are involved in the daily usage of a large DBMS (many job opportunities for smart DB people?) ? Persons directly involved on DB level
+? Database Administrators
+? responsible for tuning and maintaining the DBMS ? management of storage space, security, hardware, software, etc.
+
+? Database Designers
+? identify the data that needs to be stored and chooses appropriate data structures and representations ? integrate the needs of all users into the design
+EN 1.4 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+43
+
+1.2 Database Users
+? Application Developers
+? identify the requirements of the end-users ? develop the software that is used by (na?ve) end-users to interact with the DB ? cooperate closely with DB designers
+
+? Data Analyst
+? Analyzes trends in data to uncover valuable feedback for business operations ? i.e., discover sales trends, upcoming supply shortages, etc.
+
+? Persons working behind the scenes
+? DBMS Designers and Implementers
+? implement the DBMS software
+
+? Tool Developers
+? develop generic tools that extend the DBMS? functionalities
+
+? Operators and maintenance personnel
+? responsible for actually running and maintaining the DBMS hardware
+EN 1.4 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+44
+
+1.2 Database Users
+? Persons using the database (End Users)
+? All people who use the DB to do their job
+
+? End Users can be split into
+? Na?ve End Users
+? ? ? ? make up most DB users usually repeat similar tasks over and over are supported by predesigned interfaces for their tasks e.g. bank tellers, reservation clerks, ?
+
+EN 1.4
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+45
+
+1.2 Database Users
+? Sophisticated End Users
+? require complex non-standard operations and views from the DB ? are familiar with the facilities of the DBMS ? can solve their problems themselves, but require complex tools ? e.g. engineers, scientists, business analysts, ?
+
+? Casual End Users
+? use DB only from time to time, but need to perform different tasks ? are familiar with query languages ? e.g. people in middle or senior management
+EN 1.4 Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+46
+
+1 Introduction
+? What is a Database? ? Characteristics of a Database ? History of Databases
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+47
+
+1.3 History of DBs
+? Databases have an exceptional history of development
+? many synergies between academic, governmental and industrial research ? much to be learned from it ? most popular concepts used today have been invented decades ago
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+48
+
+1.3 History of DBs
+? The beginnings
+? 1880: U.S. Bureau of Census instructs Herman Hollerith to develop a machine for storing census data ? result: Punch card tabulating machine
+? the evaluation of 1880?s census took 8 years ? 1890?s has been finished after only 6 years
+
+? leads to the foundation of IBM
+? International Business Machines
+
+? data processing machines soon established in accounting
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+49
+
+1.3 History of DBs
+? One of Hollerith?s punch cards:
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+50
+
+1.3 History of DBs
+? Tabulating machines
+? operations or ?programs? directed by a plug board ? up to 150 cards per minute ? results were printed or punched for input to other processing steps
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+51
+
+1.3 History of DBs
+? In 1951 IBM develops the electric UNIVAC 1
+? first commercial computer produced in the USA
+? programmable (turing complete) ? input (programs and data) with tape or punched cards
+
+? In 1959, USA dominated the (still highly active) punch card machine market
+? within the USA, the Pentagon alone used more than 200 data processing computers, costing $70 million per year
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+52
+
+1.3 History of DBs
+? In 1964, the term data base appeared for the first time in military computing using time sharing systems
+? data could be shared among users ? but data was still bound to one specific application
+? similar data needed by multiple applications had to be duplicated ? consistency problems when updating data
+
+? data structure highly-dependent on the hardware and (low-level) programming language used
+? inspired by punch cards and optimized for magnetic tapes ? usually, no relationships between different records have been stored, just plain data
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+53
+
+1.3 History of DBs
+? To turn stored data into a proper database, the following goals had to be achieved (McGee, 1981):
+? Data Consolidation
+? data must be stored in a central place, accessible to all applications ? knowledge about relationships between records must be represented
+
+? Data Independence
+? data must be independent of the specific quirks of the particular low level programming language used ? provide high-level interfaces to physical data storage
+
+? Data Protection
+? data must be protected against loss and abuse
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+54
+
+1.3 History of DBs
+? Data Consolidation motivated the development of data models
+? ? ? ? ? Hierarchical Data Model Network Data Model Relational Data Model Object-oriented Data Model Semantic Data Model
+
+? Data Independence inspired the development of query models and high-level languages
+? Relational Algebra, SQL
+
+? Data Protection led to development of transactions, backup schemes, and security protocols
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+55
+
+1.3 History of DBs
+? Hierarchical Data Model
+? first appearance in IBM?s IMS database system, designed for the Apollo Program in 1966
+? still, as of 2006, 95% of all Fortune 1000 companies use IBM IMS in their data backbone?
+
+? benefits from advances in hardware design
+? random access main memory and tape media available
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+56
+
+1.3 History of DBs
+? Hierarchical data model
+? each type of record has some defined structured data ? hierarchical one-to-many relationships
+
+? Advantages
+? 1:n relationships can be expressed ? can easily be stored on tape media
+Order 1
+
+? Disadvantages
+
+root
+
+Customer 1
+Customer 2
+
+Order 2
+Order3
+
+? no n:m relationships ? no Data Independence
+
+Customer 3
+
+?
+?
+57
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+1.3 History of DBs
+? Network Data Model
+? in the mid-1960th, direct access storage devices (DASD) gained momentum
+? primarily hard disks ? more complex storage schemes possible
+
+? Hierarchical Data Model failed, e.g. for bill-of-material-processing (BOMP)
+? many-to-many relationships needed ? development of the IBM DBOMP system (1960)
+
+? result: Network Data Model
+? two types of files: master files, chain files ? chain file entries could chain master file entry to one another
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+58
+
+1.3 History of DBs
+? Network Data Model
+? the model was standardized by Charles W. Bachman for the CODASYL Consortium in 1969
+? CODASYL = Conference of Data Systems Languages ? thus, also called the CODASYL model
+
+? allowed for more natural modeling of associations
+
+? Advantages
+? many-to-many-relationships
+
+? Disadvantages
+? no declarative queries ? queries must state the data access path
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+59
+
+1.3 History of DBs
+? The relational data model ? Published by Edgar F. ?Ted? Codd in 1970, after several years of work
+? A Relational Model of Data for Large Shared Data Banks, Communications of the ACM, 1970 ? employee of IBM Research
+? IBM ignored his idea for a long time as not being ?practical? while pushing it?s hierarchical IMS database system ? other researchers in the field also rejected his theories ? finally, he received the Turing Award in 1981
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+60
+
+1.3 History of DBs
+? Idea underlying the relational model:
+? database is seen as a collection of predicates over a finite set of predicate variables
+? example
+? dislikes(x, y) ? dislikes(?Ted Codd?, ?hierarchical IMS database system?) (TRUE) ? dislikes(?IBM?, ?hierarchical IMS database system?) (FALSE)
+
+? the set of all true assignments is called a relation ? relations are stored in tables
+
+? contents of the DB are a collection of relations ? queries are also predicates
+? queries and data are very similar ? Allows for declarative querying
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+61
+
+1.3 History of DBs
+? It?s really like a collection of index cards
+? more details during the next weeks?
+
+Tuple (Row) {unordered}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+62
+
+1.3 History of DBs
+? Beginning 1977, Lawrence J. Ellison picked up the idea and created Oracle DB (currently in version 12c)
+? and became insanely rich ? long time in the Top 10 of the richest people ? in 2015 Oracle ranked second on the list of largest software companies in the world, right after Microsoft
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+63
+
+1.3 History of DBs
+? Oracle also sells a suite of business applications
+? Oracle eBusiness Suite ? includes software to perform financial- and manufacturing-related operations, customer relationship management, enterprise resource planning, and human resource management
+
+? Basically gained from high-value acquisitions
+? JD Edwards, PeopleSoft, Siebel Systems, BEA, Sun Microsystems (Java), ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+64
+
+1.3 History of DBs
+? During the 1970s, IBM had also decided to develop a relational database system
+? System R with the first implementation of the SQL declarative query language (SEQUEL) ? at first, mostly a research prototype, later became the base for IBM DB2
+
+? Ingres Database was developed at UC Berekeley as a research project
+? It became PostgreSQL in 1996
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+65
+
+1.3 History of DBs
+Year 1887 1951 Event Hollerith census machine Univac 1 electrical data machine
+
+1959
+1960 1966
+
+First CODASYL Conference
+Flight reservation system SABRE IMS hierarchical database
+
+1969
+1971 1975 1976
+
+Network model
+CODASYL Recommendation for DDL and 3-Layer-Architecture System R introduces SEQUEL query language System R introduces transaction concepts
+
+1976
+1980 1983
+
+Peter Chen proposes entity relationship modeling
+Oracle, Informix and others start selling DBMS with SQL support Work on ACID transactions published by Theo Haerder and Andreas Reuter
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+66
+
+1.3 History of DBs
+Year 1986 Event SQL standardized as SQL-1 ANSI/SQL
+
+1987
+1989 1991
+
+SQL internationally standardized as ISO 9075
+SQL 2 standard supports referential integrity SQL 2 supports domains and key definitions
+
+1993
+1995 1996 1999 2003
+
+Object-oriented data model
+Preliminary SQL 3 supporting sub-tables, recursion, procedures, and triggers First object-oriented databases First part of the SQL 3 standard finalized SQL 2003 finalized with support for object-relational extensions
+
+2006
+2008 2011 2016 ?
+
+SQL 2006 introduces new XML capabilities
+SQL 2008 ORDER BY outside cursors, adds INSTEAD OF triggers and the TRUNCATE statement SQL 2011 supports temporal databases SQL 2016 row pattern matching, polymorphic table functions, JSON To be continued ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+67
+
+1.3 History of DBs
+? Lately, the so-called NoSQL databases have become popular
+? NoSQL systems are mostly non-relational database systems
+? They might support SQL as a query language
+
+? Its development was driven by IT companies like Amazon, Google and Facebook
+? Databases have to deal with huge amounts of data and massive numbers of users
+
+? NoSQL comprise: key-value stores, document stores, column stores, distributed databases, graph databases, triple stores
+? For details, visit our advanced lectures
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+68
+
+1 Summary
+? Databases
+? are logical interfaces ? support declarative querying ? are well-structured ? aim at efficient manipulation of data ? support control redundancy ? support multiple views of the data ? support atomic multi-user transactions ? support persistence and recovery of data
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+69
+
+2 Coming soon?
+? Next Lecture
+? Phases of DB Design ? Data Models ? Basic ER Modeling
+? Chen Notation ? Mathematical Model Conceptual Design
+ERdiagram UML,?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Technische Universit?t Braunschweig
+
+70
+
+

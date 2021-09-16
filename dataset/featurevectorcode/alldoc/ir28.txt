@@ -1,0 +1,195 @@
+Introduc*on	to	Informa(on	Retrieval	
+CS276:	Informa*on	Retrieval	and	Web	Search	Christopher	Manning	and	Pandu	Nayak	
+Spelling	Correc*on	
+Introduc)on	to	Informa)on	Retrieval					The	course	thus	far	…	Index	construc*on	Index	compression	E?cient	boolean	querying		Chapters	1,	2,	4,	5		Coursera	lectures	1,	2,	3,	4	Spelling	correc*on		Chapter	3		Coursera	lecture	5	(mainly	some	parts)		This	lecture	(PA	#2!)		2	
+Introduc)on	to	Informa)on	Retrieval					Applica*ons	for	spelling	correc*on	
+3	
+Web	search	
+Phones	Word	processing	
+Introduc)on	to	Informa)on	Retrieval					Rates	of	spelling	errors	
+26%:	Web	queries		Wang	et	al.	2003		13%:	Retyping,	no	backspace:	Whitelaw	et	al.	English&German	7%:	Words	corrected	retyping	on	phone-sized	organizer	2%:	Words	uncorrected	on	organizer	Soukore?	&MacKenzie	2003	1-2%:		Retyping:	Kane	and	Wobbrock	2007,	Gruden	et	al.	1983		4	
+Depending	on	the	applica*on,	~1–20%	error	rates	
+Introduc)on	to	Informa)on	Retrieval					
+Spelling	Tasks	§? Spelling	Error	Detec*on	§? Spelling	Error	Correc*on:	§? Autocorrect				§?hteàthe	§? Suggest	a	correc*on	§? Sugges*on	lists	
+5	
+Introduc)on	to	Informa)on	Retrieval					
+Types	of	spelling	errors	§? Non-word	Errors	§? gra?e	àgira?e	§? Real-word	Errors	§? Typographical	errors	§? three	àthere	§? Cogni*ve	Errors	(homophones)	§? pieceàpeace,		§? too	à	two	§? your	àyou’re	§? Non-word	correc*on	was	historically	mainly	context	insensi*ve	§? Real-word	correc*on	almost	needs	to	be	context	sensi*ve	6	
+Introduc)on	to	Informa)on	Retrieval					
+Non-word	spelling	errors	§? Non-word	spelling	error	detec*on:	§? Any	word	not	in	a	dic$onary	is	an	error	§? The	larger	the	dic*onary	the	becer	…	up	to	a	point	§? (The	Web	is	full	of	mis-spellings,	so	the	Web	isn’t	necessarily	a	great	dic*onary	…)	§? Non-word	spelling	error	correc*on:	§? Generate	candidates:	real	words	that	are	similar	to	error	§? Choose	the	one	which	is	best:	§? Shortest	weighted	edit	distance	§? Highest	noisy	channel	probability	
+7	
+Introduc)on	to	Informa)on	Retrieval					
+Real	word	&	non-word	spelling	errors	§? For	each	word	w,	generate	candidate	set:	§? Find	candidate	words	with	similar	pronuncia$ons	§? Find	candidate	words	with	similar	spellings	§? Include	w	in	candidate	set	§? Choose	best	candidate	§? Noisy	Channel	view	of	spell	errors	§? Context-sensi*ve	–	so	have	to	consider	whether	the	surrounding	words	“make	sense”	§? Flying	form	Heathrow	to	LAX	à	Flying	from	Heathrow	to	LAX	
+8	
+Introduc)on	to	Informa)on	Retrieval					
+Terminology	§? These	are	character	bigrams:	§? st,	pr,	an	…	§? These	are	word	bigrams:	§? palo	alto,	?ying	from,	road	repairs	§? In	today’s	class,	we	will	generally	deal	with	word	bigrams	§? In	the	accompanying	Coursera	lecture,	we	mostly	deal	with	character	bigrams	(because	we	cover	stu?	complementary	to	what	we’re	discussing	here)	
+9	
+Similarly	trigrams,	k-grams	etc		
+Introduc)on	to	Informa)on	Retrieval					
+INDEPENDENT WORD SPELLING CORRECTION The	Noisy	Channel	Model	of	Spelling	
+Introduc)on	to	Informa)on	Retrieval					Noisy	Channel	Intui*on	
+11	
+Introduc)on	to	Informa)on	Retrieval					
+Noisy	Channel	=	Bayes’	Rule	§? We	see	an	observa*on	x	of	a	misspelled	word	§? Find	the	correct	word	w		
+12	
+ˆ w=argmax w?V
+P(w|x)
+=argmax w?V
+P(x|w)P(w) P(x)
+=argmax w?V
+P(x|w)P(w)
+Bayes	
+Introduc)on	to	Informa)on	Retrieval					History:	Noisy	channel	for	spelling	proposed	around	1990	§? IBM	§? Mays,	Eric,	Fred	J.	Damerau	and	Robert	L.	Mercer.	1991.	Context	based	spelling	correc*on.	Informa)on	Processing	and	Management,	23(5),	517–522	§? AT&T	Bell	Labs	§? Kernighan,	Mark	D.,	Kenneth	W.	Church,	and	William	A.	Gale.	1990.	A	spelling	correc*on	program	based	on	a	noisy	channel	model.	Proceedings	of	COLING	1990,	205-210	
+Introduc)on	to	Informa)on	Retrieval					
+Non-word	spelling	error	example	
+acress
+14	
+Introduc)on	to	Informa)on	Retrieval					
+Candidate	genera*on	§? Words	with	similar	spelling	§? Small	edit	distance	to	error	§? Words	with	similar	pronuncia*on	§? Small	distance	of	pronuncia*on	to	error	§? In	this	class	lecture	we	mostly	won’t	dwell	on	e?cient	candidate	genera*on	§? A	lot	more	about	candidate	genera*on	in	the	accompanying	Coursera	material	
+15	
+Introduc)on	to	Informa)on	Retrieval					Candidate	Tes*ng:	Damerau-Levenshtein	edit	distance	§? Minimal	edit	distance	between	two	strings,	where	edits	are:	§? Inser*on	§? Dele*on	§? Subs*tu*on	§? Transposi*on	of	two	adjacent	lecers	
+§? See	IIR	sec	3.3.3	for	edit	distance	
+16	
+Introduc)on	to	Informa)on	Retrieval					Words	within	1	of	acress Error	Candidate	Correc(on	Correct	LeDer	Error	LeDer	Type	
+acress actress t - dele*on	
+acress cress - a inser*on	acress caress ca ac transposi*on	acress access c r subs*tu*on	acress across o e subs*tu*on	acress acres - s inser*on	17	
+Introduc)on	to	Informa)on	Retrieval					
+Candidate	genera*on	§? 80%	of	errors	are	within	edit	distance	1	§? Almost	all	errors	within	edit	distance	2	
+§? Also	allow	inser*on	of	space	or	hyphen	§? thisidea à		this idea §? inlaw à in-law §? Can	also	allow	merging	words	§? data base à		database §? For	short	texts	like	a	query,	can	just	regard	whole	string	as	one	item	from	which	to	produce	edits
+18	
+Introduc)on	to	Informa)on	Retrieval					
+How	do	you	generate	the	candidates?	1.? Run	through	dic*onary,	check	edit	distance	with	each	word	2.? Generate	all	words	within	edit	distance	=	k	(e.g.,	k	=	1	or	2)	and	then	intersect	them	with	dic*onary	3.? Use	a	character	k-gram	index	and	?nd	dic*onary	words	that	share	“most”	k-grams	with	word	(e.g.,	by	Jaccard	coe?cient)	§? see	IIR	sec	3.3.4	4.? Compute	them	fast	with	a	Levenshtein	?nite	state	transducer	5.? Have	a	precomputed	map	of	words	to	possible	correc*ons	19	
+Introduc)on	to	Informa)on	Retrieval					
+A	paradigm	…	§? We	want	the	best	spell	correc*ons	§? Instead	of	?nding	the	very	best,	we	§? Find	a	subset	of	precy	good	correc*ons	§? (say,	edit	distance	at	most	2)	§? Find	the	best	amongst	them	§? These	may	not	be	the	actual	best	§? This	is	a	recurring	paradigm	in	IR	including	?nding	the	best	docs	for	a	query,	best	answers,	best	ads	…	§? Find	a	good	candidate	set	§? Find	the	top	K	amongst	them	and	return	them	as	the	best	
+20	
+Introduc)on	to	Informa)on	Retrieval					Let’s	say	we’ve	generated	candidates:	Now	back	to	Bayes’	Rule	§? We	see	an	observa*on	x	of	a	misspelled	word	§? Find	the	correct	word	w		
+21	
+ˆ w=argmax w?V
+P(w|x)
+=argmax w?V
+P(x|w)P(w) P(x)
+=argmax w?V
+P(x|w)P(w) What’s	P(w)?	
+Introduc)on	to	Informa)on	Retrieval					
+Language	Model	§? Take	a	big	supply	of	words	(your	document	collec*on	with	T	tokens);	let	C(w)	=	#	occurrences	of	w	
+§? In	other	applica*ons	–	you	can	take	the	supply	to	be	typed	queries	(suitably	?ltered)	–	when	a	sta*c	dic*onary	is	inadequate			
+22	
+P(w)=C(w) T
+Introduc)on	to	Informa)on	Retrieval					
+Unigram	Prior	probability	
+word	Frequency	of	word	
+P(w)	
+actress	9,321 .0000230573 cress	220 .0000005442 caress	686 .0000016969 access	37,038 .0000916207 across	120,844 .0002989314 acres	12,874 .0000318463
+23	
+Counts	from	404,253,213	words	in	Corpus	of	Contemporary	English	(COCA)		
+Introduc)on	to	Informa)on	Retrieval					
+Channel	model	probability	§? Error	model	probability,	Edit	probability	§? Kernighan,	Church,	Gale		1990	
+§? Misspelled	word	x	=	x1,	x2,	x3…	xm	§? Correct	word	w	=	w1,	w2,	w3,…,	wn	
+§? P(x|w)	=	probability	of	the	edit		§? (dele*on/inser*on/subs*tu*on/transposi*on)		
+24	
+Introduc)on	to	Informa)on	Retrieval					Compu*ng	error	probability:	confusion	“matrix”	del[x,y]:    count(xy typed as x) ins[x,y]:    count(x typed as xy) sub[x,y]:    count(y typed as x) trans[x,y]:  count(xy typed as yx)
+Inser*on	and	dele*on	condi*oned	on	previous	character	
+25	
+Introduc)on	to	Informa)on	Retrieval					Confusion	matrix	for	subs*tu*on	
+Introduc)on	to	Informa)on	Retrieval					
+Nearby	keys	
+Introduc)on	to	Informa)on	Retrieval					
+Genera*ng	the	confusion	matrix	§? Peter	Norvig’s	list	of	errors	§? Peter	Norvig’s	list	of	counts	of	single-edit	errors	
+§? All	Peter	Norvig’s	ngrams	data	links:	hcp://norvig.com/ngrams/		
+28	
+Introduc)on	to	Informa)on	Retrieval					
+Channel	model		
+29	
+P(x|w)= 8 > > > > > > > > < > > > > > > > > :
+del[wi1,wi] count[wi1wi] , ifdeletion ins[wi1,xi] count[wi1] , ifinsertion sub[xi,wi] count[wi] , ifsubstitution trans[wi,wi+1] count[wiwi+1] , iftransposition
+Kernighan,	Church,	Gale	1990	
+Introduc)on	to	Informa)on	Retrieval					Smoothing	probabili*es:	Add-1	smoothing	§? But	if	we	use	the	confusion	matrix	example,	unseen	errors	are	impossible!	§? They’ll	make	the	overall	probability	0.	That	seems	too	harsh	§? e.g.,	in	Kernighan’s	chart	qèa	and	aèq	are	both	0,	even	though	they’re	adjacent	on	the	keyboard!	§? A	simple	solu*on	is	to	add	1	to	all	counts	and	then	if	there	is	a	|A|	character	alphabet,	to	normalize	appropriately:	
+30	
+If substitution, P(x|w)= sub[x,w]+1 count[w]+A
+Introduc)on	to	Informa)on	Retrieval					Channel	model	for	acress Candidate	Correc(on	Correct	LeDer	Error	LeDer	x|w	P(x|w)	
+actress t - c|ct .000117
+cress - a a|# .00000144 caress ca ac ac|ca .00000164
+access c r r|c .000000209 across o e e|o .0000093 acres - s es|e .0000321 acres - s ss|s .0000342 31	
+Introduc)on	to	Informa)on	Retrieval					Noisy	channel	probability	for	acress Candidate	Correc(on	Correct	LeDer	Error	LeDer	x|w	P(x|w)	P(w)	109	*	P(x|w)*	P(w)	actress t - c|ct .000117 .0000231 2.7
+cress - a a|# .00000144 .000000544 .00078
+caress ca ac ac| ca
+.00000164 .00000170 .0028
+access c r r|c .000000209 .0000916 .019
+across o e e|o .0000093 .000299 2.8
+acres - s es|e .0000321 .0000318 1.0 acres - s ss|s .0000342 .0000318 1.032	
+Introduc)on	to	Informa)on	Retrieval					Noisy	channel	probability	for	acress Candidate	Correc(on	Correct	LeDer	Error	LeDer	x|w	P(x|w)	P(w)	109	*P(x| w)P(w)	actress t - c| ct .000117 .0000231 2.7 cress - a a|# .00000144 .000000544 .00078
+caress ca ac ac| ca
+.00000164 .00000170 .0028
+access c r r|c .000000209 .0000916 .019
+across o e e|o .0000093 .000299 2.8 acres - s es| e .0000321 .0000318 1.0 acres - s ss| s .0000342 .0000318 1.033	
+Introduc)on	to	Informa)on	Retrieval					
+Evalua*on	§? Some	spelling	error	test	sets	§? Wikipedia’s	list	of	common	English	misspelling	§? Aspell	?ltered	version	of	that	list	§? Birkbeck	spelling	error	corpus	§? Peter	Norvig’s	list	of	errors	(includes	Wikipedia	and	Birkbeck,	for	training	or	tes*ng)	
+34	
+Introduc)on	to	Informa)on	Retrieval					
+SPELLING CORRECTION WITH THE NOISY CHANNEL Context-Sensi*ve	Spelling	Correc*on	
+Introduc)on	to	Informa)on	Retrieval					
+Real-word	spelling	errors	
+§? …leaving in about fifteen minuets to go to her house. §? The design an construction of the system… §? Can they lave him my messages? §? The study was conducted mainly be John Black.
+§? 25-40%	of	spelling	errors	are	real	words					Kukich	1992	
+36	
+Introduc)on	to	Informa)on	Retrieval					
+Context-sensi*ve	spelling	error	?xing	§? For	each	word	in	sentence	(phrase,	query	…)	§? Generate	candidate	set	§?the	word	itself		§?all	single-lecer	edits	that	are	English	words	§?words	that	are	homophones	§?(all	of	this	can	be	pre-computed!)	§? Choose	best	candidates	§?Noisy	channel	model	
+37	
+Introduc)on	to	Informa)on	Retrieval					Noisy	channel	for	real-word	spell	correc*on	§? Given	a	sentence	w1,w2,w3,…,wn	§? Generate	a	set	of	candidates	for	each	word	wi	§? Candidate(w1)	=	{w1,	w’1	,	w’’1	,	w’’’1	,…}	§? Candidate(w2)	=	{w2,	w’2	,	w’’2	,	w’’’2	,…}	§? Candidate(wn)	=	{wn,	w’n	,	w’’n	,	w’’’n	,…}	§? Choose	the	sequence	W	that	maximizes	P(W)	
+Introduc)on	to	Informa)on	Retrieval					Incorpora*ng	context	words:	Context-sensi*ve	spelling	correc*on	§? Determining	whether	actress	or	across	is	appropriate	will	require	looking	at	the	context	of	use	§? We	can	do	this	with	a	becer	language	model	§? You	learned/can	learn	a	lot	about	language	models	in	CS124	or	CS224N	§? Here	we	present	just	enough	to	be	dangerous/do	the	assignment	§? A	bigram	language	model	condi*ons	the	probability	of	a	word	on	(just)	the	previous	word	P(w1…wn)	=	P(w1)P(w2|w1)…P(wn|wn-1)		
+39	
+Introduc)on	to	Informa)on	Retrieval					
+Incorpora*ng	context	words	§? For	unigram	counts,	P(w)	is	always	non-zero	§? if	our	dic*onary	is	derived	from	the	document	collec*on	§? This	won’t	be	true	of	P(wk|wk-1).	We	need	to	smooth	§? We	could	use	add-1	smoothing	on	this	condi*onal	distribu*on	§? But	here’s	a	becer	way	–	interpolate	a	unigram	and	a	bigram:		Pli(wk|wk-1)	=	?Puni(wk)	+	(1-?)Pbi(wk|wk-1)			§?Pbi(wk|wk-1)	=	C(wk-1,	wk)	/	C(wk-1)	
+40		
+Introduc)on	to	Informa)on	Retrieval					
+All	the	important	?ne	points	§? Note	that	we	have	several	probability	distribu*ons	for	words	§? Keep	them	straight!	§? You	might	want/need	to	work	with	log	probabili*es:			§? log	P(w1…wn)	=	log	P(w1)	+	log	P(w2|w1)	+	…	+	log	P(wn|wn-1)		§? Otherwise,	be	very	careful	about	?oa*ng	point	under?ow	§? Our	query	may	be	words	anywhere	in	a	document	§? We’ll	start	the	bigram	es*mate	of	a	sequence	with	a	unigram	es*mate	§? O~en,	people	instead	condi*on	on	a	start-of-sequence	symbol,	but	not	good	here	§? Because	of	this,	the	unigram	and	bigram	counts	have	di?erent	totals	–	not	a	problem	
+41	
+Introduc)on	to	Informa)on	Retrieval					
+Using	a	bigram	language	model	§? “a stellar and versatile acress whose combination of sass and glamour…” §? Counts	from	the	Corpus	of	Contemporary	American	English	with	add-1	smoothing	§? P(actress|versatile)=.000021 P(whose|actress) = .0010 §? P(across|versatile) =.000021 P(whose|across) = .000006
+§? P(“versatile actress whose”) = .000021*.0010 = 210 x10-10 §? P(“versatile across whose”)  = .000021*.000006 = 1 x10-10
+42	
+Introduc)on	to	Informa)on	Retrieval					
+Using	a	bigram	language	model	§? “a stellar and versatile acress whose combination of sass and glamour…” §? Counts	from	the	Corpus	of	Contemporary	American	English	with	add-1	smoothing	§? P(actress|versatile)=.000021 P(whose|actress) = .0010 §? P(across|versatile) =.000021 P(whose|across) = .000006
+§? P(“versatile actress whose”) = .000021*.0010 = 210 x10-10 §? P(“versatile across whose”)  = .000021*.000006 = 1 x10-10
+43	
+Introduc)on	to	Informa)on	Retrieval					Noisy	channel	for	real-word	spell	correc*on	
+44	
+two of thew
+to threw
+on
+thawof ftao
+thetoo
+oftwo thaw
+...
+Introduc)on	to	Informa)on	Retrieval					Noisy	channel	for	real-word	spell	correc*on	
+45	
+two of thew
+to threw
+on
+thawof ftao
+thetoo
+oftwo thaw
+...
+Introduc)on	to	Informa)on	Retrieval					Simpli?ca*on:	One	error	per	sentence	
+§? Out	of	all	possible	sentences	with	one	word	replaced	§? w1,	w’’2,w3,w4							two	o?	thew						§? w1,w2,w’3,w4													two	of	the	§? w’’’1,w2,w3,w4										too	of	thew		§? …	§? Choose	the	sequence	W	that	maximizes	P(W)	
+Introduc)on	to	Informa)on	Retrieval					
+Where	to	get	the	probabili*es	§? Language	model	§? Unigram	§? Bigram	§? etc.	§? Channel	model	§? Same	as	for		non-word	spelling	correc*on	§? Plus	need	probability	for	no	error,	P(w|w)	
+47	
+Introduc)on	to	Informa)on	Retrieval					
+Probability	of	no	error	§? What	is	the	channel	probability	for	a	correctly	typed	word?	§? P(“the”|“the”)	§? If	you	have	a	big	corpus,	you	can	es*mate	this	percent	correct	§? But	this	value	depends	strongly	on	the	applica*on	§? .90	(1	error	in	10	words)	§? .95	(1	error	in	20	words)	§? .99	(1	error	in	100	words)	
+48	
+Introduc)on	to	Informa)on	Retrieval					
+Peter	Norvig’s	“thew”	example	
+49	
+x	w	x|w	P(x|w)	P(w)	
+109	P(x| w)P(w)	thew	the	ew|e	0.000007 0.02 144 thew	thew	0.95 0.0000000990 thew	thaw	e|a	0.001 0.0000007 0.7 thew	threw	h|hr	0.000008 0.000004 0.03
+thew	thwe	
+ew| we	0.000003 0.000000040.0001
+Introduc)on	to	Informa)on	Retrieval					
+State	of	the	art	noisy	channel	§? We	never	just	mul*ply	the	prior	and	the	error	model	§? Independence	assump*onsàprobabili*es	not	commensurate	§? Instead:	Weight	them	
+§? Learn	?	from	a	development	test	set	
+50	
+ˆ w=argmax w?V
+P(x|w)P(w) ?
+Introduc)on	to	Informa)on	Retrieval					
+Improvements	to	channel	model	§? Allow	richer	edits				(Brill	and	Moore	2000)	§? entàant	§? phàf	§? leàal	§? Incorporate	pronuncia*on	into	channel	(Toutanova	and	Moore	2002)	§? Incorporate	device	into	channel	§? Not	all	Android	phones	need	have	the	same	error	model	§? But	spell	correc*on	may	be	done	at	the	system	level	
+51	

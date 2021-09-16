@@ -1,0 +1,135 @@
+Introduction	to Information	Retrieval
+CS276:	Information	Retrieval	and	Web	Search Christopher	Manning	and	Pandu	Nayak
+Lecture	14:	Learning	to	Rank
+Introduction	to	Information	Retrieval Machine	learning	for	IR	ranking? § We’ve	looked	at	methods	for	ranking	documents	in	IR § Cosine	similarity,	inverse	document	frequency,	BM25,	proximity,	pivoted	document	length	normalization,	(will	look	at)	Pagerank,	… § We’ve	looked	at	methods	for	classifying	documents	using	supervised	machine	learning	classifiers § Rocchio,	kNN,	SVMs,	etc.
+§ Surely	we	can	also	use	machine	learning	to	rank	the	documents	displayed	in	search	results? § Sounds	like	a	good	idea § A.k.a.	“machine-learned	relevance”	or	“learning	to	rank”
+Sec.	15.4
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval Machine	learning	for	IR	ranking § This	“good	idea”	has	been	actively	researched	–and	actively	deployed	by	major	web	search	engines	–in	the	last	7–10	years § Why	didn’t	it	happen	earlier?		§ Modern	supervised	ML	has	been	around	for	about	20	years… § Naïve	Bayes	has	been	around	for	about	50	years…
+Introduction	to	Information	Retrieval Machine	learning	for	IR	ranking § There’s	some	truth	to	the	fact	that	the	IR	community	wasn’t	very	connected	to	the	ML	community § But	there	were	a	whole	bunch	of	precursors: § Wong,	S.K.	et	al.	1988.	Linear	structure	in	information	retrieval.	SIGIR	1988. § Fuhr,	N.	1992.	Probabilistic	methods	in	information	retrieval.	Computer	Journal. § Gey,	F.	C.	1994.	Inferring	probability	of	relevance	using	the	method	of	logistic	regression.	SIGIR	1994. § Herbrich,	R.	et	al.	2000.	Large	Margin	Rank	Boundaries	for	Ordinal	Regression.	Advances	in	Large	Margin	Classifiers.
+Introduction	to	Information	Retrieval Why	weren’t	early	attempts	very	successful/influential? § Sometimes	an	idea	just	takes	time	to	be	appreciated… § Limited	training	data § Especially	for	real	world	use	(as	opposed	to	writing	academic	papers),	it	was	very	hard	to	gather	test	collection	queries	and	relevance	judgments	that	are	representative	of	real	user	needs	and	judgments	on	documents	returned § This	has	changed,	both	in	academia	and	industry § Poor	machine	learning	techniques § Insufficient	customization	to	IR	problem § Not	enough	features	for	ML	to	show	value
+Introduction	to	Information	Retrieval Why	wasn’t	ML	much	needed? § Traditional	ranking	functions	in	IR	used	a	very	small	number	of	features,	e.g., § Term	frequency § Inverse	document	frequency § Document	length § It	was	easypossible	to	tune	weighting	coefficients	by	hand § And	people	did § You	students	do	it	in	PA3	
+Introduction	to	Information	Retrieval Why	is	ML	needed	now? § Modern	systems	–especially	on	the	Web	–use	a	great	number	of	features: § Arbitrary	useful	features	–not	a	single	unified	model § Log	frequency	of	query	word	in	anchor	text? § Query	word	in	color	on	page? § #	of	images	on	page? § #	of	(out)	links	on	page? § PageRank	of	page? § URL	length? § URL	contains	“~”? § Page	edit	recency? § Page	loading	speed § The	New	York	Times	in	2008-06-03	quoted	Amit	Singhalas	saying	Google	was	using	over	200	such	features	(“signals”)
+Introduction	to	Information	Retrieval Simple	example: Using	classification	for	ad	hoc	IR § Collect	a	training	corpus	of	(q,	d,	r)	triples § Relevance	r	is	here	binary	(but	may	be	multiclass,	with	3–7	values) § Document	is	represented	by	a	feature	vector § x=	(a,	?) a	is	cosine	similarity,	?is	minimum	query	window	size § ?is	the	the	shortest	text	span	that	includes	all	query	words § Query	term	proximity	is	an	importantnew	weighting	factor § Train	a	machine	learning	model	to	predict	the	class	r	of	a	documentquery	pair	Sec.	15.4.1
+Introduction	to	Information	Retrieval Simple	example: Using	classification	for	ad	hoc	IR § A	linear	score	function	is	then	Score(d,	q)	=	Score(a,	?)	=	aa	+	b?	+	c § And	the	linear	classifier	is Decide	relevant	if	Score(d,	q)	>	?
+§ …	just	like	when	we	were	doing	text	classification
+Sec.	15.4.1
+Introduction	to	Information	Retrieval Simple	example: Using	classification	for	ad	hoc	IR
+0
+2 3 4 5
+0.05
+0.025
+cosine	score	a
+Term	proximity	w
+R R
+R
+R
+R R R RRR R
+N
+N
+N N
+N
+N
+NN
+N
+N
+Sec.	15.4.1
+Decision	surface
+Introduction	to	Information	Retrieval More	complex	example	of	using	classification	for	search	ranking		[Nallapati	2004] § We	can	generalize	this	to	classifier	functions	over	more	features § We	can	use	methods	we	have	seen	previously	for	learning	the	linear	classifier	weights
+Introduction	to	Information	Retrieval An	SVM	classifier	for	information	retrieval		[Nallapati	2004] § Let	relevance	score	g(r|d,q)	=	w?f(d,q)	+	b § SVM	training:	want	g(r|d,q)	=	-1	for	nonrelevant	documents	and	g(r|d,q)	=	1	for	relevant	documents § SVM	testing:	decide	relevant	iffg(r|d,q)	=	0
+§ Features	are	notword	presence	features	(how	would	you	deal	with	query	words	not	in	your	training	data?)	but	scores	like	the	summed	(log)	tfof	all	query	terms § Unbalanced	data	(which	can	result	in	trivial	always-saynonrelevant	classifiers)	is	dealt	with	by	undersampling nonrelevant	documents	during	training	(just	take	some	at	random)					[there	are	other	ways	of	doing	this	–cf.	Cao	et	al.	later]
+Introduction	to	Information	Retrieval An	SVM	classifier	for	information	retrieval		[Nallapati	2004] § Experiments: § 4	TREC	data	sets § Comparisons	with	Lemur,	a	state-of-the-art	open	source	IR	engine	(Language	Model	(LM)-based	–see	IIR	ch.	12) § Linear	kernel	normally	best	or	almost	as	good	as	quadratic	kernel,	and	so	used	in	reported	results § 6	features,	all	variants	of	tf,	idf,	and	tf.idf	scores
+Introduction	to	Information	Retrieval An	SVM	classifier	for	information	retrieval		[Nallapati	2004]
+Train	\Test Disk	3 Disk	4-5 WT10G	(web) TREC	Disk	3 Lemur 0.1785 0.2503 0.2666 SVM 0.1728 0.2432 0.2750 Disk	4-5 Lemur 0.1773 0.2516 0.2656 SVM 0.1646 0.2355 0.2675
+§ At	best	the	results	are	about	equal	to	Lemur § Actually	a	little	bit	below § Paper’s	advertisement:	Easy	to	add	more	features § This	is	illustrated	on	a	homepage	finding	task	on	WT10G: § Baseline	Lemur	52%	success@10,	baseline	SVM	58% § SVM	with	URL-depth,	and	in-link	features:	78%	success@10
+Introduction	to	Information	Retrieval “Learning	to	rank” § Classification	probably	isn’t	the	right	way	to	think	about	approaching	ad	hoc	IR: § Classification	problems:	Map	to	an	unordered	set	of	classes § Regression	problems:	Map	to	a	real	value	[Start	of	PA4] § Ordinal	regression	problems:	Map	to	an	orderedset	of	classes § A	fairly	obscure	sub-branch	of	statistics,	but	what	we	want	here § This	formulation	gives	extra	power: § Relations	between	relevance	levels	are	modeled § Documents	are	good	versus	other	documents	for	query	given	collection;	not	an	absolute	scale	of	goodness Sec.	15.4.2
+Introduction	to	Information	Retrieval “Learning	to	rank” § Assume	a	number	of	categories	Cof	relevance	exist § These	are	totally	ordered:	c1 <	c2 <	…	<	cJ § This	is	the	ordinal	regression	setup § Assume	training	data	is	available	consisting	of	documentquery	pairs	represented	as	feature	vectors	?i and	relevance	ranking	ci § We	could	do	point-wise	learning,	where	we	try	to	map	items	of	a	certain	relevance	rank	to	a	subinterval	(e.g,	Crammer	et	al.	2002	PRank) § But	most	work	does	pair-wise	learning,	where	the	input	is	a	pair	of	results	for	a	query,	and	the	class	is	the	relevance	ordering	relationship	between	them
+Introduction	to	Information	Retrieval Point-wise	learning § Goal	is	to	learn	a	threshold	to	separate	each	rank
+Introduction	to	Information	Retrieval Pairwise	learning:	The	Ranking	SVM	[Herbrich	et	al.	1999,	2000;	Joachims	et	al.	2002] § Aim	is	to	classify	instance	pairs	as	correctly	ranked	or	incorrectly	ranked § This	turns	an	ordinal	regression	problem	back	into	a	binary	classification	problem	in	an	expanded	space § We	want	a	ranking	function	f	such	that ci >	ck ifff(?i)	>	f(?k) § …	or	at	least	one	that	tries	to	do	this	with	minimal	error § Suppose	that	fis	a	linear	function	f(?i)	=	w??i Sec.	15.4.2
+Introduction	to	Information	Retrieval The	Ranking	SVM	[Herbrich	et	al.	1999,	2000;	Joachims	et	al.	2002] § Ranking	Model:	f(?i)
+€ 
+f( ? i)
+Sec.	15.4.2
+Introduction	to	Information	Retrieval The	Ranking	SVM	[Herbrich	et	al.	1999,	2000;	Joachims	et	al.	2002] § Then	(combining	ci >	ck ifff(?i)	>	f(?k)and	f(?i)	=	w??i): ci >	ck iffw?(?i -	?k)>	0 § Let	us	then	create	a	new	instance	space	from	such	pairs: Fu =	F(di,	dk,	q)	=	?i -	?k zu =	+1,	0,	-1	as	ci >,=,<	ck § We	can	build	model	over	just	cases	for	which	zu =	-1 § From	training	data	S=	{Fu},	we	train	an	SVM Sec.	15.4.2
+Introduction	to	Information	Retrieval Two	queries	in	the	original	space
+Introduction	to	Information	Retrieval Two	queries	in	the	pairwise	space
+Introduction	to	Information	Retrieval The	Ranking	SVM	[Herbrich	et	al.	1999,	2000;	Joachims	et	al.	2002] § The	SVM	learning	task	is	then	like	other	examples	that	we	saw	before § Find	wand	?u =	0	such	that § ½wTw	+	C	S?u is	minimized,	and § for	all	Fusuch	that		zu <	0,			w?Fu =	1	-	?u § We	can	just	do	the	negative	zu,	as	ordering	is	antisymmetric § You	can	again	use	libSVMor	SVMlight(or	other	SVM	libraries)	to	train	your	model	(SVMrankspecialization) Sec.	15.4.2
+Introduction	to	Information	Retrieval Aside:	The	SVM	loss	function § The	minimization minw ½wTw	+	CS	?u and	for	all	Fu	such	that		zu <	0,	w?Fu	=	1	-	?u § can	be	rewritten	as minw (1/2C)wTw	+	S	?u and	for	all	Fu	such	that		zu <	0,			?u =	1	-	(w?Fu)
+§ Now,	taking	?	=	1/2C,	we	can	reformulate	this	as	minw S	[1	-	(w?Fu)]+ +	?wTw § Where	[]+ is	the	positive	part	(0	if	a	term	is	negative)
+Introduction	to	Information	Retrieval Aside:	The	SVM	loss	function § The	reformulation minw S[1	-	(w?Fu)]+ +	?wTw § shows	that	an	SVM	can	be	thought	of	as	having	an	empirical	“hinge”	losscombined	with	a	weight	regularizer(smaller	weights	are	preferred)
+Loss
+1												w?Fu
+Hinge	loss Regularizerof	?w?
+Introduction	to	Information	Retrieval Adapting	the	Ranking	SVM	for	(successful)	Information	Retrieval [Yunbo Cao,	Jun	Xu,	Tie-Yan	Liu,	Hang	Li,	Yalou Huang,	HsiaoWuenHon	SIGIR	2006] § A	Ranking	SVM	model	already	works	well § Using	things	like	vector	space	model	scores	as	features	§ As	we	shall	see,	it	outperforms	standard	IR	in	evaluations § But	it	does	not	model	important	aspects	of	practical	IR	well	§ This	paper	addresses	two	customizations	of	the	Ranking	SVM	to	fit	an	IR	utility	model
+Introduction	to	Information	Retrieval The	ranking	SVM	fails	to	model	the	IR	problem	well	… 1. Correctly	ordering	the	most	relevant	documents	is	crucial	to	the	success	of	an	IR	system,	while	misorderingless	relevant	results	matters	little § The	ranking	SVM	considers	all	ordering	violations	as	the	same 2. Some	queries	have	many	(somewhat)	relevant	documents,	and	other	queries	few.		If	we	treat	all	pairs	of	results	for	queries	equally,	queries	with	many	results	will	dominate	the	learning § But	actually	queries	with	few	relevant	results	are	at	least	as	important	to	do	well	on
+Introduction	to	Information	Retrieval Experiments	use	LETOR	test	collection § https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/ § From	Microsoft	Research	Asia § An	openly	available	standard	test	collection	with	pregenerated features,	baselines,	and	research	results	for	learning	to	rank § It’s	availability	has	really	driven	research	in	this	area § OHSUMED,	MEDLINE	subcollectionfor	IR § 350,000	articles § 106	queries § 16,140	query-document	pairs § 3	class	judgments:	Definitely	relevant	(DR),	Partially	Relevant	(PR),	Non-Relevant	(NR) § TREC	GOV	collection	(predecessor	of	GOV2,	cf.	IIR	p.	142) § 1	million	web	pages § 125	queries
+Introduction	to	Information	Retrieval Principal	components	projection	of	2	queries [solid	=	q12,	open	=	q50;	circle	=	DR,	square	=	PR,	triangle	=	NR]	
+Introduction	to	Information	Retrieval Ranking	scale	importance	discrepancy [r3	=	Definitely	Relevant,	r2	=	Partially	Relevant,	r1	=	Nonrelevant]
+Introduction	to	Information	Retrieval Number	of	training	documents	per	query	discrepancy			[solid	=	q12,	open	=	q50]
+Introduction	to	Information	Retrieval IR	Evaluation	Measures § Some	evaluation	measures	strongly	weight	doing	well	in	highest	ranked	results: § MAP	(Mean	Average	Precision) § NDCG	(Normalized	Discounted	Cumulative	Gain) § NDCG	has	been	especially	popular	in	machine	learned	relevance	research § It	handles	multiple	levels	of	relevance	(MAP	doesn’t) § It	seems	to	have	the	right	kinds	of	properties	in	how	it	scores	system	rankings
+Introduction	to	Information	Retrieval Normalized	Discounted	Cumulative	Gain	(NDCG)	evaluation	measure § Query:	§ DCG	at	position	m:	§ NDCG	at	position	m:	average	over	queries § Example § (3,	3,	2,	2,	1,	1,	1) § (7,	7,	3,	3,	1,	1,	1)	§ (1,	0.63,	0.5,	0.43,	0.39,	0.36,	0.33) § (7,	11.41,	12.91,	14.2,	14.59,	14.95,	15.28) § Zi normalizes	against	best	possible	result	for	query,	the	above,	versus	lower	scores	for	other	rankings § Necessarily:	High	ranking	number	is	good	(more	relevant) iq € Ni =Zi (2r(j) j=1 m ? -1)/log(1+ j) 2r(j) -1 rank	r 1/log(1+ j) (2r( j) j=1 m ? -1)/ log(1+ j) gain discount Sec.	8.4
+Introduction	to	Information	Retrieval Recap:	Two	Problems	with	Direct	Application	of	the	Ranking	SVM
+§ Cost	sensitivity:	negative	effects	of	making	errors	on	top	ranked	documents	d:	definitely relevant,	p:	partially relevant,	n:	not relevant ranking	1:	pdpnnnn ranking	2:	dpnpnnn § Query	normalization:	number	of	instance	pairs	varies	according	to	query q1:	dppnnnn q2:	ddpppnnnnn q1	pairs:	2*(d,	p)	+	4*(d,	n)	+	8*(p,	n)	=	14 q2	pairs:	6*(d,	p)	+	10*(d,	n)	+	15*(p,	n)	=	31
+Introduction	to	Information	Retrieval These	problems	are	solved	with	a	new	Loss	function
+§ t	weights	for	type	of	rank	difference § Estimated	empirically	from	effect	on	NDCG § µ	weights	for	size	of	ranked	result	set § Linearly	scaled	versus	biggest	result	set	min ? w L(? w)= t k(i) µ q(i) 1-zi ? w,? xi(1) - ? xi(2)! "
+# $
+i=1
+l ?
++
++
+?
+? w 2
+Introduction	to	Information	Retrieval Optimization	(Gradient	Descent)
+Introduction	to	Information	Retrieval Optimization	(Quadratic	Programming)
+min ? w
+L=
+t k(i) µ q(i) 1-zi ? w,? xi(1) - ? xi(2)! "
+# $+i =1 ? ? +
+?
+? w 2,
+min ? w
+M(? w)= 1 2
+? w 2 + Ci ·
+? i
+i=1
+? ?
+subjectto
+? i =0, zi ? w,? xi(1) - ? xi(2) =1-
+? i i=1,?,?
+whereCi =
+t k(i) µ q(i) 2 ?
+max ? a
+LD =
+a i
+i=1
+? ? -1 2
+a i a i'zizi' ? xi(1) - ? xi(2),? xi' (1) - ? xi' (2) i'=1 ? ?
+i=1
+? ?
+subject to 0=
+a i =Ci i=1,?,?
+Introduction	to	Information	Retrieval Experiments § OHSUMED	(from	LETOR)	§ Features: § 6	that	represent	versions	of	tf,	idf,	and	tf.idffactors § BM25	score	(IIR	sec.	11.4.3)
+Introduction	to	Information	Retrieval
+Experimental	Results	(OHSUMED)
+Introduction	to	Information	Retrieval MSN	Search	[now	Bing] § Second	experiment	with	MSN	search § Collection	of	2198	queries § 6	relevance	levels	rated: § Definitive 8990 § Excellent 4403 § Good 3735 § Fair 20463 § Bad 36375 § Detrimental 310
+Introduction	to	Information	Retrieval Experimental	Results	(MSN	search)
+Introduction	to	Information	Retrieval Alternative:	Optimizing	Rank-Based	Measures [Yue	et	al.	SIGIR	2007] § If	we	think	that	NDCG	is	a	good	approximation	of	the	user’s	utility	function	from	a	result	ranking § Then,	let’s	directly	optimize	this	measure § As	opposed	to	some	proxy	(weighted	pairwise	prefs)
+§ But,	there	are	problems	… § Objective	function	no	longer	decomposes § Pairwise	prefs	decomposed	into	each	pair
+§ Objective	function	is	flat	or	discontinuous
+Introduction	to	Information	Retrieval Discontinuity	Example § NDCG	computed	using	rank	positions § Ranking	via	retrieval	scores § Slight	changes	to	model	parameters	§ Slight	changes	to	retrieval	scores § No	change	to	ranking § No	change	to	NDCG
+d1 d2 d3 Retrieval Score 0.9 0.6 0.3 Rank 1 2 3 Relevance 0 1 0
+NDCG	=	0.63 NDCG	discontinuous	w.r.t	model	parameters!
+Introduction	to	Information	Retrieval
+Structural	SVMs				[Tsochantaridis	et	al.,	2007] § Structural	SVMs	are	a	generalization	of	SVMs	where	the	output	classification	space	is	not	binary	or	one	of	a	set	of	classes,	but	some	complex	object	(such	as	a	sequence	or	a	parse	tree) § Here,	it	is	a	complete	(weak)	ranking	of	documents	for	a	query § The	Structural	SVM	attempts	to	predict	the	complete	ranking	for	the	input	query	and	document	set § The	true	labelingis	a	ranking	where	the	relevant	documents	are	all	ranked	in	the	front,	e.g.,
+§ An	incorrect	labelingwould	be	any	other	ranking,	e.g.,
+§ There	are	an	intractable	number	of	rankings,	thus	an	intractable	number	of	constraints!
+Introduction	to	Information	Retrieval Structural	SVM	training	[Tsochantaridis	et	al.,	2007]
+Original	SVM	Problem § Exponential	constraints § Most	are	dominated	by	a	small	set	of	“important”constraints
+Structural	SVM	Approach § Repeatedly	finds	the	next	most	violated	constraint… § …until	a	set	of	constraints	which	is	a	good	approximation	is	found
+Structural	SVM	training	proceeds	incrementally	by	starting	with	a	working	set	of	constraints,	and	adding	in	the	most	violated	constraint	at	each	iteration
+Introduction	to	Information	Retrieval Other	machine	learning	methods	for	learning	to	rank § Of	course! § I’ve	only	presented	the	use	of	SVMs	for	machine	learned	relevance,	but	other	machine	learning	methods	have	also	been	used	successfully § Boosting:	RankBoost § Ordinal	Regression	loglinearmodels § Neural	Nets:	RankNet,	RankBrain § (Gradient-boosted)	Decision	Trees
+Introduction	to	Information	Retrieval The	Limitations	of	Machine	Learning § Everything	that	we	have	looked	at	(and	most	work	in	this	area)	produces	linearmodels	over	features	§ This	contrasts	with	most	of	the	clever	ideas	of	traditional	IR,	which	are	nonlinearscalingsand	combinations	(products,	etc.)	of	basic	measurements § log	term	frequency,	idf,	tf.idf,	pivoted	length	normalization § At	present,	ML	is	good	at	weighting	features,	but	not	as	good	at	coming	up	with	nonlinear	scalings § Designing	the	basic	features	that	give	good	signals	for	ranking	remains	the	domain	of	human	creativity § Or	maybe	we	can	do	it	with	deep	learning	J
+Introduction	to	Information	Retrieval
+http://www.quora.com/Why-is-machine-learning-used-heavily-for-Googles-ad-ranking-and-less-for-their-search-ranking
+Introduction	to	Information	Retrieval Summary § The	idea	of	learning	ranking	functions	has	been	around	for	about	20	years § But	only	more	recently	have	ML	knowledge,	availability	of	training	datasets,	a	rich	space	of	features,	and	massive	computation	come	together	to	make	this	a	hot	research	area § It’s	too	early	to	give	a	definitive	statement	on	what	methods	are	best	in	this	area	…	it’s	still	advancing	rapidly § But	machine-learned	ranking	over	many	features	now	easily	beats	traditional	hand-designed	ranking	functions	in	comparative	evaluations		[in	part	by	using	the	hand-designed	functions	as	features!] § There	is	every	reason	to	think	that	the	importance	of	machine	learning	in	IR	will	grow	in	the	future.
+Introduction	to	Information	Retrieval Resources § IIRsecs	6.1.2–3	and	15.4 § LETOR	benchmark	datasets § Website	with	data,	links	to	papers,	benchmarks,	etc. § http://research.microsoft.com/users/LETOR/ § Everything	you	need	to	start	research	in	this	area! § Nallapati,	R.	Discriminative	models	for	information	retrieval.	SIGIR	2004. § Cao,	Y.,	Xu,	J.	Liu,	T.-Y.,	Li,	H.,	Huang,	Y.	and	Hon,	H.-W.	Adapting	Ranking	SVM	to	Document	Retrieval,	SIGIR	2006.	§ Y.	Yue,	T.	Finley,	F.	Radlinski,	T.	Joachims.	A	Support	Vector	Method	for	Optimizing	Average	Precision.	SIGIR	2007.

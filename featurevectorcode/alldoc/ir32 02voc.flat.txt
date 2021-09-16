@@ -1,0 +1,229 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 2: The term vocabulary and postings lists
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-04-09
+
+1 / 62
+
+Overview
+
+1
+
+Recap Documents Terms General + Non-English English Skip pointers Phrase queries
+
+2
+
+3
+
+4
+
+5
+
+2 / 62
+
+Outline
+
+1
+
+Recap Documents Terms General + Non-English English Skip pointers Phrase queries
+
+2
+
+3
+
+4
+
+5
+
+3 / 62
+
+Inverted index
+
+For each term t, we store a list of all documents that contain t. Brutus ?? 1 2 4 11 31 45 173 174 Caesar Calpurnia . . . dictionary postings ?? ?? 1 2 2 31 4 54 5 101 6 16 57 132 ...
+
+4 / 62
+
+Intersecting two postings lists
+
+Brutus Calpurnia Intersection
+
+?? ?? =?
+
+1 ? 2 ? 4 ? 11 ? 31 ? 45 ? 173 ? 174 2 ? 31 ? 54 ? 101 2 ? 31
+
+5 / 62
+
+Constructing the inverted index: Sort postings
+term docID I 1 did 1 enact 1 julius 1 caesar 1 I 1 was 1 killed 1 i? 1 the 1 capitol 1 brutus 1 killed 1 me 1 so 2 let 2 it 2 be 2 with 2 caesar 2 the 2 noble 2 brutus 2 hath 2 told 2 you 2 caesar 2 was 2 ambitious 2 term docID ambitious 2 be 2 brutus 1 brutus 2 capitol 1 caesar 1 caesar 2 caesar 2 did 1 enact 1 hath 1 I 1 I 1 i? 1 it 2 julius 1 killed 1 killed 1 let 2 me 1 noble 2 so 2 the 1 the 2 told 2 you 2 was 1 was 2 with 2
+
+=?
+
+6 / 62
+
+Westlaw: Example queries
+
+Information need: Information on the legal theories involved in preventing the disclosure of trade secrets by employees formerly employed by a competing company Query: ?trade secret? /s disclos! /s prevent /s employe! Information need: Requirements for disabled people to be able to access a workplace Query: disab! /p access! /s work-site work-place (employment /3 place) Information need: Cases about a host?s responsibility for drunk guests Query: host! /p (responsib! liab!) /p (intoxicat! drunk!) /p guest
+
+7 / 62
+
+Does Google use the Boolean model?
+On Google, the default interpretation of a query [w1 w2 . . . wn ] is w1 AND w2 AND . . . AND wn Cases where you get hits that do not contain one of the wi :
+anchor text page contains variant of wi (morphology, spelling correction, synonym) long queries (n large) boolean expression generates very few hits
+
+Simple Boolean vs. Ranking of result set
+Simple Boolean retrieval returns matching documents in no particular order. Google (and most well designed Boolean engines) rank the result set ? they rank good hits (according to some estimator of relevance) higher than bad hits.
+
+8 / 62
+
+Take-away
+
+Understanding of the basic unit of classical information retrieval systems: words and documents: What is a document, what is a term? Tokenization: how to get from raw text to words (or tokens) More complex indexes: skip pointers and phrases
+
+9 / 62
+
+Outline
+
+1
+
+Recap Documents Terms General + Non-English English Skip pointers Phrase queries
+
+2
+
+3
+
+4
+
+5
+
+10 / 62
+
+Documents
+
+Last lecture: Simple Boolean retrieval system Our assumptions were:
+We know what a document is. We can ?machine-read? each document.
+
+This can be complex in reality.
+
+11 / 62
+
+Parsing a document
+
+We need to deal with format and language of each document. What format is it in? pdf, word, excel, html etc. What language is it in? What character set is in use? Each of these is a classi?cation problem, which we will study later in this course (IIR 13). Alternative: use heuristics
+
+12 / 62
+
+Format/Language: Complications
+A single index usually contains terms of several languages. Sometimes a document or its components contain multiple languages/formats.
+French email with Spanish pdf attachment
+
+What is the document unit for indexing? A ?le? An email? An email with 5 attachments? A group of ?les (ppt or latex in HTML)? Upshot: Answering the question ?what is a document?? is not trivial and requires some design decisions. Also: XML
+
+13 / 62
+
+Outline
+
+1
+
+Recap Documents Terms General + Non-English English Skip pointers Phrase queries
+
+2
+
+3
+
+4
+
+5
+
+14 / 62
+
+Outline
+
+1
+
+Recap Documents Terms General + Non-English English Skip pointers Phrase queries
+
+2
+
+3
+
+4
+
+5
+
+15 / 62
+
+De?nitions
+
+Word ? A delimited string of characters as it appears in the text. Term ? A ?normalized? word (case, morphology, spelling etc); an equivalence class of words. Token ? An instance of a word or term occurring in a document. Type ? The same as a term in most cases: an equivalence class of tokens.
+
+16 / 62
+
+Normalization
+Need to ?normalize? words in indexed text as well as query terms into the same form. Example: We want to match U.S.A. and USA We most commonly implicitly de?ne equivalence classes of terms. Alternatively: do asymmetric expansion
+window ? window, windows windows ? Windows, windows Windows (no expansion)
+
+More powerful, but less e?cient Why don?t you want to put window, Window, windows, and Windows in the same equivalence class?
+
+17 / 62
+
+Normalization: Other languages
+
+Normalization and language detection interact. PETER WILL NICHT MIT. ? MIT = mit He got his PhD from MIT. ? MIT = mit
+
+18 / 62
+
+Tokenization: Recall construction of inverted index
+
+Input: Friends, Romans, countrymen. So let it be with Caesar . . . Output: friend roman countryman so . . . Each token is a candidate for a postings entry. What are valid tokens to emit?
+
+19 / 62
+
+Exercises
+
+In June, the dog likes to chase the cat in the barn. ? How many word tokens? How many word types? Why tokenization is di?cult ? even in English. Tokenize: Mr. O?Neill thinks that the boys? stories about Chile?s capital aren?t amusing.
+
+20 / 62
+
+Tokenization problems: One word or two? (or several)
+
+Hewlett-Packard State-of-the-art co-education the hold-him-back-and-drag-him-away maneuver data base San Francisco Los Angeles-based company cheap San Francisco-Los Angeles fares York University vs. New York University
+
+21 / 62
+
+Numbers
+
+3/20/91 20/3/91 Mar 20, 1991 B-52 100.2.86.144 (800) 234-2333 800.234.2333 Older IR systems may not index numbers . . . . . . but generally it?s a useful feature. Google example
+
+22 / 62
+
+Chinese: No whitespace
+
+! )
+
+"
+
+# %&
+
+$ '
+
+(
+
+23 / 62
+
+Ambiguous segmentation in Chinese
+
+The two characters can be treated as one word meaning ?monk? or as a sequence of two words meaning ?and? and ?still?.
+
+24 / 62
+
+Other cases of ?no whitespace?
+
+Compounds in Dutch, German, Swedish Computerlinguistik ? Computer + Linguistik Lebensversicherungsgesellschaftsangestellter ? leben + versicherung + gesellschaft + angestellter
+
+Inuit: tusaatsiarunnanngittualuujunga (I can?t hear very well.) Many other languages with segmentation di?culties: Finnish, Urdu, . . .
+
+25 / 62
+
+

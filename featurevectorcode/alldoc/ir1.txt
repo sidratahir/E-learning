@@ -1,0 +1,222 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke and José Pinto
+Lecture 1: Introduction April 6th , 2017
+IR is finding material (usually documents) of an unstructured nature (usually text) that satisfies an information need from within large collections (usually stored on computers).
+What is Information Retrieval (IR)?
+IR is the science of searching for documents, for information within documents and for metadata about documents, as well as that of searching relational databases and the WWW.
+IR: The techniques of storing and recovering and often disseminating recorded data especially through the use of a computerized system.
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+IR: Part of computer science which studies the retrieval of information (not data) from a collection of written documents. The retrieved documents aim at satisfying a user information need usually expressed in natural language.
+What is Information Retrieval (IR)?
+• Documents, unstructured, text, large • Information need • Store, search, find • The WorldWide Web? • Relational databases?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Information Retrieval vs. Databases
+Information retrieval Data retrieval
+Retrieve all objects relevant to some information need
+Retrieve all objects satisfying some clearly defined conditions
+Find all documents about the topic“semantic web”!
+SELECT id FROM document WHERE title LIKE ‘%semantic web%’
+Result list Well-defined result set Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Very similar to information retrieval • Main differences: – Links between Web pages can be exploited – Collecting, storing, and updating documents is more difficult – Usually, the number of users is very large – Spam is a problem
+Web Search
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• “80% of business is conducted on unstructured information” • “85% of all data stored is held in an unstructured format” • “7 million Web pages are being added every day”
+• “Unstructured data doubles every three months”
+Why Should I Know about All This?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Managing the information flood • Have you ever tried to drink from a fire hydrant?
+Why Should I Know About All This?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Why Should I Know about All This?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Course overview – 13 lectures – Exercises are integrated into lectures – Thursdays, 15:00–17:30 (including a 5-minute break) • Final exam (for Bachelor’s and Master’s students) – Oral exam
+Organizational Issues
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Homework exercises will be published every week • However, there will be no grading – That is, homework is optional • Solutions to be dropped off or sent and will be corrected and redistributed the next lecture. • Sometimes, there will be practical exercises – Idea: Give you an impression how algorithms really work
+• Hints for exam preparation: – Work together and discuss the lecture’s topics in small groups – Do all homework exercises
+Homework
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Christopher D. Manning, Prabhakar Raghavan, and Hinrich Schütze. Introduction to Information Retrieval. Cambridge University Press, 2008. http://www.informationretrieval.org
+Ricardo Baeza-Yates and Berthier Ribeiro-Neto. Modern Information Retrieval.Addison-Wesley, 1999.
+Richard K. Belew. Finding Out About: A Cognitive Perspective on Search Engine Technology and the WWW. Cambridge University Press, 2000. Cornelis Joost van Rijsbergen. Information Retrieval. Butterworths, second edition, 1979. http://www.dcs.gla.ac.uk/Keith/Preface.html
+Literature
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+1. Introduction and fundamental notions 2. Retrieval models: fuzzy, coordination level matching, vector space 3. Probabilistic retrieval models 4. Indexing 5. Latent Semantic Indexing 6. Language models, retrieval evaluation 7. Document clustering 8. Relevance feedback, classification 9. Support vector machines 10. Introduction to Web retrieval 11. Web crawling 12. Link analysis 13. Miscellaneous
+Course Overview
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Lecture 1: Introduction
+1. A Brief History of Libraries, Information Retrieval, and Web Search 2. Fundamental Notions 3. IR Systems and Models 4. The Boolean Retrieval Model
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Sumerian archives – Around 3000–2000 BC – About 25,000 clay tablets stored in temple rooms – Mostly inventories and records of commercial transactions • The Great Library of Alexandria – Founded about 300 BC – Idea: A universal library holding copies of all the world’s books – At its height, the library held nearly 750,000 scrolls
+Ancient Libraries
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Monastic libraries – Educated monks saved many ancient texts from getting lost by hand-copying – The Vatican Library was formally founded in 1475 but is in fact much older • Gutenberg’s Movable type – Around 1450, Johannes Gutenberg introduced movable type to Europe for printing – The technique spread rapidly, copying books became much easier and less expensive Medieval Libraries
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• German National Library – 25 million items – Located in Leipzig, Frankfurt (Main), and Berlin • Library of Congress – 150 million items – 20 million new items since 2009 – The world’s largest library (according to the Guinness Book) – Classification system: Library of Congress Classification
+Modern Libraries
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Library Catalogs
+Items are cataloged by metadata: • Author/Editor, ISBN, … • Keyword, e.g. “information retrieval” • Subject area, e.g. “information systems” • Specialized classification systems, e.g. Library of Congress
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Are small compared to the resource they’re describing. • Traditionally used in libraries (Card Catalogues). • Used now to describe the digital data, due to the increasing conversion of information into digital formats. • Conforms to some metadata standards as specified per a particular discipline. • Most search engines use it, when adding pages to their search index.
+Metadata in the digital world
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A life science and biomedical information database containing over 26 million references to journal articles. • Around 2,000-4,000 references are added each day (Tues - Sat) • Accessible online through PubMed interface. • Manually indexed by Medical Subject Headings (MeSH) for information retrieval. • http://www.ncbi.nlm.nih.gov/pubmed/
+MEDLINE
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Controlled vocabulary used for indexing. • Has a total of 27,149 subject headings (AKA descriptors) • It can viewed as a thesaurus and they are arranged within a hierarchy. • 10 – 15 subject headings are used to index every entry in MEDLINE. • Efficiently searching MEDLINE requires familiarity with the MeSH database. • http://www.nlm.nih.gov/mesh/MBrowser.html
+MeSH
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• It’s an open, non-profit organization that supports shared innovation in metadata design • They define a small set of metadata elements for describing information resources • Dublin Core Metadata Element Set: – Used to describe resources – Includes 2 levels: Simple (15 elements) and qualified Dublin Core (18 elements) e.g. abstract, creator, title, publisher, language, rightsHolder, etc.(List: http://dublincore.org/documents/dces/.) – Endorsed as an ISO standard 15836:2009 Dublin Core Metadata
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• In HTML 4.0, META and LINKS tag can be utilized • META Tag encodes a named metadata element E.g.  
+<meta name = “prefix.elementName” content = “elementvalue” > <meta name = “DC.Title” content = “Information retrieval and web search engines” name  = “DC.Language”  content = “English”> • Link Tag the prefix of the element name to its element set definition E.g. <link rel = “schema.DC” href = http://purl.org/DC/elements/1.0/>
+Encoding DC in HTML
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Catalogue cards are document proxies • Often, they suffice to judge the relevance of a particular item for your information need • But: – A clever classification scheme is required: • Extensive enough to allow detailed classification • Simple enough to be easily understandable – Experts must catalogue each item individually • Problem:A lot of manual work! • Full text search: Every word is a keyword!
+Full Text Search?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Pre-computer area: Concordances – Alphabetical list of the principal words used in a book – Only for works of special importance, such as the Bible – First Bible concordance by Hugo de Saint Charo, with the help of 500 monks, around 1250
+Full Text Search? (2)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Vision of a hypertext-based PDA • Proposed by Vannevar Bush – Director of the Office of Scientific Research and Development (USA, 1941–1947) • Outlined in Bush’s famous essay “As We May Think” published in The Atlantic Monthly (1945) • “A device in which an individual stores all his books, records, and communications, and which is mechanized so that it may be consulted with exceeding speed and flexibility.” • “Selection by association, rather than by indexing.”
+The Memex
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+The Memex (2)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• 1957: Hans-Peter Luhn (IBM) uses words as indexing units for documents – Measure similarity between documents by word overlap
+• 1960s and 1970s: Gerard Salton and his students (Harvard, Cornell) create the SMART system – Vector space model – Relevance feedback
+Early Information Retrieval Systems
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• ACM’s SIGIR – Special Interest Group on Information Retrieval – Annual conferences, beginning in 1978 – Gerald Salton award, first honoree: Gerald Salton (1983) • TREC – Annual Text Retrieval Conference, beginning in 1992 – Sponsored by the U.S. National Institute of Standards and Technology as well as the U.S. Department of Defense – Today: many different tracks, e.g., blogs, genomics, spam – Provides data sets and test problems
+IR Becomes a Research Discipline
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• 1991: Tim Berners-Lee“invents” the World Wide Web • First Web search engines: – Archie: Query file names by regular expressions – Architext/Excite: Full text search, simple ranking (1993) • Until 1998, web search meant information retrieval • 1998: Google was founded – Exploits link structure using the PageRank algorithm
+A Brief History of Web Search
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• How to store and update large document collections? – Small! – Scalable! • How to do efficient retrieval? – Fast! • How to do effective retrieval? – High result quality!
+Core Problems
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Lecture 1: Introduction
+1. A Brief History of Libraries, Information Retrieval, and Web Search 2. Fundamental Notions 3. IR Systems and Models 4. The Boolean Retrieval Model
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A document is a coherent passage of free text • “Coherent” means: is about related topics • “Free” means: natural, written language • Examples: – Newspaper article – Scientific article – Dictionary entry – Web page – Email message
+Document
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A document collection is a set of documents • Also known as corpus • Usually, all documents within a collection are similar with respect to some criterion • Examples: – MEDLINE – The articles covered by Google News – The Web
+Document Collection
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• An information need is the topic about which the user desires to know more • Refers to an individual, hidden cognitive state • Depends on what the users knows and doesn’t know • Ill-defined • Examples: – What is the capital of Uganda? – Is it really true that McDonald’s hamburgers contain worm meat? – What is “cloud computing”?
+Information Need
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A query is what the user conveys to the computer in an attempt to communicate the information need • Stated using a formal query language – Usually a list of search terms – But also: “Panda NEAR Jaguar BUT NOT animal”
+Query
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A document is relevant with respect to some user’s information need if the user perceives it as containing information of value with respect to this information need • Usually assumed to be a binary concept, but could also be graded • Example: – Information need: “What is relevance in IR?” Relevant document: Wikipedia’s entry “Relevance (information retrieval)”
+Relevance
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Lecture 1: Introduction
+1. A Brief History of Libraries, Information Retrieval, and Web Search 2. Fundamental Notions 3. IR Systems and Models 4. The Boolean Retrieval Model
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Schematic Diagram of an IR System
+Query (or Feedback)
+Document Collection
+Result
+usually a ranked list of documents
+Representation of Query
+Representation of Doc. Coll.
+Comparison
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Any IR system is based on an IR model • The model defines … – … a query language, – … an internal representation of queries, – … an internal representation of documents, – … a ranking function which associates a real number with each query–document pair. • Optional: A mechanism for relevance feedback IR Models Query (or Feedback) Document Collection
+Result
+Representation of Query
+Representation of Doc. Coll.
+Comparison
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A very popular representation of documents is the bag of words model • Each document is represented by a bag (= multiset) of terms from a predefined vocabulary • Standard case: – Vocabulary = set of all the words occurring in the collection’s documents – Each document is represented by the words it contains The Bag of Words Representation
+That’s one small step for a man, a giant leap for mankind
+that’s, one, small, step, for (2), a (2), man, giant, leap, mankind{ }
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Cons: – Word order gets lost – Very different documents could have similar representations – Document structure (e.g. headings) and metadata is ignored • Pros: – Simple set-theoretic representation of documents – Efficient storage and retrieval of individual terms – IR models using the bag of words representation work well!
+The Bag of Words Model (2)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Any document can be represented by an incidence vector:
+The Bag of Words Model (3)
+That’s one small step for a man, a giant leap for mankind
+Taikonaut Zhai’s small step is a giant leap for China
+that’s one small step for a mangiant leap mankind taikonaut Zhai’s isChina
+1 1 1 1 2 2 1 1 1 1 0 0 0 0
+0 0 1 1 0 1 0 1 1 0 1 1 1 1
+vocabulary (aka index terms)
+incidence matrix (aka term-document matrix)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+Lecture 1: Introduction
+1. A Brief History of Libraries, Information Retrieval, and Web Search 2. Fundamental Notions 3. IR Systems and Models 4. The Boolean Retrieval Model
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• The simplest (and arguably oldest) IR model
+• Documents = sets of words (index terms) • Query language = Boolean expressions over index terms • Binary ranking function, i.e. 0/1-valued
+• Retrieval is based on membership in sets – “Find all documents indexed by the word ‘mankind’!” – “Find all documents indexed by the word ‘man’ or ‘mankind’!”
+Boolean Retrieval
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Boolean connectives: – Conjunction – Disjunction – Negation
+Boolean Connectives
+? 0 1 0 0 0 1 0 1
+? 0 1 0 0 1 1 1 1
+¬ 0 1 1 0
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Document1 = {step, mankind} • Document2 = {step, China}
+• Query1 = “step AND mankind” – Result set: {Document1}
+• Query2 = “step OR mankind” – Result set: {Document1, Document2}
+Example
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Warning: Exclusive use of negation will result in large result sets! – Query3 = “NOT mankind” • To match natural language better, “BUT NOT” can be used instead of “AND NOT” – Query4 = “step BUT NOT China” • Use “OF” to search for subsets of a given size: – Query5 = “2 of {step, mankind, China}” – Query5 = “(step AND mankind) OR (step AND China) OR (mankind AND China)”
+Boolean Queries in Practice
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Usually, documents are indexed by an inverted index – For each index term, the set of documents containing this term is pre-computed and stored on disk – This enables fast query processing • Document collection: – Document1 = {step, mankind} – Document2 = {step, China} • Inverted index: – step: {Document1, Document2} – mankind: {Document1} – China: {Document2}
+Query Processing
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Thanks to the inverted index, queries of the type “Show me all documents containing term X” can be answered quickly • Also quick to compute: unions and intersections of sets • Example: – result of “mankind AND step” = (result of “mankind”) n (result of “step”) – result of “mankind OR step” = (result of “mankind”) ? (result of “step”) • Idea: Convert all queries to conjunctive normal form or disjunctive normal form
+Query Processing (2)
+n ?
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Conjunctive normal form (CNF) – A propositional formula is in CNF if it is a conjunction of clauses • A clause is a disjunction of literals • A literal is a variable or its negation – Theorem:Any propositional formula can be converted into an equivalent formula that is in CNF • Disjunctive normal form (DNF) – A propositional formula is in DNF if it is a disjunction of conjunctive clauses • A conjunctive clause is a conjunction of literals – Theorem:Any propositional formula can be converted into an equivalent formula that is in DNF
+Query Processing (3)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Query6 = “step AND ((China AND taikonaut) OR man)” • Conjunctive normal form (CNF): Query6 = “step AND (China OR man) AND (taikonaut OR man)” • Disjunctive normal form (DNF): Query6 = “(step AND China AND taikonaut) OR (step AND man)”
+Query Processing (4)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Conjunctive normal form: “step AND (China OR man) AND (taikonaut OR man)” 1. Compute unions  (might become very large) 2. Compute intersections
+• Disjunctive normal form: “(step AND China AND taikonaut) OR (step AND man)” 1. Compute intersections  (smaller intermediate results) 2. Compute unions
+Query Processing (5)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Simple query paradigm, easy to understand • If all document representations are mutually distinct, any possible subset of documents can be retrieved by a suitable query ? cut out the set of relevant documents • But: This advantage is rather theoretical, since the “right” query usually is unknown
+Pros
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• A binary ranking function returns a set of results, i.e. it is unordered • Controlling the result size is difficult • Similarity queries are not supported • Usually, most of the documents found are relevant; but many relevant documents are not found
+Cons
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Westlaw – Online legal research service for US law – Includes more than 40,000 databases of case law, state and federal statutes, administrative codes, law journals, newspapers … – Offers search by: • “Terms and Connectors” – Boolean Search • “Natural Language” – Free text querying (added in 1992) – Boolean search includes the Boolean operators plus some proximity operators
+Westlaw
+• space = OR • /s, /p,/k = matches in the same sentence, paragraph or within k-words respectively
+• & = AND • ! = a trailing wildcard query
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Example 1: – Information need: Information on the legal theories involved in preventing the disclosure of trade secrets by employees formerly employed by a competing company
+– Query: “trade secret” /s disclos! /s prevent /s employe!
+Westlaw (2)
+Finds matches in the same sentence
+Examples taken from Mannig/Raghavan/Schütze: Introduction to Information Retrieval
+Wildcard
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Example 2: – Information need: Requirements for disabled people to be able to access a workplace
+– Query: disab! /p access! /s (work-site work-place) (employment /3 place)
+Westlaw (3)
+Finds matches within 3 words
+Finds matches in the same paragraph
+Space means disjunction
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• Until 2005, Boolean search was the default in Westlaw • Submitted queries average about ten words in length • Professionals often prefer Boolean search to other methods as they offer greater control and transparency • But: In 1994, experiments on a Westlaw subcollection found that free text queries produced better results for queries prepared by Westlaw’s own librarians
+Westlaw (4)
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• More retrieval models – Fuzzy retrieval model – Coordination level matching – Vector space model
+Next Lecture
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig

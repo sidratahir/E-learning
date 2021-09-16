@@ -1,0 +1,719 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 14: Vector Space Classi?cation
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2013-05-28
+
+1 / 68
+
+Overview
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+2 / 68
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+3 / 68
+
+Feature selection: MI for poultry/export
+Goal of feature selection: eleminate noise and useless features for better e?ectiveness and e?ciency ec = e poultry = 1 ec = e poultry = 0 et = e export = 1 N11 = 49 N10 = 27,652 Plug et = e export = 0 N01 = 141 N00 = 774,106 these values into formula: I (U; C ) = 49 801,948 ? 49 log2 801,948 (49+27,652)(49+141) 801,948 ? 141 141 log2 + 801,948 (141+774,106)(49+141) 27,652 801,948 ? 27,652 + log2 801,948 (49+27,652)(27,652+774,106) 774,106 801,948 ? 774,106 + log2 801,948 (141+774,106)(27,652+774,106) ? 0.000105
+4 / 68
+
+Feature selection for Reuters classes co?ee and sports
+Class: co?ee term MI coffee 0.0111 bags 0.0042 growers 0.0025 kg 0.0019 colombia 0.0018 brazil 0.0016 export 0.0014 exporters 0.0013 exports 0.0013 crop 0.0012 Class: sports term MI soccer 0.0681 cup 0.0515 match 0.0441 matches 0.0408 played 0.0388 league 0.0386 beat 0.0301 game 0.0299 games 0.0284 team 0.0264
+
+5 / 68
+
+Using language models (LMs) for IR
+
+LM = language model We view the document as a generative model that generates the query. What we need to do: De?ne the precise generative model we want to use Estimate parameters (di?erent parameters for each document?s model) Smooth to avoid zeros Apply to query and ?nd document most likely to have generated the query Present most likely document(s) to user
+
+6 / 68
+
+Jelinek-Mercer smoothing
+
+P(t|d) = ?P(t|Md ) + (1 ? ?)P(t|Mc ) Mixes the probability from the document with the general collection frequency of the word. High value of ?: ?conjunctive-like? search ? tends to retrieve documents containing all query words. Low value of ?: more disjunctive, suitable for long queries Correctly setting ? is very important for good performance.
+
+7 / 68
+
+Take-away today
+
+Vector space classi?cation: Basic idea of doing text classi?cation for documents that are represented as vectors Rocchio classi?er: Rocchio relevance feedback idea applied to text classi?cation k nearest neighbor classi?cation Linear classi?ers More than two classes
+
+8 / 68
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+9 / 68
+
+Recall vector space representation
+
+Each document is a vector, one component for each term. Terms are axes. High dimensionality: 100,000s of dimensions Normalize vectors (documents) to unit length How can we do classi?cation in this space?
+
+10 / 68
+
+Basic text classi?cation setup
+?(d ? ) =China regions industries subject areas
+
+classes: training set:
+
+UK
+congestion London
+
+China
+
+poultry
+
+co?ee
+roasting beans
+
+elections
+recount votes
+
+sports
+
+d?
+
+Olympics Beijing
+
+feed chicken
+
+diamond baseball
+
+test set:
+
+first private Chinese airline
+
+Parliament Big Ben
+
+tourism Great Wall
+
+pate ducks
+
+arabica robusta
+
+seat run-off
+
+forward soccer
+
+Windsor the Queen
+
+Mao communist
+
+bird flu turkey
+
+Kenya harvest
+
+TV ads campaign
+
+team captain
+
+11 / 68
+
+Vector space classi?cation
+
+As before, the training set is a set of documents, each labeled with its class. In vector space classi?cation, this set corresponds to a labeled set of points or vectors in the vector space. Premise 1: Documents in the same class form a contiguous region. Premise 2: Documents from di?erent classes don?t overlap. We de?ne lines, surfaces, hypersurfaces to divide regions.
+
+12 / 68
+
+Classes in the vector space
+? ? ? ?
+
+?
+China
+
+? ?
+
+UK
+
+x
+
+x x x
+
+Kenya
+
+Should the document ? be assigned to China, UK or Kenya? Find separators between the classes Based on these separators: ? should be assigned to China How do we ?nd separators that do a good job at classifying new documents like ?? ? Main topic of today
+13 / 68
+
+Aside: 2D/3D graphs can be misleading
+x2 x3 x4
+e
+
+d tru
+
+x1
+
+x5
+? x1 ? x2 ? x3 ? x4 ? x5
+
+? x1
+
+? ? ? x2 x3 x4
+
+? x5
+
+d projected
+
+Left: A projection of the 2D semicircle to 1D. For the points x1 , x2 , x3 , x4 , x5 at x coordinates ?0.9, ?0.2, 0, 0.2, 0.9 the distance ?? |x2 x3 | ? 0.201 only di?ers by 0.5% from |x2 x3 | = 0.2; but ?? |x1 x3 |/|x1 x3 | = d true /d projected ? 1.06/0.9 ? 1.18 is an example of a large distortion (18%) when projecting a large area. Right: The corresponding projection of the 3D hemisphere to 2D.
+14 / 68
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+15 / 68
+
+Relevance feedback
+
+In relevance feedback, the user marks documents as relevant/nonrelevant. Relevant/nonrelevant can be viewed as classes or categories. For each document, the user decides which of these two classes is correct. The IR system then uses these class assignments to build a better query (?model?) of the information need . . . . . . and returns better documents. Relevance feedback is a form of text classi?cation.
+
+16 / 68
+
+Using Rocchio for vector space classi?cation
+
+The principal di?erence between relevance feedback and text classi?cation:
+The training set is given as part of the input in text classi?cation. It is interactively created in relevance feedback.
+
+17 / 68
+
+Rocchio classi?cation: Basic idea
+
+Compute a centroid for each class
+The centroid is the average of all documents in the class.
+
+Assign each test document to the class of its closest centroid.
+
+18 / 68
+
+Recall de?nition of centroid
+
+?(c) =
+
+1 |Dc |
+
+v (d)
+d?Dc
+
+where Dc is the set of all documents that belong to class c and v (d) is the vector space representation of d.
+
+19 / 68
+
+Rocchio illustrated : a1 = a2 , b1 = b2 , c1 = c2
+? ? ? ? ?
+
+?
+China
+
+UK
+? b1 b2
+x x x x
+
+a1 a2
+
+c1 c2
+
+Kenya
+
+20 / 68
+
+Rocchio algorithm
+
+TrainRocchio(C, D) 1 for each cj ? C 2 do Dj ? {d : d, cj ? D} 1 3 ?j ? |Dj | d?Dj v (d) 4 return {?1 , . . . , ?J } ApplyRocchio({?1 , . . . , ?J }, d) 1 return arg minj |?j ? v(d)|
+
+21 / 68
+
+Rocchio properties
+
+Rocchio forms a simple representation for each class: the centroid
+We can interpret the centroid as the prototype of the class.
+
+Classi?cation is based on similarity to / distance from centroid/prototype. Does not guarantee that classi?cations are consistent with the training data!
+
+22 / 68
+
+Time complexity of Rocchio
+
+mode training testing
+
+time complexity ?(|D|Lave + |C||V |) ? ?(|D|Lave ) ?(La + |C|M a ) ? ?(|C|M a )
+
+23 / 68
+
+Rocchio vs. Naive Bayes
+
+In many cases, Rocchio performs worse than Naive Bayes. One reason: Rocchio does not handle nonconvex, multimodal classes correctly.
+
+24 / 68
+
+Rocchio cannot handle nonconvex, multimodal classes
+Exercise: Why is Rocchio not expected to do well for the classi?cation task a vs. b here? A is centroid of the a?s, B is centroid of the b?s. The point o is closer to A than to B. But o is a better ?t for the b class. A is a multimodal class with two prototypes. But in Rocchio we only have one prototype.
+25 / 68
+
+a
+
+a a a aaaa a aXa a aaa aa a a b
+
+A
+b bb bbb b Bb b bbbbb b b b
+
+o
+
+aa a a a a a a a aa Xa aa a aa a aa
+
+a
+
+b
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+26 / 68
+
+kNN classi?cation
+
+kNN classi?cation is another vector space classi?cation method. It also is very simple and easy to implement. kNN is more accurate (in most cases) than Naive Bayes and Rocchio. If you need to get a pretty accurate classi?er up and running in a short time . . . . . . and you don?t care about e?ciency that much . . . . . . use kNN.
+
+27 / 68
+
+kNN classi?cation
+kNN = k nearest neighbors kNN classi?cation rule for k = 1 (1NN): Assign each test document to the class of its nearest neighbor in the training set. 1NN is not very robust ? one document can be mislabeled or atypical. kNN classi?cation rule for k > 1 (kNN): Assign each test document to the majority class of its k nearest neighbors in the training set. Rationale of kNN: contiguity hypothesis
+We expect a test document d to have the same label as the training documents located in the local region surrounding d.
+
+28 / 68
+
+Probabilistic kNN
+
+Probabilistic version of kNN: P(c|d) = fraction of k neighbors of d that are in c kNN classi?cation rule for probabilistic kNN: Assign d to class c with highest P(c|d)
+
+29 / 68
+
+kNN is based on Voronoi tessellation
+x x x x x x x x
+
+x
+
+xx
+
+? ? ? ? ? ? ? ? ? ?
+
+?
+
+?
+
+30 / 68
+
+kNN algorithm
+
+Train-kNN(C, D) 1 D? ? Preprocess(D) 2 k ? Select-k(C, D? ) 3 return D? , k Apply-kNN(D? , k, d) 1 Sk ? ComputeNearestNeighbors(D? , k, d) 2 for each cj ? C(D? ) 3 do pj ? |Sk ? cj |/k 4 return arg maxj pj
+
+31 / 68
+
+Exercise
+
+o o o o
+
+x x o ? x x x
+
+x x x
+
+x
+
+x
+
+How is star classi?ed by: (i) 1-NN (ii) 3-NN (iii) 9-NN (iv) 15-NN (v) Rocchio?
+
+32 / 68
+
+Time complexity of kNN
+
+kNN with preprocessing of training set training ?(|D|Lave ) testing ?(La + |D|M ave M a ) = ?(|D|M ave M a ) kNN test time proportional to the size of the training set! The larger the training set, the longer it takes to classify a test document. kNN is ine?cient for very large training sets. Question: Can we divide up the training set into regions, so that we only have to search in one region to do kNN classi?cation for a given test document? (which perhaps would give us better than linear time complexity)
+
+33 / 68
+
+Curse of dimensionality
+Our intuitions about space are based on the 3D world we live in. Intuition 1: some things are close by, some things are distant. Intuition 2: we can carve up space into areas such that: within an area things are close, distances between areas are large. These two intuitions don?t necessarily hold for high dimensions. In particular: for a set of k uniformly distributed points, let dmin be the smallest distance between any two points and dmax be the largest distance between any two points. Then
+d??
+
+lim
+
+dmax ? dmin =0 dmin
+34 / 68
+
+Curse of dimensionality: Simulation
+
+Simulate
+d??
+
+lim
+
+dmax ? dmin =0 dmin
+
+Pick a dimensionality d Generate 10 random points in the d-dimensional hypercube (uniform distribution) Compute all 45 distances Compute dmax?dmin dmin We see that intuition 1 (some things are close, others are distant) is not true for high dimensions.
+
+35 / 68
+
+Intuition 2: Space can be carved up
+
+Intuition 2: we can carve up space into areas such that: within an area things are close, distances between areas are large. If this is true, then we have a simple and e?cient algorithm for kNN. To ?nd the k closest neighbors of data point < x1 , x2 , . . . , xd > do the following. Using binary search ?nd all data points whose ?rst dimension is in [x1 ? ?, x1 + ?]. This is O(log n) where n is the number of data points. Do this for each dimension, then intersect the d subsets.
+
+36 / 68
+
+Intuition 2: Space can be carved up
+Size of data set n = 100 Again, assume uniform distribution in hypercube Set ? = 0.05: we will look in an interval of length 0.1 for neighbors on each dimension. What is the probability that the nearest neighbor of a new data point x is in this neighborhood in d = 1 dimension? for d = 1: 1 ? (1 ? 0.1)100 ? 0.99997 In d = 2 dimensions? for d = 2: 1 ? (1 ? 0.12 )100 ? 0.63 In d = 3 dimensions? for d = 3: 1 ? (1 ? 0.13 )100 ? 0.095 In d = 4 dimensions? for d = 4: 1 ? (1 ? 0.14 )100 ? 0.0095 In d = 5 dimensions? for d = 5: 1 ? (1 ? 0.15 )100 ? 0.0009995
+37 / 68
+
+Intuition 2: Space can be carved up
+
+In d = 5 dimensions? for d = 5: 1 ? (1 ? 0.15 )100 ? 0.0009995 In other words: with enough dimensions, there is only one ?local? region that will contain the nearest neighbor with high certainty: the entire search space. We cannot carve up high-dimensional space into neat neighborhoods . . . . . . unless the ?true? dimensionality is much lower than d.
+
+38 / 68
+
+kNN: Discussion
+
+No training necessary
+But linear preprocessing of documents is as expensive as training Naive Bayes. We always preprocess the training set, so in reality training time of kNN is linear.
+
+kNN is very accurate if training set is large. Optimality result: asymptotically zero error if Bayes rate is zero. But kNN can be very inaccurate if training set is small.
+
+39 / 68
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+40 / 68
+
+Linear classi?ers
+De?nition:
+A linear classi?er computes a linear combination or weighted sum i wi xi of the feature values. Classi?cation decision: i wi xi > ?? . . . where ? (the threshold) is a parameter.
+
+(First, we only consider binary classi?ers.) Geometrically, this corresponds to a line (2D), a plane (3D) or a hyperplane (higher dimensionalities), the separator. We ?nd this separator based on training set. Methods for ?nding separator: Perceptron, Rocchio, Naive Bayes ? as we will explain on the next slides Assumption: The classes are linearly separable.
+
+41 / 68
+
+A linear classi?er in 1D
+
+A linear classi?er in 1D is a point described by the equation w1 d1 = ? The point at ?/w1 Points (d1 ) with w1 d1 ? ? are in the class c. Points (d1 ) with w1 d1 < ? are in the complement class c.
+
+42 / 68
+
+A linear classi?er in 2D
+
+A linear classi?er in 2D is a line described by the equation w1 d1 + w2 d2 = ? Example for a 2D linear classi?er Points (d1 d2 ) with w1 d1 + w2 d2 ? ? are in the class c. Points (d1 d2 ) with w1 d1 + w2 d2 < ? are in the complement class c.
+
+43 / 68
+
+A linear classi?er in 3D
+A linear classi?er in 3D is a plane described by the equation w1 d1 + w2 d2 + w3 d3 = ? Example for a 3D linear classi?er Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 ? ? are in the class c. Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 < ? are in the complement class c.
+44 / 68
+
+Rocchio as a linear classi?er
+
+Rocchio is a linear classi?er de?ned by:
+M
+
+wi di = w d = ?
+i =1
+
+where w is the normal vector ?(c1 ) ? ?(c2 ) and ? = 0.5 ? (|?(c1 )|2 ? |?(c2 )|2 ).
+
+45 / 68
+
+Naive Bayes as a linear classi?er
+
+Multinomial Naive Bayes is a linear classi?er (in log space) de?ned by:
+M
+
+wi di = ?
+i =1
+
+? ?c where wi = log[P(ti |c)/P(ti |?)], di = number of occurrences of ti ? ?c in d, and ? = ? log[P(c)/P(?)]. Here, the index i , 1 ? i ? M, refers to terms of the vocabulary (not to positions in d as k did in our original de?nition of Naive Bayes)
+
+46 / 68
+
+kNN is not a linear classi?er
+
+x
+
+x xx x x
+
+? ? ? ? ? ? ? ? ? ? ?
+
+Classi?cation decision based on majority of k nearest neighbors. The decision boundaries between classes are piecewise linear . . . . . . but they are in general not linear classi?ers that can be described as M i =1 wi di = ?.
+
+x x x
+
+x x
+
+?
+
+47 / 68
+
+Example of a linear two-class classi?er
+wi d1i d2i ti wi d1i d2i ti prime 0.70 0 1 dlrs -0.71 1 1 world -0.35 1 0 rate 0.67 1 0 interest 0.63 0 0 sees -0.33 0 0 year -0.25 0 0 rates 0.60 0 0 discount 0.46 1 0 group -0.24 0 0 dlr -0.24 0 0 bundesbank 0.43 0 0 This is for the class interest in Reuters-21578. For simplicity: assume a simple 0/1 vector representation d1 : ?rate discount dlrs world? d2 : ?prime dlrs? ?=0 Exercise: Which class is d1 assigned to? Which class is d2 assigned to? We assign document d1 ?rate discount dlrs world? to interest since w T d1 = 0.67 ? 1 + 0.46 ? 1 + (?0.71) ? 1 + (?0.35) ? 1 = 0.07 > 0 = ?. We assign d2 ?prime dlrs? to the complement class (not in interest) since w T d2 = ?0.01 ? ?.
+
+48 / 68
+
+Which hyperplane?
+
+49 / 68
+
+Learning algorithms for vector space classi?cation
+
+In terms of actual computation, there are two types of learning algorithms. (i) Simple learning algorithms that estimate the parameters of the classi?er directly from the training data, often in one linear pass.
+Naive Bayes, Rocchio, kNN are all examples of this.
+
+(ii) Iterative algorithms
+Support vector machines Perceptron (example available as PDF on website: http://cislmu.org)
+
+The best performing learning algorithms usually require iterative learning.
+
+50 / 68
+
+Perceptron update rule
+
+Randomly initialize linear separator w Do until convergence:
+Pick data point x If sign(w T x) is correct class (1 or -1): do nothing Otherwise: w = w ? sign(w T x)x
+
+51 / 68
+
+Perceptron (class of x is YES)
+
+NO YES x
+
+w
+
+S
+
+52 / 68
+
+Perceptron (class of x is YES)
+
+NO YES x
+
+x w
+
+S
+
+53 / 68
+
+Perceptron (class of x is YES)
+YES NO
+
+NO YES x w +x x w
+
+S
+
+S?
+
+54 / 68
+
+Perceptron (class of x is YES)
+YES NO
+
+x w +x
+
+S?
+
+55 / 68
+
+Which hyperplane?
+
+56 / 68
+
+Which hyperplane?
+
+For linearly separable training sets: there are in?nitely many separating hyperplanes. They all separate the training set perfectly . . . . . . but they behave di?erently on test data. Error rates on new data are low for some, high for others. How do we ?nd a low-error separator? Perceptron: generally bad; Naive Bayes, Rocchio: ok; linear SVM: good
+
+57 / 68
+
+Linear classi?ers: Discussion
+
+Many common text classi?ers are linear classi?ers: Naive Bayes, Rocchio, logistic regression, linear support vector machines etc. Each method has a di?erent way of selecting the separating hyperplane
+Huge di?erences in performance on test documents
+
+Can we get better performance with more powerful nonlinear classi?ers? Not in general: A given amount of training data may su?ce for estimating a linear boundary, but not for estimating a more complex nonlinear boundary.
+
+58 / 68
+
+A nonlinear problem
+
+0.0 0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+Linear classi?er like Rocchio does badly on this task. kNN will do well (assuming enough training data)
+
+59 / 68
+
+Which classi?er do I use for a given TC problem?
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available? How simple/complex is the problem? (linear vs. nonlinear decision boundary) How noisy is the problem? How stable is the problem over time?
+For an unstable problem, it?s better to use a simple and robust classi?er.
+
+60 / 68
+
+Outline
+
+1
+
+Recap Intro vector space classi?cation Rocchio kNN Linear classi?ers > two classes
+
+2
+
+3
+
+4
+
+5
+
+6
+
+61 / 68
+
+How to combine hyperplanes for > 2 classes?
+
+?
+
+62 / 68
+
+One-of problems
+
+One-of or multiclass classi?cation
+Classes are mutually exclusive. Each document belongs to exactly one class. Example: language of a document (assumption: no document contains multiple languages)
+
+63 / 68
+
+One-of classi?cation with linear classi?ers
+
+Combine two-class linear classi?ers as follows for one-of classi?cation:
+Run each classi?er separately Rank classi?ers (e.g., according to score) Pick the class with the highest score
+
+64 / 68
+
+Any-of problems
+
+Any-of or multilabel classi?cation
+A document can be a member of 0, 1, or many classes. A decision on one class leaves decisions open on all other classes. A type of ?independence? (but not statistical independence) Example: topic classi?cation Usually: make decisions on the region, on the subject area, on the industry and so on ?independently?
+
+65 / 68
+
+Any-of classi?cation with linear classi?ers
+
+Combine two-class linear classi?ers as follows for any-of classi?cation:
+Simply run each two-class classi?er separately on the test document and assign document accordingly
+
+66 / 68
+
+Take-away today
+
+Vector space classi?cation: Basic idea of doing text classi?cation for documents that are represented as vectors Rocchio classi?er: Rocchio relevance feedback idea applied to text classi?cation k nearest neighbor classi?cation Linear classi?ers More than two classes
+
+67 / 68
+
+Resources
+
+Chapter 13 of IIR (feature selection) Chapter 14 of IIR Resources at http://cislmu.org
+Perceptron example General overview of text classi?cation: Sebastiani (2002) Text classi?cation chapter on decision tress and perceptrons: Manning & Sch?tze (1999) u One of the best machine learning textbooks: Hastie, Tibshirani & Friedman (2003)
+
+68 / 68
+
+

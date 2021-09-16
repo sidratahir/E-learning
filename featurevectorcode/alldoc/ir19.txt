@@ -1,0 +1,208 @@
+Introduc*on	  to	   Informa(on	  Retrieval	  
+CS276	   Informa*on	  Retrieval	  and	  Web	  Search	   Chris	  Manning	  and	  Pandu	  Nayak	   Link	  analysis	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Today’s	  lecture	  –	  hypertext	  and	  links	   §?? We	  look	  beyond	  the	  content	  of	  documents	   §?? We	  begin	  to	  look	  at	  the	  hyperlinks	  between	  them	   §?? Address	  ques*ons	  like	   §?? Do	  the	  links	  represent	  a	  conferral	  of	  authority	  to	  some	   pages?	  Is	  this	  useful	  for	  ranking?	   §?? How	  likely	  is	  it	  that	  a	  page	  pointed	  to	  by	  the	  CERN	  home	   page	  is	  about	  high	  energy	  physics	   §?? Big	  applica*on	  areas	   §?? The	  Web	   §?? Email	   §?? Social	  networks	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Links	  are	  everywhere	   §?? Powerful	  sources	  of	  authen*city	  and	  authority	   §?? Mail	  spam	  –	  which	  email	  accounts	  are	  spammers?	   §?? Host	  quality	  –	  which	  hosts	  are	  “bad”?	   §?? Phone	  call	  logs	   §?? The	  Good,	  The	  Bad	  and	  The	  Unknown	  
+3	  
+? 
+? 
+? 
+? Good Bad 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Example	  1:	  Good/Bad/Unknown	   §?? The	  Good,	  The	  Bad	  and	  The	  Unknown	   §?? Good	  nodes	  won’t	  point	  to	  Bad	  nodes	   §?? All	  other	  combina*ons	  plausible	  
+4	  
+? 
+? 
+? 
+? Good Bad 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Simple	  itera*ve	  logic	   §?? Good	  nodes	  won’t	  point	  to	  Bad	  nodes	   §?? If	  you	  point	  to	  a	  Bad	  node,	  you’re	  Bad	   §?? If	  a	  Good	  node	  points	  to	  you,	  you’re	  Good	  
+5	  
+? 
+? 
+? 
+? Good Bad 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Simple	  itera*ve	  logic	   §?? Good	  nodes	  won’t	  point	  to	  Bad	  nodes	   §?? If	  you	  point	  to	  a	  Bad	  node,	  you’re	  Bad	   §?? If	  a	  Good	  node	  points	  to	  you,	  you’re	  Good	  
+6	  
+? 
+? Good Bad 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Simple	  itera*ve	  logic	   §?? Good	  nodes	  won’t	  point	  to	  Bad	  nodes	   §?? If	  you	  point	  to	  a	  Bad	  node,	  you’re	  Bad	   §?? If	  a	  Good	  node	  points	  to	  you,	  you’re	  Good	  
+7	  
+Good Bad 
+Sometimes need probabilistic analogs – e.g., mail spam 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   Example	  2:	   In-­-links	  to	  pages	  –	  unusual	  paZerns	  J?	  
+8	  
+Spammers	   viola*ng	   power	  laws!	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Many	  other	  examples	  of	  link	  analysis	   §?? Social	  networks	  are	  a	  rich	  source	  of	  grouping	   behavior	   §?? E.g.,	  Shoppers’	  a?nity	  –	  Goel+Goldstein	  2010	   §?? Consumers	  whose	  friends	  spend	  a	  lot,	  spend	  a	  lot	   themselves	   §?? hZp://www.cs.cornell.edu/home/kleinber/networks-­-book/	  
+9	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Our	  primary	  interest	  in	  this	  course	   §?? Link	  analysis	  for	  most	  IR	  func*onality	  thus	  far	  based	   purely	  on	  text	   §?? Scoring	  and	  ranking	   §?? Link-­-based	  clustering	  –	  topical	  structure	  from	  links	   §?? Links	  as	  features	  in	  classi?ca*on	  –	  documents	  that	  link	  to	   one	  another	  are	  likely	  to	  be	  on	  the	  same	  subject	   §?? Crawling	   §?? Based	  on	  the	  links	  seen,	  where	  do	  we	  crawl	  next?	  
+10	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+The	  Web	  as	  a	  Directed	  Graph	  
+Hypothesis	  1:	  A	  hyperlink	  between	  pages	  denotes	  	  	  	  	  	  	  	  a	  conferral	  of	  authority	  (quality	  signal)	   Hypothesis	  2:	  The	  text	  in	  the	  anchor	  of	  the	  hyperlink	  on	   page	  A	  describes	  the	  target	  page	  B	  
+Page A 
+hyperlink Page B Anchor 
+Sec. 21.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Assump*on	  1:	  reputed	  sites	  
+12	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Assump*on	  2:	  annota*on	  of	  target	  
+13	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   Anchor	  Text	  	  WWW	  Worm	  -­-	  McBryan	  [Mcbr94]	  	   §?? For	  ibm	  how	  to	  dis*nguish	  between:	   §?? IBM’s	  home	  page	  (mostly	  graphical)	   §?? IBM’s	  copyright	  page	  (high	  term	  freq.	  for	  ‘ibm’)	   §?? Rival’s	  spam	  page	  (arbitrarily	  high	  term	  freq.)	  
+www.ibm.com 
+“ibm”  “ibm.com” “IBM home page” A million pieces of anchor text with “ibm” send a strong signal 
+Sec. 21.1.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Indexing	  anchor	  text	   §?? When	  indexing	  a	  document	  D,	  include	  (with	  some	   weight)	  anchor	  text	  from	  links	  poin*ng	  to	  D.	  
+www.ibm.com 
+Armonk, NY-based computer giant IBM announced today 
+Joe’s computer hardware links Sun HP IBM 
+Big Blue today announced record profits for the quarter 
+Sec. 21.1.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Indexing	  anchor	  text	   §?? Can	  some*mes	  have	  unexpected	  e?ects,	  e.g.,	  spam,	   miserable	  failure	   §?? Can	  score	  anchor	  text	  with	  weight	  depending	  on	  the	   authority	  of	  the	  anchor	  page’s	  website	   §?? E.g.,	  if	  we	  were	  to	  assume	  that	  content	  from	  cnn.com	  or	   yahoo.com	  is	  authorita*ve,	  then	  trust	  (more)	  the	  anchor	   text	  from	  them	   §?? Increase	  the	  weight	  of	  o?-­-site	  anchors	  (non-­-nepo*s*c	   scoring)	  
+Sec. 21.1.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Gekng	  at	  all	  that	  link	  informa*on	   Inexpensively	   Connec*vity	  servers	  
+17	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Connec*vity	  Server	   §?? Support	  for	  fast	  queries	  on	  the	  web	  graph	   §??Which	  URLs	  point	  to	  a	  given	  URL?	   §??Which	  URLs	  does	  a	  given	  URL	  point	  to?	   Stores	  mappings	  in	  memory	  from	   §??URL	  to	  outlinks,	  URL	  to	  inlinks	   §?? Applica*ons	   §??Link	  analysis	   §??Web	  graph	  analysis	   §??Connec*vity,	  crawl	  op*miza*on	   §??Crawl	  control	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Boldi	  and	  Vigna	  2004	   §?? hZp://www2004.org/proceedings/docs/1p595.pdf	   §?? Webgraph	  –	  set	  of	  algorithms	  and	  a	  java	   implementa*on	   §?? Fundamental	  goal	  –	  maintain	  node	  adjacency	   lists	  in	  memory	   §??For	  this,	  compressing	  the	  adjacency	  lists	  is	  the	   cri*cal	  component	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Adjacency	  lists	   §?? The	  set	  of	  neighbors	  of	  a	  node	   §?? Assume	  each	  URL	  represented	  by	  an	  integer	   §?? E.g.,	  for	  a	  4	  billion	  page	  web,	  need	  32	  bits	  per	   node	   §?? Naively,	  this	  demands	  64	  bits	  to	  represent	  each	   hyperlink	   §?? Boldi/Vigna	  get	  down	  to	  an	  average	  of	  ~3	  bits/ link	   §??Further	  work	  achieves	  2	  bits/link	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Adjaceny	  list	  compression	   §??Proper*es	  exploited	  in	  compression:	   §??Similarity	  (between	  lists)	   §??Locality	  (many	  links	  from	  a	  page	  go	  to	   “nearby”	  pages)	   §??Use	  gap	  encodings	  in	  sorted	  lists	   §??Distribu*on	  of	  gap	  values	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Main	  ideas	  of	  Boldi/Vigna	   §?? Consider	  lexicographically	  ordered	  list	  of	  all	  URLs,	   e.g.,	  	   §?? www.stanford.edu/alchemy	   §?? www.stanford.edu/biology	   §?? www.stanford.edu/biology/plant	   §?? www.stanford.edu/biology/plant/copyright	   §?? www.stanford.edu/biology/plant/people	   §?? www.stanford.edu/chemistry	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Why 7? 
+Boldi/Vigna	   §?? Each	  of	  these	  URLs	  has	  an	  adjacency	  list	   §?? Main	  idea:	  due	  to	  templates,	  the	  adjacency	  list	  of	  a	   node	  is	  similar	  to	  one	  of	  the	  7	  preceding	  URLs	  in	   the	  lexicographic	  ordering	   §?? Express	  adjacency	  list	  in	  terms	  of	  one	  of	  these	   §?? E.g.,	  consider	  these	  adjacency	  lists	   §?? 1,	  2,	  4,	  8,	  16,	  32,	  64	   §?? 1,	  4,	  9,	  16,	  25,	  36,	  49,	  64	   §?? 1,	  2,	  3,	  5,	  8,	  13,	  21,	  34,	  55,	  89,	  144	   §?? 1,	  4,	  8,	  16,	  25,	  36,	  49,	  64	   Encode as (-2), remove 9, add 8 
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Gap	  encodings	   §??Given	  a	  sorted	  list	  of	  integers	  x,	  y,	  z,	  …,	   represent	  by	  x,	  y-­-x,	  z-­-y,	  …	  	   §??Compress	  each	  integer	  using	  a	  code	   §?? ? code	  -­-	  Number	  of	  bits	  =	  1	  +	  2	  ??lg	  x?? 	
+§??d code:	  …	   §??Informa*on	  theore*c	  bound:	  1	  +	  ??lg	  x?? bits	  	   §??? code:	  Works	  well	  for	  integers	  from	  a	   power	  law	  Boldi	  Vigna	  DCC	  2004	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Main	  advantages	  of	  BV	   §??Depends	  only	  on	  locality	  in	  a	  canonical	  ordering	   §??Lexicographic	  ordering	  works	  well	  for	  the	  web	   §??Adjacency	  queries	  can	  be	  answered	  very	   e?ciently	   §??To	  fetch	  out-­-neighbors,	  trace	  back	  the	  chain	  of	   prototypes	   §??This	  chain	  is	  typically	  short	  in	  prac*ce	  (since	  similarity	   is	  mostly	  intra-­-host)	   §??Can	  also	  explicitly	  limit	  the	  length	  of	  the	  chain	  during	   encoding	   §??Easy	  to	  implement	  one-­-pass	  algorithm	  
+Sec. 20.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Link	  analysis:	  Pagerank	  
+26	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Cita*on	  Analysis	   §??Cita*on	  frequency	   §??Bibliographic	  coupling	  frequency	   §??Ar*cles	  that	  co-­-cite	  the	  same	  ar*cles	  are	  related	  	   §??Cita*on	  indexing	   §??Who	  is	  this	  author	  cited	  by?	  (Gar?eld	  1972)	   §?? Pagerank	  preview:	  Pinsker	  and	  Narin	  ’60s	   §??Asked:	  which	  journals	  are	  authorita*ve?	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+The	  web	  isn’t	  scholarly	  cita*on	   §?? Millions	  of	  par*cipants,	  each	  with	  self	  interests	   §?? Spamming	  is	  widespread	   §?? Once	  search	  engines	  began	  to	  use	  links	  for	  ranking	   (roughly	  1998),	  link	  spam	  grew	   §?? You	  can	  join	  a	  link	  farm	  –	  a	  group	  of	  websites	  that	  heavily	   link	  to	  one	  another	  
+28	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Pagerank	  scoring	   §?? Imagine	  a	  user	  doing	  a	  random	  walk	  on	  web	  pages:	   §?? Start	  at	  a	  random	  page	   §?? At	  each	  step,	  go	  out	  of	  the	  	   current	  page	  along	  one	  of	  	   the	  links	  on	  that	  page,	  equiprobably	   §?? “In	  the	  long	  run”	  each	  page	  has	  a	  long-­-term	  visit	  rate	   -­-	  use	  this	  as	  the	  page’s	  score.	  	   1/3 1/3 1/3 
+Sec. 21.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Not	  quite	  enough	   §?? The	  web	  is	  full	  of	  dead-­-ends.	   §?? Random	  walk	  can	  get	  stuck	  in	  dead-­-ends.	   §?? Makes	  no	  sense	  to	  talk	  about	  long-­-term	  visit	  rates.	  
+?? 
+Sec. 21.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Telepor*ng	   §??At	  a	  dead	  end,	  jump	  to	  a	  random	  web	  page.	   §??At	  any	  non-­-dead	  end,	  with	  probability	  10%,	   jump	  to	  a	  random	  web	  page.	   §??With	  remaining	  probability	  (90%),	  go	  out	  on	   a	  random	  link.	   §??10%	  -­-	  a	  parameter.	  
+Sec. 21.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Result	  of	  telepor*ng	   §??Now	  cannot	  get	  stuck	  locally.	   §??There	  is	  a	  long-­-term	  rate	  at	  which	  any	   page	  is	  visited	  (not	  obvious,	  will	  show	   this).	   §??How	  do	  we	  compute	  this	  visit	  rate?	  
+Sec. 21.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Markov	  chains	   §?? A	  Markov	  chain	  consists	  of	  n	  states,	  plus	  an	  n×n	   transi*on	  probability	  matrix	  P.	   §?? At	  each	  step,	  we	  are	  in	  one	  of	  the	  states.	   §?? For	  1	  =	  i,j	  =	  n,	  the	  matrix	  entry	  Pij	  tells	  us	  the	   probability	  of	  j	  being	  the	  next	  state,	  given	  we	  are	   currently	  in	  state	  i.	  	  
+i j Pij 
+Pii>0 is OK. 
+Sec. 21.2.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+.1
+1 =? = ij n j P Markov	  chains	   §?? Clearly,	  for	  all	  i,	   §??	  Markov	  chains	  are	  abstrac*ons	  of	  random	  walks.	   §?? Exercise:	  represent	  the	  telepor*ng	  random	  walk	   from	  3	  slides	  ago	  as	  a	  Markov	  chain,	  for	  this	  case:	  	  
+Sec. 21.2.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Ergodic	  Markov	  chains	   §??For	  any	  ergodic	  Markov	  chain,	  there	  is	  a	   unique	  long-­-term	  visit	  rate	  for	  each	  state.	   §??Steady-­-state	  probability	  distribu)on.	   §??Over	  a	  long	  *me-­-period,	  we	  visit	  each	  state	   in	  propor*on	  to	  this	  rate.	   §??It	  doesn’t	  maZer	  where	  we	  start.	  
+Sec. 21.2.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Probability	  vectors	   §?? A	  probability	  (row)	  vector	  x	  =	  (x1,	  …	  xn)	  tells	  us	   where	  the	  walk	  is	  at	  any	  point.	   §?? E.g.,	  (000…1…000)	  means	  we’re	  in	  state	  i.	   i n 1 
+More generally, the vector x = (x1, … xn) means the walk is in state i with probability xi.  .1 1 =? = n i ix
+Sec. 21.2.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Change	  in	  probability	  vector	   §??If	  the	  probability	  vector	  is	  	  x	  =	  (x1,	  …	  xn)	  at	   this	  step,	  what	  is	  it	  at	  the	  next	  step?	   §??Recall	  that	  row	  i	  of	  the	  transi*on	  prob.	   Matrix	  P	  tells	  us	  where	  we	  go	  next	  from	   state	  i.	   §??So	  from	  x,	  our	  next	  state	  is	  distributed	  as	  xP	   §??The	  one	  aser	  that	  is	  xP2,	  then	  xP3,	  etc.	   §??(Where)	  Does	  this	  converge?	  
+Sec. 21.2.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+How	  do	  we	  compute	  this	  vector?	   §?? Let	  a	  =	  (a1,	  …	  an)	  denote	  the	  row	  vector	  of	  steady-­- state	  probabili*es.	   §?? If	  our	  current	  posi*on	  is	  described	  by	  a,	  then	  the	   next	  step	  is	  distributed	  as	  aP.	   §?? But	  a	  is	  the	  steady	  state,	  so	  a=aP.	   §?? Solving	  this	  matrix	  equa*on	  gives	  us	  a.	   §?? So	  a	  is	  the	  (les)	  eigenvector	  for	  P.	   §?? (Corresponds	  to	  the	  “principal”	  eigenvector	  of	  P	  with	  the	   largest	  eigenvalue.)	   §?? Transi*on	  probability	  matrices	  always	  have	  largest	   eigenvalue	  1.	  
+Sec. 21.2.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Link	  analysis:	  HITS	  
+39	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hyperlink-­-Induced	  Topic	  Search	  (HITS)	   §?? In	  response	  to	  a	  query,	  instead	  of	  an	  ordered	  list	  of	   pages	  each	  mee*ng	  the	  query,	  ?nd	  two	  sets	  of	  inter-­- related	  pages:	   §?? Hub	  pages	  are	  good	  lists	  of	  links	  on	  a	  subject.	   §?? e.g.,	  “Bob’s	  list	  of	  cancer-­-related	  links.”	   §?? Authority	  pages	  occur	  recurrently	  on	  good	  hubs	  for	  the	   subject.	   §?? Best	  suited	  for	  “broad	  topic”	  queries	  rather	  than	  for	   page-­-?nding	  queries.	   §?? Gets	  at	  a	  broader	  slice	  of	  common	  opinion.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hubs	  and	  Authori*es	   §??Thus,	  a	  good	  hub	  page	  for	  a	  topic	  points	  to	   many	  authorita*ve	  pages	  for	  that	  topic.	   §??A	  good	  authority	  page	  for	  a	  topic	  is	  pointed	   to	  by	  many	  good	  hubs	  for	  that	  topic.	   §??Circular	  de?ni*on	  -­-	  will	  turn	  this	  into	  an	   itera*ve	  computa*on.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+The	  hope	                                                      AT&T         Alice                      
+                                  ITIM  Bob                                   O2 Mobile telecom companies 
+Hubs 
+Authorities 
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+High-­-level	  scheme	   §??Extract	  from	  the	  web	  a	  base	  set	  of	   pages	  that	  could	  be	  good	  hubs	  or	   authori*es.	   §??From	  these,	  iden*fy	  a	  small	  set	  of	  top	   hub	  and	  authority	  pages;	   ??itera*ve	  algorithm.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Base	  set	   §??Given	  text	  query	  (say	  browser),	  use	  a	  text	   index	  to	  get	  all	  pages	  containing	  browser.	   §??Call	  this	  the	  root	  set	  of	  pages.	  	   §??Add	  in	  any	  page	  that	  either	   §??points	  to	  a	  page	  in	  the	  root	  set,	  or	   §??is	  pointed	  to	  by	  a	  page	  in	  the	  root	  set.	   §??Call	  this	  the	  base	  set.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Visualiza*on	  
+Root set 
+Base set 
+Sec. 21.3 
+Get in-links (and out-links) from a connectivity server  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Dis*lling	  hubs	  and	  authori*es	   §?? Compute,	  for	  each	  page	  x	  in	  the	  base	  set,	  a	  hub	   score	  h(x)	  and	  an	  authority	  score	  a(x).	   §?? Ini*alize:	  for	  all	  x,	  h(x) ? 1;	  a(x)	   ? 1;	   §?? Itera*vely	  update	  all	  h(x),	  a(x);	   §?? Aser	  itera*ons	   §??output	  pages	  with	  highest	  h()	  scores	  as	  top	  hubs	   §??	  highest	  a()	  scores	  as	  top	  authori*es.	   Key 
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Itera*ve	  update	   §?? Repeat	  the	  following	  updates,	  for	  all	  x:	  
+?? yx yaxh ! )()(
+?? xy yhxa ! )()(
+x 
+x 
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Scaling	   §??To	  prevent	  the	  h()	  and	  a()	  values	  from	   gekng	  too	  big,	  can	  scale	  down	  aser	  each	   itera*on.	   §??Scaling	  factor	  doesn’t	  really	  maZer:	   §??we	  only	  care	  about	  the	  rela)ve	  values	  of	   the	  scores.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+How	  many	  itera*ons?	   §?? Claim:	  rela*ve	  values	  of	  scores	  will	  converge	   aser	  a	  few	  itera*ons:	   §??in	  fact,	  suitably	  scaled,	  h()	  and	  a()	  scores	  seZle	   into	  a	  steady	  state!	   §??proof	  of	  this	  comes	  later.	   §?? In	  prac*ce,	  ~5	  itera*ons	  get	  you	  close	  to	  stability.	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Proof	  of	  convergence	  
+§?? n×n	  adjacency	  matrix	  A:	   §?? each	  of	  the	  n	  pages	  in	  the	  base	  set	  has	  a	  row	  and	   column	  in	  the	  matrix.	   §?? Entry	  Aij	  =	  1	  if	  page	  i	  links	  to	  page	  j,	  else	  =	  0.	  
+1 2 
+3 
+ 1      2      3 1 2 
+3
+ 0      1      0  1      1      1  1      0      0 
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hub/authority	  vectors	   §?? View	  the	  hub	  scores	  h()	  and	  the	  authority	  scores	  a()	   as	  vectors	  with	  n	  components.	   §?? Recall	  the	  itera*ve	  updates	  
+?? yx yaxh ! )()(
+?? xy yhxa ! )()(
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Rewrite	  in	  matrix	  form	   §?? h=Aa.	   §?? a=Ath.	   Recall At is the transpose of A.  Substituting, h=AAth and a=AtAa. Thus, h is an eigenvector of AAt and a is an eigenvector of AtA. Further, our algorithm is a particular, known algorithm for computing eigenvectors: the power iteration method. 
+Guaranteed to converge. 
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Issues	   §?? Topic	  Dris	   §??O?-­-topic	  pages	  can	  cause	  o?-­-topic	  “authori*es”	   to	  be	  returned	   §??E.g.,	  the	  neighborhood	  graph	  can	  be	  about	  a	  “super	   topic”	   §?? Mutually	  Reinforcing	  A?liates	   §??	  A?liated	  pages/sites	  can	  boost	  each	  others’	   scores	  	   §??Linkage	  between	  a?liated	  pages	  is	  not	  a	  useful	  signal	  
+Sec. 21.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Resources	   §?? IIR	  Chap	  21	   §?? hZp://www2004.org/proceedings/docs/1p309.pdf	   §?? hZp://www2004.org/proceedings/docs/1p595.pdf	   §?? hZp://www2003.org/cdrom/papers/refereed/p270/ kamvar-­-270-­-xhtml/index.html	   §?? hZp://www2003.org/cdrom/papers/refereed/p641/ xhtml/p641-­-mccurley.html	   §?? The	  WebGraph	  framework	  I:	  Compression	   techniques	  (Boldi	  et	  al.	  2004)	  

@@ -1,0 +1,567 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 5: Index Compression
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-04-17
+
+1 / 59
+
+Overview
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+2 / 59
+
+Outline
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+3 / 59
+
+Blocked Sort-Based Indexing
+postings to be merged
+brutus caesar noble with d3 d4 d3 d4 brutus caesar julius killed d2 d1 d1 d2 brutus brutus caesar caesar julius killed noble with d2 d3 d1 d4 d1 d2 d3 d4
+
+merged postings
+
+disk
+
+4 / 59
+
+Single-pass in-memory indexing
+
+Abbreviation: SPIMI Key idea 1: Generate separate dictionaries for each block ? no need to maintain term-termID mapping across blocks. Key idea 2: Don?t sort. Accumulate postings in postings lists as they occur. With these two ideas we can generate a complete inverted index for each block. These separate indexes can then be merged into one big index.
+
+5 / 59
+
+SPIMI-Invert
+
+SPIMI-Invert(token stream) 1 output ?le ? NewFile() 2 dictionary ? NewHash() 3 while (free memory available) 4 do token ? next(token stream) 5 if term(token) ? dictionary / 6 then postings list ? AddToDictionary(dictionary ,term(token)) 7 else postings list ? GetPostingsList(dictionary ,term(token)) 8 if full (postings list) 9 then postings list ? DoublePostingsList(dictionary ,term(token)) 10 AddToPostingsList(postings list,docID(token)) 11 sorted terms ? SortTerms(dictionary ) 12 WriteBlockToDisk(sorted terms,dictionary ,output ?le) 13 return output ?le
+
+6 / 59
+
+MapReduce for index construction
+splits
+
+assign
+
+master
+
+assign
+
+postings a-f g-p q-z
+
+parser parser
+
+a-f g-p q-z a-f g-p q-z
+
+inve rter inve rter inve rter
+
+parser map phase
+
+a-f g-p q-z segment files
+
+reduce phase
+
+7 / 59
+
+Dynamic indexing: Simplest approach
+
+Maintain big main index on disk New docs go into small auxiliary index in memory. Search across both, merge results Periodically, merge auxiliary index into big index
+
+8 / 59
+
+Take-away today
+
+Motivation for compression in information retrieval systems How can we compress the dictionary component of the inverted index? How can we compress the postings component of the inverted index? Term statistics: how are terms distributed in document collections?
+
+9 / 59
+
+Outline
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+10 / 59
+
+Why compression? (in general)
+
+Use less disk space (saves money) Keep more stu? in memory (increases speed) Increase speed of transferring data from disk to memory (again, increases speed)
+[read compressed data and decompress in memory] is faster than [read uncompressed data]
+
+Premise: Decompression algorithms are fast. This is true of the decompression algorithms we will use.
+
+11 / 59
+
+Why compression in information retrieval?
+
+First, we will consider space for dictionary
+Main motivation for dictionary compression: make it small enough to keep in main memory
+
+Then for the postings ?le
+Motivation: reduce disk space needed, decrease time needed to read from disk Note: Large search engines keep signi?cant part of postings in memory
+
+We will devise various compression schemes for dictionary and postings.
+
+12 / 59
+
+Lossy vs. lossless compression
+
+Lossy compression: Discard some information Several of the preprocessing steps we frequently use can be viewed as lossy compression:
+downcasing, stop words, porter, number elimination
+
+Lossless compression: All information is preserved.
+What we mostly do in index compression
+
+13 / 59
+
+Outline
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+14 / 59
+
+Model collection: The Reuters collection
+symbol N L M statistic documents avg. # word tokens per document word types avg. # bytes per word token (incl. spaces/punct.) avg. # bytes per word token (without spaces/punct.) avg. # bytes per word type non-positional postings value 800,000 200 400,000 6 4.5 7.5 100,000,000
+
+T
+
+15 / 59
+
+E?ect of preprocessing for Reuters
+
+word types non-positional positional postings (terms) postings (word tokens) size of dictionary non-positional index positional index size ? cml size ? cml size ? cml Explain 484,494 di?erences between numbers non-positional vs positional: un?ltered 109,971,179 197,879,290 no numbers 473,723 -2 -2 100,680,242 -8 -8 179,158,204 -9 -9 case folding 391,523 -17 -19 96,969,056 -3 -12 179,158,204 -0 -9 30 stopw?s 391,493 -0 -19 83,390,443 -14 -24 121,857,825 -31 -38 150 stopw?s 391,373 -0 -19 67,001,847 -30 -39 94,516,599 -47 -52 stemming 322,383 -17 -33 63,812,300 -4 -42 94,516,599 -0 -52 -3 vs -0, -14 vs -31, -30 vs -47, -4 vs -0
+
+16 / 59
+
+How big is the term vocabulary?
+That is, how many distinct words are there? Can we assume there is an upper bound? Not really: At least 7020 ? 1037 di?erent words of length 20. The vocabulary will keep growing with collection size. Heaps? law: M = kT b M is the size of the vocabulary, T is the number of tokens in the collection. Typical values for the parameters k and b are: 30 ? k ? 100 and b ? 0.5. Heaps? law is linear in log-log space.
+It is the simplest possible relationship between collection size and vocabulary size in log-log space. Empirical law
+17 / 59
+
+Heaps? law for Reuters
+Vocabulary size M as a function of collection size T (number of tokens) for Reuters-RCV1. For these data, the dashed line log10 M = 0.49 ? log10 T + 1.64 is the best least squares ?t. Thus, M = 101.64 T 0.49 and k = 101.64 ? 44 and b = 0.49.
+
+log10 M
+
+0 0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+2
+
+4 log10 T
+
+6
+
+8
+
+18 / 59
+
+Empirical ?t for Reuters
+
+Good, as we just saw in the graph. Example: for the ?rst 1,000,020 tokens Heaps? law predicts 38,323 terms: 44 ? 1,000,0200.49 ? 38,323 The actual number is 38,365 terms, very close to the prediction. Empirical observation: ?t is good in general.
+
+19 / 59
+
+Exercise
+
+1
+
+2
+
+What is the e?ect of including spelling errors vs. automatically correcting spelling errors on Heaps? law? Compute vocabulary size M
+Looking at a collection of web pages, you ?nd that there are 3000 di?erent terms in the ?rst 10,000 tokens and 30,000 di?erent terms in the ?rst 1,000,000 tokens. Assume a search engine indexes a total of 20,000,000,000 (2 ? 1010 ) pages, containing 200 tokens on average What is the size of the vocabulary of the indexed collection as predicted by Heaps? law?
+
+20 / 59
+
+Zipf?s law
+
+Now we have characterized the growth of the vocabulary in collections. We also want to know how many frequent vs. infrequent terms we should expect in a collection. In natural language, there are a few very frequent terms and very many very rare terms. Zipf?s law: The i th most frequent term has frequency cf i proportional to 1/i . cf i ?
+1 i
+
+cf i is collection frequency: the number of occurrences of the term ti in the collection.
+
+21 / 59
+
+Zipf?s law
+Zipf?s law: The i th most frequent term has frequency proportional to 1/i . cf i ?
+1 i
+
+cf is collection frequency: the number of occurrences of the term in the collection. So if the most frequent term (the) occurs cf 1 times, then the second most frequent term (of) has half as many occurrences 1 cf 2 = 2 cf 1 . . . . . . and the third most frequent term (and) has a third as 1 many occurrences cf 3 = 3 cf 1 etc. Equivalent: cf i = ci k and log cf i = log c + k log i (for k = ?1) Example of a power law
+
+22 / 59
+
+Zipf?s law for Reuters
+Fit is not great. What is important is the key insight: Few frequent terms, many rare terms.
+
+log10 cf 0 0 1 2 3
+
+4
+
+5
+
+6
+
+7
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+log10 rank
+
+23 / 59
+
+Outline
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+24 / 59
+
+Dictionary compression
+
+The dictionary is small compared to the postings ?le. But we want to keep it in memory. Also: competition with other applications, cell phones, onboard computers, fast startup time So compressing the dictionary is important.
+
+25 / 59
+
+Recall: Dictionary as array of ?xed-width entries
+
+term a aachen ... zulu 20 bytes
+
+space needed:
+
+document frequency 656,265 65 ... 221 4 bytes
+
+pointer to postings list ?? Space ?? ... ?? 4 bytes
+
+for Reuters: (20+4+4)*400,000 = 11.2 MB
+
+26 / 59
+
+Fixed-width entries are bad.
+
+Most of the bytes in the term column are wasted.
+We allot 20 bytes for terms of length 1.
+
+We can?t handle hydrochlorofluorocarbons and supercalifragilisticexpialidocious Average length of a term in English: 8 characters (or a little bit less) How can we use on average 8 characters per term?
+
+27 / 59
+
+Dictionary as a string
+
+. . . sys t i l esyzyget i csyzyg i a l syzygysza i be l y i teszec i nszono. . .
+
+freq.
+
+postings ptr. term ptr.
+
+9 92 5 71 12 ...
+
+? ? ? ? ? ...
+
+... 3 bytes
+
+4 bytes 4 bytes
+
+28 / 59
+
+Space for dictionary as a string
+
+4 bytes per term for frequency 4 bytes per term for pointer to postings list 8 bytes (on average) for term in string 3 bytes per pointer into string (need log2 8 ? 400000 < 24 bits to resolve 8 ? 400,000 positions) Space: 400,000 ? (4 + 4 + 3 + 8) = 7.6MB (compared to 11.2 MB for ?xed-width array)
+
+29 / 59
+
+Dictionary as a string with blocking
+
+. . . 7 s y s t i l e 9 s yzyge t i c 8 s yzyg i a l 6 s yzygy11s za i be l y i t e 6 s zec i n . . .
+
+freq.
+
+postings ptr. term ptr.
+
+9 92 5 71 12 ...
+
+? ? ? ? ? ...
+
+...
+
+30 / 59
+
+Space for dictionary as a string with blocking
+
+Example block size k = 4 Where we used 4 ? 3 bytes for term pointers without blocking ... . . . we now use 3 bytes for one pointer plus 4 bytes for indicating the length of each term. We save 12 ? (3 + 4) = 5 bytes per block. Total savings: 400,000/4 ? 5 = 0.5 MB This reduces the size of the dictionary from 7.6 MB to 7.1 MB.
+
+31 / 59
+
+Lookup of a term without blocking
+aid box den ex job ox pit win
+
+32 / 59
+
+Lookup of a term with blocking: (slightly) slower
+
+aid
+
+box
+
+den
+
+ex
+
+job
+
+ox
+
+pit
+
+win
+
+33 / 59
+
+Front coding
+One block in blocked compression (k = 4) . . . 8 a u t o m a t a 8 a u t o m a t e 9 a u t o m a t i c 10 a u t o m a t i o n ? . . . further compressed with front coding. 8automat?a1?e2 ? i c3? i on
+
+34 / 59
+
+Dictionary compression for Reuters: Summary
+
+data structure dictionary, ?xed-width dictionary, term pointers into string ?, with blocking, k = 4 ?, with blocking & front coding
+
+size in MB 11.2 7.6 7.1 5.9
+
+35 / 59
+
+Exercise
+
+Which pre?xes should be used for front coding? What are the tradeo?s? Input: list of terms (= the term vocabulary) Output: list of pre?xes that will be used in front coding
+
+36 / 59
+
+Outline
+
+1
+
+Recap Compression Term statistics Dictionary compression Postings compression
+
+2
+
+3
+
+4
+
+5
+
+37 / 59
+
+Postings compression
+
+The postings ?le is much larger than the dictionary, factor of at least 10. Key desideratum: store each posting compactly A posting for our purposes is a docID. For Reuters (800,000 documents), we would use 32 bits per docID when using 4-byte integers. Alternatively, we can use log2 800,000 ? 19.6 < 20 bits per docID. Our goal: use a lot less than 20 bits per docID.
+
+38 / 59
+
+Key idea: Store gaps instead of docIDs
+
+Each postings list is ordered in increasing order of docID. Example postings list: computer: 283154, 283159, 283202, ... It su?ces to store gaps: 283159-283154=5, 283202-283159=43 Example postings list using gaps : computer: 283154, 5, 43, . . . Gaps for frequent terms are small. Thus: We can encode small gaps with fewer than 20 bits.
+
+39 / 59
+
+Gap encoding
+the computer arachnocentric encoding docIDs gaps docIDs gaps docIDs gaps postings list ... ... 252000 252000 283042 1 283047 107 500100 248100 283154 5 283043 1 283159 43 283044 1 283202 283045 ... ... ... ...
+
+40 / 59
+
+Variable length encoding
+
+Aim:
+For arachnocentric and other rare terms, we will use about 20 bits per gap (= posting). For the and other very frequent terms, we will use only a few bits per gap (= posting).
+
+In order to implement this, we need to devise some form of variable length encoding. Variable length encoding uses few bits for small gaps and many bits for large gaps.
+
+41 / 59
+
+Variable byte (VB) code
+
+Used by many commercial/research systems Good low-tech blend of variable-length coding and sensitivity to alignment matches (bit-level codes, see later). Dedicate 1 bit (high bit) to be a continuation bit c. If the gap G ?ts within 7 bits, binary-encode it in the 7 available bits and set c = 1. Else: encode lower-order 7 bits and then use one or more additional bytes to encode the higher order bits using the same algorithm. At the end set the continuation bit of the last byte to 1 (c = 1) and of the other bytes to 0 (c = 0).
+
+42 / 59
+
+VB code examples
+docIDs gaps VB code 824 00000110 10111000 829 5 10000101
+
+215406 214577 00001101 00001100 10110001
+
+43 / 59
+
+VB code encoding algorithm
+VBEncodeNumber(n) 1 bytes ? 2 while true 3 do Prepend(bytes, n mod 128) 4 if n < 128 5 then Break 6 n ? n div 128 7 bytes[Length(bytes)] += 128 8 return bytes VBEncode(numbers) 1 bytestream ? 2 for each n ? numbers 3 do bytes ? VBEncodeNumber(n) 4 bytestream ? Extend(bytestream, bytes) 5 return bytestream
+
+44 / 59
+
+VB code decoding algorithm
+
+VBDecode(bytestream) 1 numbers ? 2 n?0 3 for i ? 1 to Length(bytestream) 4 do if bytestream[i ] < 128 5 then n ? 128 ? n + bytestream[i ] 6 else n ? 128 ? n + (bytestream[i ] ? 128) 7 Append(numbers, n) 8 n?0 9 return numbers
+
+45 / 59
+
+Other variable codes
+
+Instead of bytes, we can also use a di?erent ?unit of alignment?: 32 bits (words), 16 bits, 4 bits (nibbles) etc Variable byte alignment wastes space if you have many small gaps ? nibbles do better on those. There is work on word-aligned codes that e?ciently ?pack? a variable number of gaps into one word ? see resources at the end
+
+46 / 59
+
+Gamma codes for gap encoding
+
+You can get even more compression with another type of variable length encoding: bitlevel code. Gamma code is the best known of these. First, we need unary code to be able to introduce gamma code. Unary code
+Represent n as n 1s with a ?nal 0. Unary code for 3 is 1110 Unary code for 40 is 11111111111111111111111111111111111111110 Unary code for 70 is:
+11111111111111111111111111111111111111111111111111111111111111111111110
+
+47 / 59
+
+Gamma code
+
+Represent a gap G as a pair of length and o?set. O?set is the gap in binary, with the leading bit chopped o?. For example 13 ? 1101 ? 101 = o?set Length is the length of o?set. For 13 (o?set 101), this is 3. Encode length in unary code: 1110. Gamma code of 13 is the concatenation of length and o?set: 1110101.
+
+48 / 59
+
+Gamma code examples
+number 0 1 2 3 4 9 13 24 511 1025 unary code 0 10 110 1110 11110 1111111110 length 0 10 10 110 1110 1110 11110 111111110 11111111110 o?set ? code 0 10,0 10,1 110,00 1110,001 1110,101 11110,1000 111111110,11111111 11111111110,0000000001
+
+0 1 00 001 101 1000 11111111 0000000001
+
+49 / 59
+
+Exercise
+
+Compute the variable byte code of 130 Compute the gamma code of 130
+
+50 / 59
+
+Length of gamma code
+
+The length of o?set is ?log2 G ? bits. The length of length is ?log2 G ? + 1 bits, So the length of the entire code is 2 ? ?log2 G ? + 1 bits. ? codes are always of odd length. Gamma codes are within a factor of 2 of the optimal encoding length log2 G .
+(assuming the frequency of a gap G is proportional to log2 G ? only approximately true)
+
+51 / 59
+
+Gamma code: Properties
+
+Gamma code (like variable byte code) is pre?x-free: a valid code word is not a pre?x of any other valid code. Encoding is optimal within a factor of 3 (and within a factor of 2 making additional assumptions). This result is independent of the distribution of gaps! We can use gamma codes for any distribution. Gamma code is universal. Gamma code is parameter-free.
+
+52 / 59
+
+Gamma codes: Alignment
+
+Machines have word boundaries ? 8, 16, 32 bits Compressing and manipulating at granularity of bits can be slow. Variable byte encoding is aligned and thus potentially more e?cient. Regardless of e?ciency, variable byte is conceptually simpler at little additional space cost.
+
+53 / 59
+
+Compression of Reuters
+data structure dictionary, ?xed-width dictionary, term pointers into string ?, with blocking, k = 4 ?, with blocking & front coding collection (text, xml markup etc) collection (text) T/D incidence matrix postings, uncompressed (32-bit words) postings, uncompressed (20 bits) postings, variable byte encoded postings, ? encoded size in MB 11.2 7.6 7.1 5.9 3600.0 960.0 40,000.0 400.0 250.0 116.0 101.0
+
+54 / 59
+
+Term-document incidence matrix
+Anthony and Cleopatra 1 1 1 0 1 1 1 Julius Caesar The Tempest Hamlet Othello Macbeth ...
+
+Anthony 1 0 0 0 Brutus 1 0 1 0 Caesar 1 0 1 1 Calpurnia 1 0 0 0 Cleopatra 0 0 0 0 mercy 0 1 1 1 worser 0 1 1 1 ... Entry is 1 if term occurs. Example: Calpurnia occurs in Julius Caesar. Entry is 0 if term doesn?t occur. Example: Calpurnia doesn?t occur in The tempest.
+
+1 0 1 0 0 1 0
+
+55 / 59
+
+Compression of Reuters
+data structure dictionary, ?xed-width dictionary, term pointers into string ?, with blocking, k = 4 ?, with blocking & front coding collection (text, xml markup etc) collection (text) T/D incidence matrix postings, uncompressed (32-bit words) postings, uncompressed (20 bits) postings, variable byte encoded postings, ? encoded size in MB 11.2 7.6 7.1 5.9 3600.0 960.0 40,000.0 400.0 250.0 116.0 101.0
+
+56 / 59
+
+Summary
+
+We can now create an index for highly e?cient Boolean retrieval that is very space e?cient. Only 10-15% of the total size of the text in the collection. However, we?ve ignored positional and frequency information. For this reason, space savings are less in reality.
+
+57 / 59
+
+Take-away today
+
+Motivation for compression in information retrieval systems How can we compress the dictionary component of the inverted index? How can we compress the postings component of the inverted index? Term statistics: how are terms distributed in document collections?
+
+58 / 59
+
+Resources
+
+Chapter 5 of IIR Resources at http://cislmu.org
+Original publication on word-aligned binary codes by Anh and Mo?at (2005); also: Anh and Mo?at (2006a) Original publication on variable byte codes by Scholer, Williams, Yiannis and Zobel (2002) More details on compression (including compression of positions and frequencies) in Zobel and Mo?at (2006)
+
+59 / 59
+
+

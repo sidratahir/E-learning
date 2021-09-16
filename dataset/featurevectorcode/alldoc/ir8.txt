@@ -1,0 +1,216 @@
+Introduc*on	to	Informa(on	Retrieval	
+CS276	Informa*on	Retrieval	and	Web	Search	Chris	Manning	and	Pandu	Nayak	Evalua*on	
+Introduc)on	to	Informa)on	Retrieval					
+Situa*on	§? Thanks	to	your	stellar	performance	in	CS276,	you	quickly	rise	to	VP	of	Search	at	internet	retail	giant	nozama.com.	Your	boss	brings	in	her	nephew	Sergey,	who	claims	to	have	built	a	beLer	search	engine	for	nozama.	Do	you	§? Laugh	derisively	and	send	him	to	rival	Tramlaw	Labs?	§? Counsel	Sergey	to	go	to	Stanford	and	take	CS276?	§? Try	a	few	queries	on	his	engine	and	say	“Not	bad”?	§? …	?	
+2	
+Introduc)on	to	Informa)on	Retrieval					
+3	
+What	could	you	ask	Sergey?	§? How	fast	does	it	index?	§? Number	of	documents/hour	§? Incremental	indexing	–	nozama	adds	10K	products/day	§? How	fast	does	it	search?	§? Latency	and	CPU	needs	for	nozama’s	5	million	products	§? Does	it	recommend	related	products?	§? This	is	all	good,	but	it	says	nothing	about	the	quality	of	Sergey’s	search	§? You	want	nozama’s	users	to	be	happy	with	the	search	experience	
+Sec. 8.6 
+Introduc)on	to	Informa)on	Retrieval					
+How	do	you	tell	if	users	are	happy?	§? Search	returns	products	relevant	to	users	§? How	do	you	assess	this	at	scale?	§? Search	results	get	clicked	a	lot	§? Misleading	*tles/summaries	can	cause	users	to	click	§? Users	buy	a^er	using	the	search	engine	§? Or,	users	spend	a	lot	of	$	a^er	using	the	search	engine	§? Repeat	visitors/buyers	§? Do	users	leave	soon	a^er	searching?	§? Do	they	come	back	within	a	week/month/…	?	
+4	
+Introduc)on	to	Informa)on	Retrieval					
+5	
+Happiness:	elusive	to	measure	§? Most	common	proxy:	relevance	of	search	results	§? But	how	do	you	measure	relevance?	§? Pioneered	by	Cyril	Cleverdon	in	the	Cran?eld	Experiments	
+Sec. 8.1 
+Introduc)on	to	Informa)on	Retrieval					
+6	
+Measuring	relevance	§? Three	elements:	1.? A	benchmark	document	collec*on		2.? A	benchmark	suite	of	queries	3.? An	assessment	of	either	Relevant	or	Nonrelevant	for	each	query	and	each	document	
+Sec. 8.1 
+Introduc)on	to	Informa)on	Retrieval					So	you	want	to	measure	the	quality	of	a	new	search	algorithm	§? Benchmark	documents	–	nozama’s	products	§? Benchmark	query	suite	–	more	on	this	§? Judgments	of	document	relevance	for	each	query	
+7	
+5 million nozama.com products 
+50000 sample  queries 
+Relevance	judgement	
+Introduc)on	to	Informa)on	Retrieval					
+Relevance	judgments	§? Binary	(relevant	vs.	non-relevant)	in	the	simplest	case,	more	nuanced	(0,	1,	2,	3	…)	in	others	§? What	are	some	issues	already?	§? 5	million	*mes	50K	takes	us	into	the	range	of	a	quarter	trillion	judgments	§? If	each	judgment	took	a	human	2.5	seconds,	we’d	s*ll	need	1011	seconds,	or	nearly	$300	million	if	you	pay	people	$10	per	hour	to	assess	§? 10K	new	products	per	day	
+8	
+Introduc)on	to	Informa)on	Retrieval					
+Crowd	source	relevance	judgments?	§? Present	query-document	pairs	to	low-cost	labor	on	online	crowd-sourcing	plalorms	§? Hope	that	this	is	cheaper	than	hiring	quali?ed	assessors	§? Lots	of	literature	on	using	crowd-sourcing	for	such	tasks	§? Main	takeaway	–	you	get	some	signal,	but	the	variance	in	the	resul*ng	judgments	is	very	high	
+9	
+Introduc)on	to	Informa)on	Retrieval					
+10	
+Evalua*ng	an	IR	system	§? Note:	user	need	is	translated	into	a	query	§? Relevance	is	assessed	rela*ve	to	the	user	need,	not	the	query	§? E.g.,	Informa*on	need:	My	swimming	pool	bo;om	is	becoming	black	and	needs	to	be	cleaned.	§? Query:	pool	cleaner	§? Assess	whether	the	doc	addresses	the	underlying	need,	not	whether	it	has	these	words	
+Sec. 8.1 
+Introduc)on	to	Informa)on	Retrieval					
+11	
+What	else?	§? S*ll	need	test	queries	§? Must	be	germane	to	docs	available	§? Must	be	representa*ve	of	actual	user	needs	§? Random	query	terms	from	the	documents	generally	not	a	good	idea	§? Sample	from	query	logs	if	available	§? Classically	(non-Web)	§? Low	query	rates	–	not	enough	query	logs	§? Experts	hand-cra^	“user	needs”	
+Sec. 8.5 
+Introduc)on	to	Informa)on	Retrieval					
+12	
+Some	public	test	Collec*ons	
+Sec. 8.5 
+Typical	TREC	
+Introduc)on	to	Informa)on	Retrieval					
+Now	we	have	the	basics	of	a	benchmark	§? Let’s	review	some	evalua*on	measures	§? Precision	§? Recall	§? NDCG	§? …		
+13	
+Introduc)on	to	Informa)on	Retrieval					
+14	
+Unranked	retrieval	evalua*on:	Precision	and	Recall	–	recap	from	IIR	8/video	§?Binary	assessments	Precision:	frac*on	of	retrieved	docs	that	are	relevant	=	P(relevant|retrieved)	Recall:	frac*on	of	relevant	docs	that	are	retrieved		=	P(retrieved|relevant)			
+§? Precision	P	=	tp/(tp	+	fp)	§? Recall						R	=	tp/(tp	+	fn)	
+Relevant Nonrelevant Retrieved tp fp Not Retrieved fn tn 
+Sec. 8.3 
+Introduc)on	to	Informa)on	Retrieval					Rank-Based Measures §? Binary relevance §? Precision@K (P@K) §? Mean Average Precision (MAP) §? Mean Reciprocal Rank (MRR) 
+§? Multiple levels of relevance §? Normalized Discounted Cumulative Gain (NDCG) 
+Introduc)on	to	Informa)on	Retrieval					Precision@K §? Set a rank threshold K §? Compute % relevant in top K §? Ignores documents ranked lower than K §? Ex:                   §? Prec@3 of 2/3  §? Prec@4 of 2/4 §? Prec@5 of 3/5 §? In similar fashion we have Recall@K 
+Introduc)on	to	Informa)on	Retrieval					
+17	
+A	precision-recall	curve	
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0 0.2 0.4 0.6 0.8 1.0 Recall
+Precision
+Sec. 8.4 
+Lots more detail on this in the Coursera video 
+Introduc)on	to	Informa)on	Retrieval					Mean Average Precision §? Consider rank position of each relevant doc §? K1, K2, … KR §? Compute Precision@K for each K1, K2, … KR §? Average precision = average of P@K 
+§? Ex:                    has AvgPrec of §? MAP is Average Precision across multiple queries/ rankings 76.0 5 3 3 2 1 1 3 1 ˜? ? ? ? ? ? + +·
+Introduc)on	to	Informa)on	Retrieval					
+Average Precision 
+Introduc)on	to	Informa)on	Retrieval					
+MAP 
+Introduc)on	to	Informa)on	Retrieval					
+Mean	average	precision	§? If a relevant document never gets retrieved, we assume the precision corresponding to that relevant doc to be zero  §? MAP is macro-averaging: each query counts equally §? Now perhaps most commonly used measure in research papers §? Good for web search? §? MAP assumes user is interested in finding many relevant documents for each query §? MAP requires many relevance judgments in text collection 
+Introduc)on	to	Informa)on	Retrieval					
+BEYOND	BINARY	RELEVANCE	
+22	
+Introduc)on	to	Informa)on	Retrieval					
+fair	
+fair	
+Good	
+Introduc)on	to	Informa)on	Retrieval					
+Discounted Cumulative Gain §? Popular measure for evaluating web search and related tasks 
+§? Two assumptions: §?Highly relevant documents are more useful than marginally relevant documents §?the lower the ranked position of a relevant document, the less useful it is for the user, since it is less likely to be examined 
+Introduc)on	to	Informa)on	Retrieval					
+Discounted Cumulative Gain §? Uses graded relevance as a measure of  usefulness, or gain, from examining a document §? Gain is accumulated starting at the top of the ranking and may be reduced, or discounted, at lower ranks §? Typical discount is 1/log (rank) §?With base 2, the discount at rank 4 is 1/2, and at rank 8 it is 1/3 
+Introduc)on	to	Informa)on	Retrieval					
+26  
+Summarize a Ranking: DCG 
+§? What if relevance judgments are in a scale of [0,r]? r>2 §? Cumulative Gain (CG) at rank n §?Let the ratings of the n documents be r1, r2, …rn (in ranked order) §?CG = r1+r2+…rn §? Discounted Cumulative Gain (DCG) at rank n §?DCG = r1 + r2/log22 + r3/log23 + … rn/log2n §? We may use any base for the logarithm 
+Introduc)on	to	Informa)on	Retrieval					
+Discounted Cumulative Gain §? DCG is the total gain accumulated at a particular rank p: 
+§? Alternative formulation: 
+§? used by some web search companies §? emphasis on retrieving highly relevant documents 
+Introduc)on	to	Informa)on	Retrieval					
+DCG Example §? 10 ranked documents judged on 0-3 relevance scale:  3, 2, 3, 0, 0, 1, 2, 2, 3, 0 §? discounted gain:  3, 2/1, 3/1.59, 0, 0, 1/2.59, 2/2.81, 2/3, 3/3.17, 0  = 3, 2, 1.89, 0, 0, 0.39, 0.71, 0.67, 0.95, 0 §? DCG: 3, 5, 6.89, 6.89, 6.89, 7.28, 7.99, 8.66, 9.61, 9.61  
+Introduc)on	to	Informa)on	Retrieval					
+29  
+Summarize a Ranking: NDCG 
+§? Normalized Discounted Cumulative Gain (NDCG) at rank n §?Normalize DCG at rank n by the DCG value at rank n of the ideal ranking §?The ideal ranking would first return the documents with the highest relevance level, then the next highest relevance level, etc §?Normalization useful for contrasting queries with varying numbers of relevant results  §? NDCG is now quite popular in evaluating Web search 
+Introduc)on	to	Informa)on	Retrieval					
+NDCG - Example 
+i	
+Ground	Truth	Ranking	Func*on1	Ranking	Func*on2	Document	Order	ri	Document	Order	ri	Document	Order	ri	1	d4	2	d3	2	d3	2	2	d3	2	d4	2	d2	1	3	d2	1	d2	1	d4	2	4	d1	0	d1	0	d1	0	NDCGGT=1.00	NDCGRF1=1.00	NDCGRF2=0.9203	
+6309.4
+4log 0
+3log 1
+2log 22 222
+=? ? ? ?
+? ? ? ? +++=GTDCG
+6309.4
+4log 0
+3log 1
+2log 22 222 1 = ? ? ? ? ? ? ? ? +++=RFDCG
+2619.4
+4log 0
+3log 2
+2log 12 222 2 = ? ? ? ? ? ? ? ? +++=RFDCG 6309.4== GTDCGMaxDCG
+4 documents: d1, d2, d3, d4 
+Introduc)on	to	Informa)on	Retrieval					
+31		
+What	if	the	results	are	not	in	a	list?	§? Suppose	there’s	only	one	Relevant	Document	§? Scenarios:		§? known-item	search	§? naviga*onal	queries	§? looking	for	a	fact	§? Search	dura*on	~	Rank	of	the	answer		§? measures	a	user’s	e?ort		
+Introduc)on	to	Informa)on	Retrieval					Mean Reciprocal Rank 
+§? Consider rank position, K, of first relevant doc §? Could be – only clicked doc 
+§? Reciprocal Rank score =  
+§? MRR is the mean RR across multiple queries    K 1
+Introduc)on	to	Informa)on	Retrieval					
+Human	judgments	are	§? Expensive	§? Inconsistent	§? Between	raters	§? Over	*me	§? Decay	in	value	as	documents/query	mix	evolves	§? Not	always	representa*ve	of	“real	users”	§? Ra*ng	vis-à-vis	query,	vs	underlying	need	§? So	–	what	alterna*ves	do	we	have?	
+33		
+Introduc)on	to	Informa)on	Retrieval					
+USING	USER	CLICKS	
+34	
+Introduc)on	to	Informa)on	Retrieval					
+What	do	clicks	tell	us?	
+35	
+#	of	clicks	received	
+Strong position bias, so absolute click rates unreliable 
+Introduc)on	to	Informa)on	Retrieval					
+Rela*ve	vs	absolute	ra*ngs	
+36	
+Hard to conclude Result1 > Result3 Probably can conclude Result3 > Result2 
+User’s click sequence 
+Introduc)on	to	Informa)on	Retrieval					
+Pairwise	rela*ve	ra*ngs	§? Pairs	of	the	form:	DocA	beLer	than	DocB	for	a	query	§? Doesn’t	mean	that	DocA	relevant	to	query	§? Now,	rather	than	assess	a	rank-ordering	wrt	per-doc	relevance	assessments	§? Assess	in	terms	of	conformance	with	historical	pairwise	preferences	recorded	from	user	clicks	
+37	
+Introduc)on	to	Informa)on	Retrieval					
+A/B	tes*ng	at	web	search	engines	§? Purpose:	Test	a	single	innova*on		§? Prerequisite:	You	have	a	large	search	engine	up	and	running.	§? Have	most	users	use	old	system	§? Divert	a	small	propor*on	of	tra?c	(e.g.,	1%)	to	an	experiment	to	evaluate	an	innova*on	§?Full	page	experiment	§?Interleaved	experiment	
+38	
+Sec. 8.6.3 
+Introduc)on	to	Informa)on	Retrieval					Comparing	two	rankings	via	clicks	(Joachims	2002)	
+39	
+Kernel	machines	SVM-light		Lucent	SVM	demo	Royal	Holl.	SVM	SVM	so^ware	SVM	tutorial	
+Kernel	machines	SVMs	Intro	to	SVMs	Archives	of	SVM	SVM-light	SVM	so^ware	
+Query: [support vector machines] 
+Ranking A Ranking B 
+Introduc)on	to	Informa)on	Retrieval					
+Interleave	the	two	rankings	
+40	
+Kernel	machines	
+SVM-light		
+Lucent	SVM	demo	
+Royal	Holl.	SVM	
+Kernel	machines	
+SVMs	
+Intro	to	SVMs	
+Archives	of	SVM	
+SVM-light	
+This interleaving starts with B 
+… 
+Introduc)on	to	Informa)on	Retrieval					
+Remove	duplicate	results	
+41	
+Kernel	machines	
+SVM-light		
+Lucent	SVM	demo	
+Royal	Holl.	SVM	
+Kernel	machines	
+SVMs	
+Intro	to	SVMs	
+Archives	of	SVM	
+SVM-light	… 
+Introduc)on	to	Informa)on	Retrieval					
+Count	user	clicks	
+42	
+Kernel	machines	
+SVM-light		
+Lucent	SVM	demo	
+Royal	Holl.	SVM	
+Kernel	machines	
+SVMs	
+Intro	to	SVMs	
+Archives	of	SVM	
+SVM-light	… 
+Clicks 
+Ranking A: 3 Ranking B: 1 
+A, B 
+A 
+A 
+Introduc)on	to	Informa)on	Retrieval					
+Interleaved	ranking		§? Present	interleaved	ranking	to	users	§? Start	randomly	with	ranking	A	or	ranking	B	to	evens	out	presenta*on	bias	
+§? Count	clicks	on	results	from	A	versus	results	from	B		§? BeLer	ranking	will	(on	average)	get	more	clicks	
+43	
+Introduc)on	to	Informa)on	Retrieval					
+Facts/en**es	(what	happens	to	clicks?)	
+44	
+Introduc)on	to	Informa)on	Retrieval					Comparing	two	rankings	to	a	baseline	ranking	§? Given	a	set	of	pairwise	preferences	P	§? We	want	to	measure	two	rankings	A	and	B	§? De?ne	a	proximity	measure	between	A	and	P	§? And	likewise,	between	B	and	P	§? Want	to	declare	the	ranking	with	beLer	proximity	to	be	the	winner	§? Proximity	measure	should	reward	agreements	with	P	and	penalize	disagreements	
+45	
+Introduc)on	to	Informa)on	Retrieval					
+Kendall	tau	distance	§? Let	X	be	the	number	of	agreements	between	a	ranking	(say	A)	and	P	§? Let	Y	be	the	number	of	disagreements	§? Then	the	Kendall	tau	distance	between	A	and	P	is		(X-Y)/(X+Y)	§? Say	P	=	{(1,2),	(1,3),	(1,4),	(2,3),	(2,4),	(3,4))}	and	A=(1,3,2,4)	§? Then	X=5,	Y=1	…	§? (What	are	the	minimum	and	maximum	possible	values	of	the	Kendall	tau	distance?)	
+46	
+Introduc)on	to	Informa)on	Retrieval					
+Recap	§? Benchmarks	consist	of	§? Document	collec*on	§? Query	set	§? Assessment	methodology	§? Assessment	methodology	can	use	raters,	user	clicks,	or	a	combina*on	§? These	get	quan*zed	into	a	goodness	measure	–	Precision/ NDCG	etc.	§? Di?erent	engines/algorithms	compared	on	a	benchmark	together	with	a	goodness	measure	
+47	

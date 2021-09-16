@@ -1,0 +1,173 @@
+Introduc*on	  to	   Informa(on	  Retrieval	  
+CS276:	  Informa*on	  Retrieval	  and	  Web	  Search	   Pandu	  Nayak	  and	  Prabhakar	  Raghavan	  
+Lecture	  4:	  Index	  Construc*on	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Plan	   §?? Last	  lecture:	   §?? Dic*onary	  data	  structures	   §?? Tolerant	  retrieval	   §?? Wildcards	   §?? Spell	  correc*on	   §?? Soundex	   §?? This	  *me:	   §?? Index	  construc*on	  
+a-hu 
+hy-m n-z 
+mo 
+on 
+among 
+$m mace 
+abandon 
+amortize 
+madden 
+among 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Index	  construc*on	   §?? How	  do	  we	  construct	  an	  index?	   §?? What	  strategies	  can	  we	  use	  with	  limited	  main	   memory?	  
+Ch. 4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hardware	  basics	   §?? Many	  design	  decisions	  in	  informa*on	  retrieval	  are	   based	  on	  the	  characteris*cs	  of	  hardware	   §?? We	  begin	  by	  reviewing	  hardware	  basics	  
+Sec. 4.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hardware	  basics	   §?? Access	  to	  data	  in	  memory	  is	  much	  faster	  than	  access	   to	  data	  on	  disk.	   §?? Disk	  seeks:	  No	  data	  is	  transferred	  from	  disk	  while	  the	   disk	  head	  is	  being	  posi*oned.	   §?? Therefore:	  Transferring	  one	  large	  chunk	  of	  data	  from	   disk	  to	  memory	  is	  faster	  than	  transferring	  many	  small	   chunks.	   §?? Disk	  I/O	  is	  block-­-based:	  Reading	  and	  wri*ng	  of	  en*re	   blocks	  (as	  opposed	  to	  smaller	  chunks).	   §?? Block	  sizes:	  8KB	  to	  256	  KB.	  
+Sec. 4.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hardware	  basics	   §?? Servers	  used	  in	  IR	  systems	  now	  typically	  have	  several	   GB	  of	  main	  memory,	  some*mes	  tens	  of	  GB.	  	   §?? Available	  disk	  space	  is	  several	  (2–3)	  orders	  of	   magnitude	  larger.	   §?? Fault	  tolerance	  is	  very	  expensive:	  It’s	  much	  cheaper	   to	  use	  many	  regular	  machines	  rather	  than	  one	  fault	   tolerant	  machine.	  
+Sec. 4.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Hardware	  assump*ons	  for	  this	  lecture	   §?? symbol	  	  sta(s(c	  	  	  	  	  	  value	   §?? s	  	  average	  seek	  *me	  	  	  	  5	  ms	  =	  5	  x	  10-3	  s	   §?? b	  	  	  transfer	  *me	  per	  byte	  	  0.02	  µs	  =	  2	  x	  10-8	  s	   §??	  	  	  	  	  	  	  	  processor’s	  clock	  rate	  	  109	  s-1	   §?? p	  	  low-­-level	  opera*on	  	  	  0.01	  µs	  =	  10-8	  s	  	  	  	  	  	  	  	  	  	  	  (e.g.,	  compare	  &	  swap	  a	  word)	   §??	  	  	  	  	  	  	  	  size	  of	  main	  memory	  	  	  several	  GB	   §??	  	  	  	  	  	  	  	  size	  of	  disk	  space	  	  	  	  1	  TB	  or	  more	  
+Sec. 4.1 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+RCV1:	  Our	  collec*on	  for	  this	  lecture	   §?? Shakespeare’s	  collected	  works	  de?nitely	  aren’t	   large	  enough	  for	  demonstra*ng	  many	  of	  the	  points	   in	  this	  course.	   §?? The	  collec*on	  we’ll	  use	  isn’t	  really	  large	  enough	   either,	  but	  it’s	  publicly	  available	  and	  is	  at	  least	  a	   more	  plausible	  example.	   §?? As	  an	  example	  for	  applying	  scalable	  index	   construc*on	  algorithms,	  we	  will	  use	  the	  Reuters	   RCV1	  collec*on.	   §?? This	  is	  one	  year	  of	  Reuters	  newswire	  (part	  of	  1995	   and	  1996)	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+A	  Reuters	  RCV1	  document	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Reuters	  RCV1	  sta*s*cs	   §?? symbol	  sta(s(c	  	  	  	  	  	  	  value	   §?? N	  	  	  	  documents	  	  	  	  	  	  800,000	   §?? L	  	  	  	  avg.	  #	  tokens	  per	  doc	  	  	  200	   §?? M	  	  	  terms	  (=	  word	  types)	  	  	  400,000	   §??	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  avg.	  #	  bytes	  per	  token	  	  6	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  (incl.	  spaces/punct.)	   §??	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  avg.	  #	  bytes	  per	  token	  	  4.5	  	  	  	  	  	  	  	  	  	  	  	  	  	  (without	  spaces/punct.)	   §??	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  avg.	  #	  bytes	  per	  term	  	  7.5	   §??	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  non-­-posi*onal	  pos*ngs	  100,000,000	   4.5 bytes per word token vs. 7.5 bytes per word type: why? 
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+§?? Documents	  are	  parsed	  to	  extract	  words	  and	  these	   are	  saved	  with	  the	  Document	  ID.	  
+I did enact Julius Caesar I was killed  i' the Capitol;  Brutus killed me. 
+Doc 1 
+So let it be with Caesar. The noble Brutus hath told you Caesar was ambitious 
+Doc 2 
+Recall	  IIR	  1	  index	  construc*on	   Term Doc # I 1 did 1 enact 1 julius 1 caesar 1 I 1 was 1 killed 1 i' 1 the 1 capitol 1 brutus 1 killed 1 me 1 so 2 let 2 it 2 be 2 with 2 caesar 2 the 2 noble 2 brutus 2 hath 2 told 2 you 2 caesar 2 was 2 ambitious 2
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Term Doc # I 1 did 1 enact 1 julius 1 caesar 1 I 1 was 1 killed 1 i' 1 the 1 capitol 1 brutus 1 killed 1 me 1 so 2 let 2 it 2 be 2 with 2 caesar 2 the 2 noble 2 brutus 2 hath 2 told 2 you 2 caesar 2 was 2 ambitious 2
+Term Doc # ambitious 2 be 2 brutus 1 brutus 2 capitol 1 caesar 1 caesar 2 caesar 2 did 1 enact 1 hath 1 I 1 I 1 i' 1 it 2 julius 1 killed 1 killed 1 let 2 me 1 noble 2 so 2 the 1 the 2 told 2 you 2 was 1 was 2 with 2
+	  Key	  step	  
+§?? Ager	  all	  documents	  have	  been	   parsed,	  the	  inverted	  ?le	  is	   sorted	  by	  terms.	  	  
+We focus on this sort step. We have 100M items to sort. 
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Scaling	  index	  construc*on	   §?? In-­-memory	  index	  construc*on	  does	  not	  scale	   §?? Can’t	  stu?	  en*re	  collec*on	  into	  memory,	  sort,	  then	  write	   back	   §?? How	  can	  we	  construct	  an	  index	  for	  very	  large	   collec*ons?	   §?? Taking	  into	  account	  the	  hardware	  constraints	  we	  just	   learned	  about	  .	  .	  .	   §?? Memory,	  disk,	  speed,	  etc.	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Sort-­-based	  index	  construc*on	   §?? As	  we	  build	  the	  index,	  we	  parse	  docs	  one	  at	  a	  *me.	   §?? While	  building	  the	  index,	  we	  cannot	  easily	  exploit	   compression	  tricks	  	  	  (you	  can,	  but	  much	  more	  complex)	   §?? The	  ?nal	  pos*ngs	  for	  any	  term	  are	  incomplete	  un*l	  the	  end.	   §?? At	  12	  bytes	  per	  non-­-posi*onal	  pos*ngs	  entry	  (term,	  doc,	  freq),	   demands	  a	  lot	  of	  space	  for	  large	  collec*ons.	   §?? T	  =	  100,000,000	  in	  the	  case	  of	  RCV1	   §?? So	  …	  we	  can	  do	  this	  in	  memory	  in	  2009,	  but	  typical	   collec*ons	  are	  much	  larger.	  	  E.g.,	  the	  New	  York	  Times	   provides	  an	  index	  of	  >150	  years	  of	  newswire	   §?? Thus:	  We	  need	  to	  store	  intermediate	  results	  on	  disk.	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Sort	  using	  disk	  as	  “memory”?	   §?? Can	  we	  use	  the	  same	  index	  construc*on	  algorithm	   for	  larger	  collec*ons,	  but	  by	  using	  disk	  instead	  of	   memory?	   §?? No:	  Sor*ng	  T	  =	  100,000,000	  records	  on	  disk	  is	  too	   slow	  –	  too	  many	  disk	  seeks.	   §?? We	  need	  an	  external	  sor*ng	  algorithm.	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Bomleneck	   §?? Parse	  and	  build	  pos*ngs	  entries	  one	  doc	  at	  a	  *me	   §?? Now	  sort	  pos*ngs	  entries	  by	  term	  (then	  by	  doc	   within	  each	  term)	   §?? Doing	  this	  with	  random	  disk	  seeks	  would	  be	  too	  slow	   –	  must	  sort	  T=100M	  records	  
+If every comparison took 2 disk seeks, and N items could be sorted with N log2N comparisons, how long would this take? 
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   BSBI:	  Blocked	  sort-­-based	  Indexing	   (Sor*ng	  with	  fewer	  disk	  seeks)	   §?? 12-­-byte	  (4+4+4)	  records	  (term,	  doc,	  freq).	   §?? These	  are	  generated	  as	  we	  parse	  docs.	   §?? Must	  now	  sort	  100M	  such	  12-­-byte	  records	  by	  term.	   §?? De?ne	  a	  Block	  ~	  10M	  such	  records	   §?? Can	  easily	  ?t	  a	  couple	  into	  memory.	   §?? Will	  have	  10	  such	  blocks	  to	  start	  with.	   §?? Basic	  idea	  of	  algorithm:	   §?? Accumulate	  pos*ngs	  for	  each	  block,	  sort,	  write	  to	  disk.	   §?? Then	  merge	  the	  blocks	  into	  one	  long	  sorted	  order.	   Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Sor*ng	  10	  blocks	  of	  10M	  records	   §?? First,	  read	  each	  block	  and	  sort	  within:	  	  	   §?? Quicksort	  takes	  2N	  ln	  N	  expected	  steps	   §?? In	  our	  case	  2	  x	  (10M	  ln	  10M)	  steps	   §?? Exercise:	  es)mate	  total	  )me	  to	  read	  each	  block	  from	   disk	  and	  and	  quicksort	  it.	   §?? 10	  *mes	  this	  es*mate	  –	  gives	  us	  10	  sorted	  runs	  of	   10M	  records	  each.	   §?? Done	  straighqorwardly,	  need	  2	  copies	  of	  data	  on	  disk	   §?? But	  can	  op*mize	  this	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+How	  to	  merge	  the	  sorted	  runs?	   §?? Can	  do	  binary	  merges,	  with	  a	  merge	  tree	  of	  log210	  =	  4	  layers.	   §?? During	  each	  layer,	  read	  into	  memory	  runs	  in	  blocks	  of	  10M,	   merge,	  write	  back.	  
+Disk 
+1 3 4 2 
+2 1 
+4 3 
+Runs being merged. 
+Merged run. 
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+How	  to	  merge	  the	  sorted	  runs?	   §?? But	  it	  is	  more	  e?cient	  to	  do	  a	  mul*-­-way	  merge,	  where	  you	   are	  reading	  from	  all	  blocks	  simultaneously	   §?? Providing	  you	  read	  decent-­-sized	  chunks	  of	  each	  block	  into	   memory	  and	  then	  write	  out	  a	  decent-­-sized	  output	  chunk,	   then	  you’re	  not	  killed	  by	  disk	  seeks	  
+Sec. 4.2 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   Remaining	  problem	  with	  sort-­-based	   algorithm	   §?? Our	  assump*on	  was:	  we	  can	  keep	  the	  dic*onary	  in	   memory.	   §?? We	  need	  the	  dic*onary	  (which	  grows	  dynamically)	  in	   order	  to	  implement	  a	  term	  to	  termID	  mapping.	   §?? Actually,	  we	  could	  work	  with	  term,docID	  pos*ngs	   instead	  of	  termID,docID	  pos*ngs	  .	  .	  .	   §?? .	  .	  .	  but	  then	  intermediate	  ?les	  become	  very	  large.	   (We	  would	  end	  up	  with	  a	  scalable,	  but	  very	  slow	   index	  construc*on	  method.)	   Sec. 4.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   SPIMI:	  	   Single-­-pass	  in-­-memory	  indexing	   §?? Key	  idea	  1:	  Generate	  separate	  dic*onaries	  for	  each	   block	  –	  no	  need	  to	  maintain	  term-­-termID	  mapping	   across	  blocks.	   §?? Key	  idea	  2:	  Don’t	  sort.	  Accumulate	  pos*ngs	  in	   pos*ngs	  lists	  as	  they	  occur.	   §?? With	  these	  two	  ideas	  we	  can	  generate	  a	  complete	   inverted	  index	  for	  each	  block.	   §?? These	  separate	  indexes	  can	  then	  be	  merged	  into	  one	   big	  index.	   Sec. 4.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  	   SPIMI-­-Invert	  
+§?? Merging	  of	  blocks	  is	  analogous	  to	  BSBI.	  
+Sec. 4.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+SPIMI:	  Compression	   §?? Compression	  makes	  SPIMI	  even	  more	  e?cient.	   §?? Compression	  of	  terms	   §?? Compression	  of	  pos*ngs	   §?? See	  next	  lecture	  
+Sec. 4.3 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Distributed	  indexing	   §?? For	  web-­-scale	  indexing	  (don’t	  try	  this	  at	  home!):	   must	  use	  a	  distributed	  compu*ng	  cluster	   §?? Individual	  machines	  are	  fault-­-prone	   §?? Can	  unpredictably	  slow	  down	  or	  fail	   §?? How	  do	  we	  exploit	  such	  a	  pool	  of	  machines?	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Web	  search	  engine	  data	  centers	   §?? Web	  search	  data	  centers	  (Google,	  Bing,	  Baidu)	  mainly	   contain	  commodity	  machines.	   §?? Data	  centers	  are	  distributed	  around	  the	  world.	   §?? Es*mate:	  Google	  ~1	  million	  servers,	  3	  million	   processors/cores	  (Gartner	  2007)	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Massive	  data	  centers	   §?? If	  in	  a	  non-­-fault-­-tolerant	  system	  with	  1000	  nodes,	   each	  node	  has	  99.9%	  up*me,	  what	  is	  the	  up*me	  of	   the	  system?	   §?? Answer:	  63%	   §?? Exercise:	  Calculate	  the	  number	  of	  servers	  failing	  per	   minute	  for	  an	  installa*on	  of	  1	  million	  servers.	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Distributed	  indexing	   §?? Maintain	  a	  master	  machine	  direc*ng	  the	  indexing	  job	   –	  considered	  “safe”.	   §?? Break	  up	  indexing	  into	  sets	  of	  (parallel)	  tasks.	   §?? Master	  machine	  assigns	  each	  task	  to	  an	  idle	  machine	   from	  a	  pool.	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Parallel	  tasks	   §?? We	  will	  use	  two	  sets	  of	  parallel	  tasks	   §?? Parsers	   §?? Inverters	   §?? Break	  the	  input	  document	  collec*on	  into	  splits	   §?? Each	  split	  is	  a	  subset	  of	  documents	  (corresponding	  to	   blocks	  in	  BSBI/SPIMI)	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Parsers	   §?? Master	  assigns	  a	  split	  to	  an	  idle	  parser	  machine	   §?? Parser	  reads	  a	  document	  at	  a	  *me	  and	  emits	  (term,	   doc)	  pairs	   §?? Parser	  writes	  pairs	  into	  j	  par**ons	   §?? Each	  par**on	  is	  for	  a	  range	  of	  terms’	  ?rst	  lemers	   §?? (e.g.,	  a-­-f,	  g-­-p,	  q-­-z)	  –	  here	  j	  =	  3.	   §?? Now	  to	  complete	  the	  index	  inversion	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Inverters	   §?? An	  inverter	  collects	  all	  (term,doc)	  pairs	  (=	  pos*ngs)	   for	  one	  term-­-par**on.	   §?? Sorts	  and	  writes	  to	  pos*ngs	  lists	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Data	  ?ow	  
+splits 
+Parser 
+Parser 
+Parser 
+Master 
+a-f g-p q-z 
+a-f g-p q-z 
+a-f g-p q-z 
+Inverter 
+Inverter 
+Inverter 
+Postings 
+a-f 
+g-p 
+q-z 
+assign assign 
+Map phase 
+Segment files Reduce phase 
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+MapReduce	   §?? The	  index	  construc*on	  algorithm	  we	  just	  described	  is	   an	  instance	  of	  MapReduce.	   §?? MapReduce	  (Dean	  and	  Ghemawat	  2004)	  is	  a	  robust	   and	  conceptually	  simple	  framework	  for	  distributed	   compu*ng	  …	   §?? …	  without	  having	  to	  write	  code	  for	  the	  distribu*on	   part.	   §?? They	  describe	  the	  Google	  indexing	  system	  (ca.	  2002)	   as	  consis*ng	  of	  a	  number	  of	  phases,	  each	   implemented	  in	  MapReduce.	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+MapReduce	   §?? Index	  construc*on	  was	  just	  one	  phase.	   §?? Another	  phase:	  transforming	  a	  term-­-par**oned	   index	  into	  a	  document-­-par**oned	  index.	   §?? Term-­-par))oned:	  one	  machine	  handles	  a	  subrange	  of	   terms	   §?? Document-­-par))oned:	  one	  machine	  handles	  a	  subrange	  of	   documents	   §?? As	  we’ll	  discuss	  in	  the	  web	  part	  of	  the	  course,	  most	   search	  engines	  use	  a	  document-­-par**oned	  index	  …	   bemer	  load	  balancing,	  etc.	  
+Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	   Schema	  for	  index	  construc*on	  in	   MapReduce	   §?? Schema	  of	  map	  and	  reduce	  func(ons	   §?? map:	  input	  ?	  list(k,	  v)	  	  	  	  	  reduce:	  (k,list(v))	  ?	  output	   §?? Instan(a(on	  of	  the	  schema	  for	  index	  construc(on	   §?? map:	  collec*on	  ?	  list(termID,	  docID)	   §?? reduce:	  (<termID1,	  list(docID)>,	  <termID2,	  list(docID)>,	  …)	  ?	   (pos*ngs	  list1,	  pos*ngs	  list2,	  …)	   Sec. 4.4 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Example	  for	  index	  construc(on	   §?? Map:	   §?? d1	  :	  C	  came,	  C	  c’ed.	  	   §?? d2	  :	  C	  died.	  ?	   §?? <C,d1>,	  <came,d1>,	  <C,d1>,	  <c’ed,	  d1>,	  <C,	  d2>,	   <died,d2>	   §?? Reduce:	   §?? (<C,(d1,d2,d1)>,	  <died,(d2)>,	  <came,(d1)>,	  <c’ed,(d1) >)	  	  ?	  	  (<C,(d1:2,d2:1)>,	  <died,(d2:1)>,	  <came,(d1:1)>,	   <c’ed,(d1:1)>)	  
+38	  
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Dynamic	  indexing	   §?? Up	  to	  now,	  we	  have	  assumed	  that	  collec*ons	  are	   sta*c.	   §?? They	  rarely	  are:	  	   §?? Documents	  come	  in	  over	  *me	  and	  need	  to	  be	  inserted.	   §?? Documents	  are	  deleted	  and	  modi?ed.	   §?? This	  means	  that	  the	  dic*onary	  and	  pos*ngs	  lists	  have	   to	  be	  modi?ed:	   §?? Pos*ngs	  updates	  for	  terms	  already	  in	  dic*onary	   §?? New	  terms	  added	  to	  dic*onary	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Simplest	  approach	   §?? Maintain	  “big”	  main	  index	   §?? New	  docs	  go	  into	  “small”	  auxiliary	  index	   §?? Search	  across	  both,	  merge	  results	   §?? Dele*ons	   §?? Invalida*on	  bit-­-vector	  for	  deleted	  docs	   §?? Filter	  docs	  output	  on	  a	  search	  result	  by	  this	  invalida*on	   bit-­-vector	   §?? Periodically,	  re-­-index	  into	  one	  main	  index	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Issues	  with	  main	  and	  auxiliary	  indexes	   §?? Problem	  of	  frequent	  merges	  –	  you	  touch	  stu?	  a	  lot	   §?? Poor	  performance	  during	  merge	   §?? Actually:	   §?? Merging	  of	  the	  auxiliary	  index	  into	  the	  main	  index	  is	  e?cient	  if	  we	   keep	  a	  separate	  ?le	  for	  each	  pos*ngs	  list.	   §?? Merge	  is	  the	  same	  as	  a	  simple	  append.	   §?? But	  then	  we	  would	  need	  a	  lot	  of	  ?les	  –	  ine?cient	  for	  OS.	   §?? Assump*on	  for	  the	  rest	  of	  the	  lecture:	  The	  index	  is	  one	  big	   ?le.	   §?? In	  reality:	  Use	  a	  scheme	  somewhere	  in	  between	  (e.g.,	  split	   very	  large	  pos*ngs	  lists,	  collect	  pos*ngs	  lists	  of	  length	  1	  in	  one	   ?le	  etc.)	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Logarithmic	  merge	   §?? Maintain	  a	  series	  of	  indexes,	  each	  twice	  as	  large	  as	   the	  previous	  one	   §?? At	  any	  *me,	  some	  of	  these	  powers	  of	  2	  are	  instan*ated	   §?? Keep	  smallest	  (Z0)	  in	  memory	   §?? Larger	  ones	  (I0,	  I1,	  …)	  on	  disk	   §?? If	  Z0	  gets	  too	  big	  (>	  n),	  write	  to	  disk	  as	  I0	   §?? or	  merge	  with	  I0	  (if	  I0	  already	  exists)	  as	  Z1	   §?? Either	  write	  merge	  Z1	  to	  disk	  as	  I1	  (if	  no	  I1)	   §?? Or	  merge	  with	  I1	  to	  form	  Z2	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Logarithmic	  merge	   §?? Auxiliary	  and	  main	  index:	  index	  construc*on	  *me	  is	   O(T2)	  as	  each	  pos*ng	  is	  touched	  in	  each	  merge.	   §?? Logarithmic	  merge:	  Each	  pos*ng	  is	  merged	  O(log	  T)	   *mes,	  so	  complexity	  is	  O(T	  log	  T)	   §?? So	  logarithmic	  merge	  is	  much	  more	  e?cient	  for	  index	   construc*on	   §?? But	  query	  processing	  now	  requires	  the	  merging	  of	  O (log	  T)	  indexes	   §?? Whereas	  it	  is	  O(1)	  if	  you	  just	  have	  a	  main	  and	  auxiliary	   index	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Further	  issues	  with	  mul*ple	  indexes	   §?? Collec*on-­-wide	  sta*s*cs	  are	  hard	  to	  maintain	   §?? E.g.,	  when	  we	  spoke	  of	  spell-­-correc*on:	  which	  of	   several	  corrected	  alterna*ves	  do	  we	  present	  to	  the	   user?	   §?? We	  said,	  pick	  the	  one	  with	  the	  most	  hits	   §?? How	  do	  we	  maintain	  the	  top	  ones	  with	  mul*ple	   indexes	  and	  invalida*on	  bit	  vectors?	   §?? One	  possibility:	  ignore	  everything	  but	  the	  main	  index	  for	   such	  ordering	   §?? Will	  see	  more	  such	  sta*s*cs	  used	  in	  results	  ranking	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Dynamic	  indexing	  at	  search	  engines	   §?? All	  the	  large	  search	  engines	  now	  do	  dynamic	  indexing	   §?? Their	  indices	  have	  frequent	  incremental	  changes	   §?? News	  items,	  blogs,	  new	  topical	  web	  pages	   §?? Sarah	  Palin,	  …	   §?? But	  (some*mes/typically)	  they	  also	  periodically	   reconstruct	  the	  index	  from	  scratch	   §?? Query	  processing	  is	  then	  switched	  to	  the	  new	  index,	  and	   the	  old	  index	  is	  deleted	  
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Other	  sorts	  of	  indexes	   §?? Posi*onal	  indexes	   §?? Same	  sort	  of	  sor*ng	  problem	  …	  just	  larger	   §?? Building	  character	  n-­-gram	  indexes:	   §?? As	  text	  is	  parsed,	  enumerate	  n-­-grams.	   §?? For	  each	  n-­-gram,	  need	  pointers	  to	  all	  dic*onary	  terms	   containing	  it	  –	  the	  “pos*ngs”.	   §?? Note	  that	  the	  same	  “pos*ngs	  entry”	  will	  arise	  repeatedly	   in	  parsing	  the	  docs	  –	  need	  e?cient	  hashing	  to	  keep	  track	   of	  this.	   §?? E.g.,	  that	  the	  trigram	  uou	  occurs	  in	  the	  term	  deciduous	  will	  be	   discovered	  on	  each	  text	  occurrence	  of	  deciduous	   §?? Only	  need	  to	  process	  each	  term	  once	   Why? 
+Sec. 4.5 
+Introduc)on	  to	  Informa)on	  Retrieval	  	  	  	  	  
+Resources	  for	  today’s	  lecture	   §?? Chapter	  4	  of	  IIR	   §?? MG	  Chapter	  5	   §?? Original	  publica*on	  on	  MapReduce:	  Dean	  and	   Ghemawat	  (2004)	   §?? Original	  publica*on	  on	  SPIMI:	  Heinz	  and	  Zobel	  (2003)

@@ -1,0 +1,1546 @@
+Relational Database Systems 1
+Wolf-Tilo Balke / Stephan Mennicke Hermann Kroll / Janus Wawrzinek
+
+Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+6 Relational Algebra
+? Motivation ? Relational Algebra
+? basic relational algebra operations ? Query Optimization ? additional derived operations
+
+? Advanced relational algebra
+? Outer Joins ? Aggregation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+2
+
+6.1 Motivation
+? A data model has three parts:
+? Structure
+? Data structures used to create databases representing modeled objects
+
+? Integrity
+? Rules expressing constraints placed on these data structures to ensure structural integrity
+
+? Manipulation
+? Operators that can be applied to the data structures, to update and query the data contained in the database
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+3
+
+6.1 Motivation
+? Last week we introduced the relational model
+? based on set theory ? relations can be written as tables:
+
+relation name
+PERSON first_name Clark Joseph Louise Lex Charles Erik Jeanne Ororo
+
+attributes
+last_name Kent Lane Luthor Xavier Magnus Gray Munroe sex m f m m m f f
+
+tuples
+
+?
+
+domain values
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+4
+
+Relational Model
+? Tables correspond to relations, table rows to tuples, table columns to attributes or domains
+? Relations are a subset of the Cartesian product of its attribute domains, i.e., ? 1 ? ? ? .
+? Especially, each relation has a primary key with the unique key constraint ? There can be foreign key constraints, i.e., links between relations
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? There are additional constraints on relations
+
+5
+
+6.1 Motivation
+? How do you work and query relations? ? Relational algebra!
+? proposed by Edgar F. Codd: A Relational Model for Large Shared Data Banks, Communications of the ACM, 1970
+
+? The theoretical foundation of all relational databases
+? describes how to manipulate relations and retrieve interesting parts of available relations ? relational algebra is mandatory for advanced tasks like query optimization
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+6.1 Motivation
+? Why do we need special query languages at all?
+? Won?t conventional languages like C or Java suffice to ask and answer any computational question about relations?
+
+? Relational algebra is useful, because it is less powerful than C or Java. ? 2 rewards
+? ease of programming ? ability of the compiler to often produce highly optimized code
+[GUW09, 2]
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7
+
+6.1 Motivation
+? The first thing that happens to an SQL query is that it gets translated into relational algebra.
+Query
+
+Parser & Translator
+
+Relational Algebra Expression
+
+Query Optimizer
+Query Result
+
+Evaluation Engine
+
+Execution Plan
+
+Access Paths Statistics
+
+Data
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+6.1 Motivation
+? Queries are translated into an internal form
+? queries posed in a declarative DB language
+? what should be returned, not how the query should be processed
+
+? queries can be evaluated in different ways
+
+? Several relational algebra expressions might lead to the same results
+? each statement can be used for query evaluation ? but? different statements might also result in vastly different performance!
+
+? This is the area of query optimization, the heart of every database kernel
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9
+
+6.1 Motivation
+? Imagine a relation schema LECTURES(Series,Episode,Date) and a relation over LECTURES. ? Initially, = ?. ? How do you add/remove/update information in ? ? How do you query for information in ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10
+
+6 Relational Algebra
+? Motivation ? Relational Algebra
+
+? basic relational algebra operations ? Query Optimization ? additional derived operations
+
+? Advanced relational algebra
+? Outer Joins ? Aggregation
+
+?
+
+?? ?
+11
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Relational Algebra
+? What is an algebra after all?
+? Study of symbols and their manipulation ? it consists of
+? operators and atomic operands.
+
+? it allows to
+? build expressions by applying operators to operands and / or other expressions of the algebra.
+
+? e.g., algebra of arithmetics
+? atomic operands: variables like x and constants like 15 ? operators: addition, subtraction, multiplication and division
+
+? Relational algebra: an example of an algebra made for the relational model of databases
+? atomic operands
+? variables, that stand for relations ? constants, which are finite relations
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+12
+
+6.2 Relational Algebra
+? Elementary operations
+? set algebra operations
+? ? ? ? Set Union ? Set Intersection ? Set Difference ? Cartesian Product ?
+
+? new relational algebra operations ? all sorts of joins ?,?,?, ? ? division ? ??
+
+? Selection ? ? Projection ? ? Renaming ?
+
+? Additional derived operations (for convenience)
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+6.2 Example Relations
+mat no firstname (0,*) result (0,*) crs no Course title
+
+Student lastname sex
+
+exam
+
+Student(mat_no, firstname, lastname, sex) Course(crs_no, title)
+
+exam(student ? Student, course ? Course, result)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+Student mat_no 1005 2832 4512 5119 6676 8024 9876
+
+6.2 Example Relations
+Course 100 101 exam student 9876 2832 1005 1005 6676 5119 102 firstname Clark Louise Lex Charles Erik Jeanne Logan lastname Kent Lane Luther Xavier Magnus Gray NULL sex m f m m m f m crs_no title Intro to being a Superhero Secret Identities 2 How to take over the world
+
+course 100 102 101 100 102 101
+
+result 3.7 2.0 4.0 1.3 4.3 1.7
+15
+
+Student(mat_no, firstname, lastname, sex) Course(crs_no, title)
+
+exam(student ? Student, course ? Course, result)
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? Selection ?
+
+6.2 Relational Algebra
+
+? selects all tuples (rows) from a relation that satisfy the given Boolean predicate (condition) ? ? ? ? ? Condition ( ) is a Boolean statement given by a connection of clauses
+? Intensional definition of a set of tuples!
+
+? Selection = create a new relation that contains exactly the satisfying tuples
+
+? Connected by ?,? and ? (logical AND, OR, and NOT)
+
+? Condition clauses
+
+? ?attribute? ? ?value? ? ?attribute? ? ?attribute? ? ? ? {=, <, ?, ?, >, ?}
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+6.2 Relational Algebra
+? Example
+Student 1005 2832 4512 5119 6676 8024 9876 mat_no firstname Clark Louise Lex Charles Erik Jeanne Logan lastname Kent Lane Luther Xavier Magnus Gray NULL sex m f m m m f m Select all female students.
+
+?sex=?f? Student
+
+?sex=?f? Student mat_no 2832 8024
+EN 6
+
+firstname Louise Jeanne
+
+lastname Lane Gray
+
+sex f f
+17
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Relational Algebra
+? Example
+exam 9876 2832 1005 1005 6676 5119 student course 100 102 101 100 102 101 result 3.7 2.0 4.0 1.3 4.3 1.7 Select exams within course 100 with a result worse than 3.0.
+
+?course=100 ? result>3.0 exam
+
+?course=100 ? result>3.0 exam student course 9876
+EN 6
+
+result 3.7
+18
+
+100
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? Projection ?
+
+6.2 Relational Algebra
+
+? retains only specified attributes (columns)
+? Let be a relation over ( { 1, ? , } for 1 ? ? .
+? again: creates a new relation with only those attribute sets which are specified within an attribute list ? in practice (tables), if tuples are identical after projection, duplicate tuples need to be removed
+? This is due to the set-based nature of relational algebra
+
+?
+
+Course
+crs_no 100 101 102
+
+??1 ,?, ????
+
+?
+
+1
+
+,?,
+
+1, ? ,
+
+All courses titles. ? title Course
+title Intro. to being a Superhero Secret Identities 2 How to take over the world
+19
+
+??
+
+?
+
+) and let
+
+??
+
+?
+
+title Intro. to being a Superhero Secret Identities 2 How to take over the world
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Relational Algebra
+? Of course, operations can be combined
+Retrieve only the first name and last name of all female students.
+Student
+mat_no
+1005
+
+?firstname, lastname ?sex=?f? Student
+firstname
+Clark
+
+lastname
+Kent
+
+sex
+m
+
+?sex=?f? Student
+mat_no firstname lastname sex
+
+2832
+8024
+
+Louise
+Jeanne
+
+Lane
+Gray
+
+f
+f
+
+2832
+4512
+
+Louise
+Lex
+
+Lane
+Luther
+
+f
+m
+
+5119 6676 8024 9876
+EN 6
+
+Charles Erik Jeanne Logan
+
+Xavier Magnus Gray
+
+m m f m
+
+?firstname, lastname ?sex=?f? Student
+firstname Loise
+Jeanne
+
+lastname Lane
+Gray
+20
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? Renaming operator ?
+
+6.2 Relational Algebra
+
+? ? S(B1, B2, ?, Bn) R or ? S R or ?(B1, B2, ?, Bn) R
+?Lecture ?crs_no Course
+
+? renames a relation and/or its attributes
+
+Retrieve all course numbers contained in Course and name the resulting relation Lecture.
+Course 100 101 102
+EN 6
+
+Lecture course 100 101 102
+21
+
+crs_no
+
+title Intro. to being a Superhero Secret Identities 2 How to take over the world
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+? Renaming operator ?
+
+6.2 Relational Algebra
+Select all result of course 100 from exam; the resulting relation should be called result and contain the attributes mat_no, course, and grade.
+
+?course=100exam
+student 9876 1005 100 100
+
+?results(mat_no, course, grade) ?course=100 exam
+
+results
+mat_no 9876 1005 course 100 100 grade 3.7 1.3
+
+course
+
+result 3.7 1.3
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+? Union ?, intersection ?, and set difference ?
+? operators work as in set theory
+? written as R ? S, R ? S, and R ? S, respectively
+title
+
+6.2 Relational Algebra
+
+? but: operands have to be union-compatible (i.e. they must consist of the same attributes) ? We define same as having the same name & same domain
+?crs_no=100 Course ? ?crs_no=102 Course
+crs_no
+100
+
+?crs_no=100 Course
+crs_no
+
+?crs_no=102 Course
+100 crs_no 102
+EN 6
+
+Intro. to being a Superhero
+
+title
+Intro. to being a Superhero
+
+title How to take over the world
+
+102
+
+How to take over the world
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+23
+
+? Cartesian product ?
+? written as R ? S
+
+6.2 Relational Algebra
+
+? also called cross product
+
+? creates a new relation by combining each tuple of the first relation with every tuple of the second relation
+? attribute set = all attributes of R plus all attributes of S ? the resulting relation contains exactly |R|? |S| tuples
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+24
+
+Student
+mat_no 1005 2832 4512
+?
+
+6.2 Relational Algebra
+exam
+9876
+
+firstname Clark Louise Lex
+
+lastname Kent Lane Luther
+
+sex m f m
+
+student
+
+course
+100
+
+result
+3.7
+
+2832 1005
+?
+
+102 101
+
+2.0 4.0
+
+Student ? exam
+mat_no firstname 1005 1005 1005
+?
+
+lastname Kent Kent Kent Lane Lane
+
+sex m m m f f
+
+student 9876 2832 1005 9876 2832
+
+course 100 102 101 100 102
+
+result 3.7 2.0 4.0 3.7 2.0
+
+Clark Clark Clark Louise Louise
+
+2832 2832
+?
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+25
+
+6.2 Relational Algebra
+?lastname, title, result ?mat_no=student ? course=crs_no (Student ? exam ? Course)
+lastname Kent Kent Xavier
+?
+
+title Secret Identities 2 Intro to being a Superhero Secret Identities 2
+
+result 4.0 1.3 1.7
+
+? This type of expression is very important!
+? Cartesian product, followed by selections/projections ? selections/projections involve different source relations ? this kind of query is called a join
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+? Theta join ? ?
+
+6.2 Relational Algebra
+(? is a boolean condition)
+
+? sometimes also called inner join or just join ? creates a new relation by combining related tuples from different source relations ? written as R ? ?condition? S or ? ?condition? (R ? S) ? Joins can be used to join related relations
+? i.e., related in an ER model, and now linked via foreign keys
+?lastname, title, result ?mat_no=student ? course=crs_no (Student ? exam ? Course ) ?lastname, title, result (Student?mat_no=student exam?course=crs_no Course)
+
+=
+
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+27
+
+? Equi-join ? ?condition?
+
+6.2 Relational Algebra
+
+? joins two relations only using equality conditions ? R ? ?condition? S ? ?condition? may only contain equality statements between attributes (A1=A2)
+? a special case of the theta join ? Most used join operator
+?lastname, title, result (Student?mat_no=student exam?course=crs_no Course)
+
+?lastname, title, result ?mat_no=student ? course=crs_no (Student ? exam ? Course)
+EN 6
+
+=
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+? Natural join ?
+
+6.2 Relational Algebra
+
+? a special case of the equi-join ? R ? ?attributeList? S ? implicit join condition
+
+? each attribute in ?attributeList? must be contained in both source relations ? for each of these attributes, an equality condition is created ? all these conditions are connected by logical AND ? If no attributes are explicitly stated, all attributes with equal names are implicitly used
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+EN 6
+
+29
+
+Student
+mat_no 1005 2832 4512
+?
+
+6.2 Relational Algebra
+firstname Clark Louise Lex lastname Kent Lane Luther sex m f m
+
+exam
+student 9876 course 100 102
+101
+
+Course crs_no 100 101 102 title Intro. to being a Superhero Secret Identities 2 How to take over the world
+
+result 3.7 2.0
+4.0
+
+2832
+1005
+?
+
+Student?mat_no=student exam?course=crs_no Course
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+EN 6
+
+30
+
+6.2 Query Optimization
+? Relational algebra usually allows for several equivalent evaluation plans
+? respective execution costs may strongly differ
+? e.g., in memory space, response time, etc.
+
+? Idea: Find the best plan, before evaluating the query
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+6.2 Query Optimization
+? Example
+Select all results better than 1.7, their student?s name and course title.
+Student mat_no 3519 1473 2308 1337 2158 1104 2480 firstname Bilbo Samwise Meriadoc Erna Frodo Peregrin Sm?agol lastname Baggins Gamgee Brandybuck Broosh Baggins Took NULL size 103 114 135 86 111 142 98 Course crs_no 41 40 exam student 1473 3519 2480
+1337
+
+4 Byte title Cooking rabbits Destroying rings Flying eagles 4 Byte course 41 40 40
+42
+
+30 Byte
+
+42
+
+4 Byte result 1.0 3.3 1.7
+1.3
+
+8 Byte
+
+2480 4 Byte 30 Byte 30 Byte 4 Byte 2158
+
+41 40
+
+4.0 2.3
+32
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Query Optimization
+? Example
+Select all results better than 1.7, their student?s name and course title.
+Student mat_no 3519 1473 2308 1337 2158 1104 2480 ?lastname, result, title ?result?1.3 ? course=crs_no ? mat_no=student (Course ? Student ? exam) firstname Bilbo Samwise Meriadoc Erna Frodo Peregrin Sm?agol lastname Baggins Gamgee Brandybuck Broosh Baggins Took NULL Course crs_no 41 40 exam student 1473 3519 2480
+1337
+
+4 Byte title Cooking rabbits Destroying rings Flying eagles 4 Byte course 41 40 40
+42
+
+30 Byte
+
+42
+
+4 Byte result 1.0 3.3 1.7
+1.3
+
+8 Byte
+
+size 103 114 135 86 111 142 98
+
+2480 2158
+
+41 40
+
+4.0 2.3
+33
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+?lastname, result, title ?result?1.3 ? course = crs_no ?
+mat_no = student
+
+6.2 Query Optimization
+?lastname, result, title ? course=crs_no ? result?1.3
+
+(Course ? Student ? exam)
+
+? Create Canonical Operator Tree
+? operator tree visualized the order of primitive functions ? note: Illustration is not really canonical tree as selection is already split in three parts
+Student
+
+? student=matNo
+? ? exam
+34
+
+Course
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Query Optimization
+How much space is needed for the intermediate results?
+2 * 68B = 136B
+2 * 118B = 236B
+
+?lastname, result, title
+? course=crs_no ? result?1.3
+
+? This seems like a lot of unnecessary work!
+? cant we optimize this? => yes, we can!
+
+6 * 118B = 708B 18 * 118B = 2,124B
+
+? student=mat_no
+? Course exam
+
+126 * 118B = 14,868B 42 * 84B = 3,528B Student 7 * 68B = 476B ?
+
+3 * 34B= 102B
+
+6 * 16B = 96B
+35
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Query Optimization
+? Optimized Operator Tree
+2 * 68B = 136B ?lastname, result, title 2 * 76B = 152B 2 * 42B = 84B 2 * 50B = 100B ?course=crs_no Course 3 * 34B= 102B
+
+?lastname, result, course
+?student=mat_no
+
+(Course ? Student ? exam)
+mat_no = student
+
+?result?1.3 ? course = crs_no ?
+
+?lastname, result, title
+
+?lastname, mat_no
+
+? result?1.3 2 * 16B = 32B
+
+7 * 34B = 238B Student 7 * 68B = 585B exam 6 * 16B = 96B
+
+?lastname, result, title (Course ?course=crs_no ?lastname, result, course (?lastname, mat_no Student ?mat_no=student ?result?1.3 exam))
+36
+
+=
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.2 Query Optimization
+? Comparison of intermediate results
+2 * 68B = 136B
+
+?lastname, result, title ? result?1.3
+
+2 * 68B = 136B
+
+2 * 118B = 236B
+
+?lastname, result, title
+?course=crs_no
+
+6 * 118B = 708B
+
+18 * 118B = 2,124B
+
+? student=mat_no
+?
+
+? course=crs_no
+
+2 * 76B = 152B 2 * 42B = 84B
+2 * 50B = 100B
+
+?lastname, result, course
+?student=mat_no
+
+3 * 34B= 102B Course
+2 * 16B = 32B
+
+126 * 118B = 14,868B 42 * 84B = 3,528B
+
+7 * 34B = 238B
+
+?lastname, mat_no
+
+? result?1.3
+
+?
+
+Course
+3 * 34B= 102B Student exam
+
+Student 7 * 65B = 476B
+
+exam 6 * 16B = 96B
+
+7 * 68B = 585B
+
+6 * 16B = 96B
+
+Intermediate result sets ? summed up sizes: 21464 B versus 606 B
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+Have a ?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+38
+
+Note on Query Optimization
+? Query evaluation problem:
+? Given relational database DB, query Q and output tuple t. ? Does t belong to the result of Q(DB)? ? PSPACE-complete
+
+? Query inclusion:
+? Given two queries Q1 and Q2 over relational schema R. ? Is Q1(DB) included in Q2(DB) for every instance DB over R? ? undecidable
+
+? Consequence: query equivalence is undecidable, too.
+? Query optimization is an active field of research! ? Companies are interested in it, because the faster their product the more money they earn.
+AHV 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+? Left semi-join ? and right semi-join ?
+? combination of a theta-join and projection
+
+6.2 Relational Algebra
+
+? creates a copy of R (or S) while removing all those tuples that do not have a join partner
+? This is a filtering operation with a dictionary lookup
+
+? R ? ?condition? S = ?(list of all attributes in R) (R ? ?condition? S) ? R ? ?condition? S = ?(list of all attributes in S) (R ? ?condition? S)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+6.2 Relational Algebra
+Left semi-join:
+Student
+mat_no 1005 2832 4512 5119 firstname Clark Louise Lex Charles
+
+Student ?mat_no=student exam
+lastname Kent Lane Luther Xavier sex m f m m
+
+exam
+student 9876 2832 1005 1005 course 100 102 101 100 result 3.7 2.0 4.0 1.3
+
+Student ?matNr=course exam
+mat_no 1005 2832 firstname Clark Louise Kent Lane
+
+lastname
+
+sex m f
+
+All hard-trying students (those who did exams).
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+Division ?
+
+6.2 Relational Algebra
+
+? written as R ? S ? S contains only attributes that are also present in R ? division restricts R in terms of attributes and tuples
+
+? result?s attributes = those in R but not in S ? result?s tuples = those in R such that every tuple in S is a join partner ? useful for queries like Find the sailors who have reserved all boats. ? let AR={attributes of R}; AS ={attributes of S}; AS ? AR ? A = AR ? AS ? R ? S ? ?AR ? ?A ((?A (R) ? S) ? R) ? but: (R ? S) ? S = R is not true in general
+
+? more formally:
+
+? why the name division? because (R ? S) ? S = R.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+6.2 Relational Algebra
+SC = ?SC (?mat_no, lastname, course (Student ?mat_no=student exam))
+mat_no 1000 1000 1001 1002 1002
+1002
+
+Division:
+Kent Kent Lane Luther Luther
+Luther
+
+lastname
+
+course 100 102 100 102 100
+101
+
+CCK = ?CCK(?course?lastname=?Clark Kent? SC) course 100 SC ? CCK mat_no 1000 1002 lastname Kent Luther 102
+
+1003
+1003
+
+Xavier
+Xavier
+
+103
+100
+
+Result contains all those students who took the same courses as Clark Kent (and possibly some more).
+EN 6
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+6.2 Relational Algebra
+? Alternative definition
+? Read division as a for all statement ? Given relations and based on schemas
+? (
+1, ? ,
+
+?
+?
+
+?
+
+? e.g., =< 1,2 >,
+
+?{ ? ( ) ? ?? ??? ?}
+=< 3,4 >,
+
+,
+
+1, ? ,
+
+) and (
+
+1, ? ,
+
+)
+
+(
+
+)?
+
+means plain concatenation of and
+
+=< 1,2,3,4 >
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+6.2 Relational Algebra
+? Conflicting attribute names
+? In the previous examples, all relations had different attribute names
+? What to do, if not?
+
+? Simple case:
+? Use qualified attribute names:
+? Student(matno, name) ? Thesis(id, student ? Student, name) ? ?Student.name, Thesis.name(Student ?matno=student Thesis)
+
+? General case:
+? Use renaming:
+? Person(id, name, supervisor ? Person) ? Person ?supervisor=sid (?Supervisor(sid, sname, ssup) Person)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+45
+
+6.2 Relational Algebra
+? Operator Precedence
+? unary operators are applied first (?, ?, ?, ??)
+
+? cross product and joins are applied afterwards (?, ?, ?) ? followed by union und set minus (?, ?) ? last step is intersection (?)
+?lastname, result Student ?mat_no=student exam
+
+(exam ?course=crs_no (?crs_no=101 Course)) exam ?course=crs_no ?crs_no=101 Course = ? (exam ?course=crs_no (?crs_no=100 Course)) ? exam ?course=crs_no ?crs_no=100 Course
+
+projection is applied first!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+6.2 Summary
+? Basic relational algebra
+? ? ? ? ? ?
+? ? ? ? ?
+
+Selection ? Projection ? Renaming ? Union ?, set difference ? Cartesian product ? Intersection ?
+
+? Extended relational algebra
+
+Theta-join ?? Equi-join ?<=-cond> Natural join ?<attributeList> Left semi-join ? and right semi-join ? Division ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+6.2 Summary (cont?d)
+? SPC
+? Selection ? ? Projection ? ? Cartesian product ?
+? ? ? ?
+
+? SPJR
+
+? Beyond conjunctive queries
+
+? Union ? ? Set difference \
+
+Selection ? Projection ? Natural join ?<attributeList> Renaming ?
+
+AHV 4
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+48
+
+6 Relational Algebra
+? Motivation ? Relational Algebra
+? basic relational algebra operations ? Query Optimization ? additional derived operations
+
+? Advanced relational algebra
+? Outer Joins ? Aggregation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+6.3 What does this do?
+Movie(id, name, year, type, remark) produced_in(movie ? Movie, country ? Country) Country(name, residents)
+
+?country, name( Country ?name=country produced_in ?movie=id ?year=1893 ? type="cinema" Movie )
+
+From which countries are the cinema movies of the year 1893 and what are their names?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+50
+
+6.3 What does this do?
+Person(id, name, sex) plays(person ? Person, movie ? Movie, role) Movie(id, title, year, type)
+
+?name(
+)
+
+?title = "Star Wars" ? type="cinema" Movie ?Movie.id=movie ?role=?Diplomat" plays ?person=Person.id ?sex="female" Person
+
+Which female actors from ?Star Wars? cinema movies played a diplomat?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+6.3 What does this do?
+Person(id, name, sex) plays(person ? Person, movie ? Movie, role) Movie(id, title, year, type) has_genre(movie ? Movie, genre ? Genre) Genre(name, description)
+
+?name(
+
+)
+
+?id, name (Person ?id=person ?role="postman" plays ) \ ?id, name (Person ?id=person plays?plays.movie=has_genre.movie ?genre="Western" has_genre )
+
+Which actors have played a ?postman?, but never participated in a ?Western??
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+52
+
+6.3 Advanced Relational Algebra
+? Advanced relational algebra
+? Left outer join ?, ? Right outer join ?, ? Full outer join ?, ? Aggregation ?? ? these operations cannot be expressed with basic relational algebra
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+53
+
+6.3 Advanced Relational Algebra
+? Left outer join ? and right outer join ?
+? Theta-joins and its specializations join exactly those tuples that satisfy the join condition
+? tuples without a matching join partner are eliminated and will not appear in the result ? all information about non-matching tuples gets lost
+
+? outer joins allow to keep all tuples of a relation
+? ? ? ?
+EN 6
+
+padding with NULL values if there is no join partner Left outer join ?: Keeps all tuples of the left relation Right outer join ?: Keeps all tuples of the right relation Full outer join ?: Keeps all tuples of both relations
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+54
+
+6.3 Advanced Relational Algebra
+Example: List students and their exam results
+Student
+mat_no
+1005
+
+? lastname, course, result (Student?mat_no=student exam)
+exam
+9876
+
+firstname
+Clark
+
+lastname
+Kent
+
+sex
+m
+
+student 2832
+1005
+
+course
+100
+
+result
+3.7
+
+2832
+4512
+
+Louise
+Lex
+
+Lane
+Luther
+
+f
+m
+
+102
+101
+
+2.0
+4.0
+
+?lastname, course, result (Student?mat_no=studentexam)
+5119 Charles Xavier m lastname Kent Kent Lane course 100 101 102 result 1.3 4.0 2.0
+
+1005
+
+100
+
+1.3
+
+Lex Luther and Charles Xavier are lost because they didn?t take any exams! Also, information on student 9876 disappears?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+55
+
+6.3 Advanced Relational Algebra
+Left outer join: List students and their exam results
+Student
+matNr 1005 2832 4512 5119
+
+? lastname, course, result (Student ? mat_no=student exam)
+exam
+9876 2832 1005 1005 firstname Clark Louise Lex Charles lastname Kent Lane Luther Xavier sex m f m m student 100 102 101 100
+
+course
+
+result 3.7 2.0 4.0 1.3
+
+? lastname, course, result (Student ? mat_no=studentexam)
+lastname Kent Kent Lane Luther Xavier course 100 101 102 NULL NULL result 1.3 4.0 2.0 NULL NULL
+
+All student names with course and result if present.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+56
+
+6.3 Advanced Relational Algebra
+Right outer join: List exams and their participants.
+Student
+mat_no 1005 2832 4512 5119
+
+? lastname, course, result (Student ? mat_no=student exam)
+exam
+9876 2832 1005 1005 firstname Clark Louise Lex Charles lastname Kent Lane Luther Xavier sex m f m m student course 100 102 101 100
+
+result 3.7 2.0 4.0 1.3
+
+? lastname, course, result (Student ? mat_no=student exam)
+lastname Kent Kent Lane NULL course 100 101 102 100 result 1.3 4.0 2.0 3.7
+
+All exam result with student names if known.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+57
+
+6.3 Advanced Relational Algebra
+Full outer join: Combination of left and right outer joins.
+Student
+mat_no 1005 2832 4512 5119
+
+? lastname, course, result (Student ? mat_no=student exam)
+exam
+9876 2832 1005 1005 firstname Clark Louise Lex Charles lastname Kent Lane Luther Xavier sex m f m m student course 100 102 101 100 result 3.7 2.0 4.0 1.3
+
+? lastname, course, result (Student ? mat_no=student exam)
+lastname course result
+
+Kent Kent
+Lane
+
+100 101
+102
+
+1.3 4.0
+2.0
+
+Luther NULL
+Xavier
+
+NULL 100
+NULL
+
+NULL 3.7
+NULL
+
+All student names with course and result if present AND all exam result with student names if known.
+58
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.3 Aggregation
+? Aggregation operator: Typically used in simple statistical computations
+? merges tuples into groups ? computes (simple) statistics for each group
+
+? Examples
+? Compute the average exam score. ? For each student, count the total number of exams he/she has taken so far. ? Find the highest exam score ever.
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+59
+
+? Written as ?grouping attributes????function list? R
+? ?? is called script F
+
+6.3 Aggregation
+
+? Creates a new relation
+? all tuples in R that have identical values with respect to all grouping attributes, are grouped together ? all functions in the function list are applied to each group ? for each group, a new tuple is created, which contains the result values of all the functions ? the schema of the resulting relation looks as follows:
+? the grouping attributes and, for each function, one new attribute ? all other attributes of the old relation are lost
+
+? Example: course??average(result) exam
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+60
+
+6.3 Aggregation
+? Attention
+? Within groups, no duplicates are eliminated
+
+? Some available functions
+? Sum(attribute)
+? sum of all non-NULL values of attribute
+
+? Average(attribute)
+? mean of all non-NULL values of attribute
+
+? Maximum(attribute)
+? maximum value of all non-NULL values of attribute
+
+? Minimum(attribute)
+? minimum value of all non-NULL values of attribute
+
+? Count(attribute)
+? number of tuples having a non-NULL values of attribute
+
+? Count(*)
+? number of tuples
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+61
+
+6.3 Aggregation
+? Example (without grouping)
+?Without_Groups(sum, avg_result, min_result, max_result) ( ??sum(student), average(result), min(result), max(result) exam)
+course 100 102 101 102 101 result 3.7 2.0 4.0 5.0 1.7
+62
+
+? if there are no grouping attributes, the whole input relation is treated as one group
+
+exam
+9876 2832 1005 6676 5119
+
+student
+
+Without_Groups
+sum 25508 avg_result min_result 3.28 1.7 max_result 5.0
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.3 Aggregation
+? Example (with grouping)
+For each course, count results and compute the average score.
+
+?With_Grouping (course, avg_result, #result) ( course??average(result), count(result) exam)
+exam
+9876 2832 1005 1005 6676
+student course result
+
+With_Grouping
+course
+100
+
+100 102 101 100 102
+
+3.7 2.0 4.0 1.3 4.3
+
+avg_result
+2.5
+
+#result
+2
+
+101
+102
+
+4.0
+3.15
+
+1
+2
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+63
+
+6.3 Aggregation
+? Example
+?Overview(mat_no, #exams, avg_result) ( mat_no??count(course), avg(result) ? mat_no, course, result (Student ?mat_no=student exam) )
+#exams 2 1 0 0 avg_result 2.65 2.0 NULL NULL
+
+For each student, count the exams and compute average result.
+student 9876 2832 1005 1005 course 100 102 101 100 result 3.7 2.0 4.0 1.3
+
+exam
+
+Overview
+mat_no 1005 2832 4512 5119
+
+Student
+mat_no firstname
+1005 Clark
+
+lastname
+Kent
+
+sex
+m
+
+2832 4512 5119
+
+Louise Lex Charles
+
+Lane Luther Xavier
+
+f m m
+64
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.3 Advanced Relational Algebra
+? Subqueries: Conditions used in select or join operators compare a tuple?s attribute to another value or attribute
+? Condition clauses
+? ?attribute? ? ?value? ? ?attribute? ? ?attribute? ? ? ? {=, <, ?, ?, >, ?}
+
+? Sometimes, we need a dynamic value ? Convention for advanced relational algebra:
+? We can treat a relation with a single attribute and a single row as a value (we call that a subquery)
+
+? Example: Select those tuples from exam which have the overall average result as a result
+?
+=
+???? ????????????
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+65
+
+6.4 Guidelines
+? Writing complex Queries
+? Use intermediate results:
+? stud_ex = ?stud_ex(stud, num_ex) (student??count(course) exam) ? ?stud_ex.num_ex>5 stud_ex = ? ?stud_ex.num_ex>5 (?stud_ex(stud, num_ex) (student??count(course) exam))
+
+? Use proper indentation... not something like:
+
+?name(Student ?mat_no (?mat_no ?#exams>5 ? avg_result >2.7 ?Overview(mat_no, #exams, avg_result)(mat_no??count(course), avg(result) ? mat_no, course, result (Student ? mat_no=student exam))))
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+66
+
+Student
+mat_no
+
+6.4 Exercise
+firstname lastname sex
+
+Course
+crs_no title
+
+1005 2832 4512 5119 6676 8024 9876
+
+Clark Louise Lex Charles Erik Jeanne Logan
+
+Kent Lane Luther Xavier Magnus Gray
+
+m f m m m f m
+
+100 101 102 103
+
+Intro. to being a Superhero Secret Identities 2 How to take over the world Mind Reading
+
+Exam
+9876 2832 2832 1005
+
+mat_no
+
+course
+100 101 102 101 100 103 102 101 102 103
+
+result
+3.7 1.7 2.0 4.0 1.3 4.0 4.3 2.0 1.3 1.0
+67
+
+Student(mat_no, firstname, lastname, sex) Course(crs_no, title) Exam(mat_no ? Student, course ? Course, result)
+
+1005 1005 6676 5119 5119 5119
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.4 Exercise
+? List the student(s) who took the most exams. (by matno and firstname)
+? Decompose the query in multiple parts:
+? How many exams did each student take? ? What is the maximum number of exams a student took? ? Who took as many exams as the maximum?
+Student(mat_no, firstname, lastname, sex) Course(crs_no, title) Exam(mat_no ? Student, course ? Course, result)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+68
+
+6.4 Exercise
+? How many exams did each student take?
+?
+_ ,
+
+=
+
+?
+
+_ .
+
+, _ =
+
+, . _
+
+_
+
+StudentExams
+mat_no 1005
+2832
+
+firstname Clark
+Louise
+
+exam_count 3
+2
+
+4512 6676 Student(mat_no, firstname, lastname, sex) Course(crs_no, title) 8024 Exam(mat_no ? Student, course ? Course, result) 9876
+5119
+
+Lex
+Charles
+
+0
+3
+
+Erik Jeanne Logan
+
+1 0 1
+69
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6.4 Exercise
+? What is the maximum number of exams a max_exam_count student took?
+? _ =
+( _ )
+
+3
+
+? List the student(s) who took the most exams.
+?
+_ ,
+
+=
+.
+
+? ?
+
+_
+
+?
+,
+
+_
+
+, _ = _
+
+, . = _ _
+
+_
+
+=
+
+(
+
+_
+
+)
+
+StudentExams
+mat_no firstname
+
+1005 5119
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+Clark Charles
+70
+
+6.4 Recommendation
+? The University of Innsbruck build a relational algebra calculator
+? https://dbis-uibk.github.io/relax/index.htm ? It can be helpful to improve your relational algebra skills
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+71
+
+6 Next Lecture
+? Tuple relational calculus
+? foundation of SQL
+
+? Domain relational calculus
+? foundation of Query-by-example (QBE)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+72
+
+

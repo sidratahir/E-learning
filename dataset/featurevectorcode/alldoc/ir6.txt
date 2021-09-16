@@ -1,0 +1,255 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke
+Lecture 6: Language Models and Retrieval Evaluation May 11th, 2017
+Lecture 6: Language Models and Evaluation
+1. Language Models 2. Evaluation of IR Systems
+2Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Observation: There are many different styles of writing, especially depending on topics – For example, political news articles use a completely different vocabulary than personal blog entries • Idea in IR: – Equate “languages” and fine-grained(!) topics • Each topic corresponds to a specific language – Represent each document by its corresponding language model (different parameters) – Querying then becomes: To which document’s language model the query fits best? • There are models available to describe such “languages”… How to define a Model’s Language? Topics and Languages
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to describe “language” within a formal model? – Well-known from theoretical computer science: Formal grammars – A way to describe correct syntax – Example: • sentence ? noun_phrase verb_phrase • verb_phrase ? verb  noun_phrase • verb ? took • noun_phrase ? the man • noun_phrase ? the book
+1. Formal Grammars
+4Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Why formal grammars will not help us: – Grammars capture syntactical correctness but not style – Natural language does not strictly obey grammar rules – The writing style or topic of a document largely depends on how typical words, phrases, or sentences look like – Formal grammars fail to capture statistical properties of text, they just describe the set of “correct” documents
+1. Formal Grammars (2)
+5Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• A different approach to modeling language are statistical language models: – Ignore syntactical rules and grammar – Focus on statistical regularities in the generation of language • A generative model is used here: – Assumption: Every document is the result of a random process – Central quantity:  Pr(w1, …, wn), the probability of generating a document containing the words w1, …, wn (in this order)
+2. Statistical Language Models
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• A statistical language model consists of probability distributions: – For any given n, there is a probability distribution such that every document w1, …, wnof length n (word count) gets assigned its probability of generation Pr(w1, …, wn) • Example: – Assume that only the words “cat” and “dog” are generated
+2. Statistical Language Models (2)
+7Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+doc Pr(doc) () 1
+doc Pr(doc) (cat) 0.3 (dog) 0.7
+doc Pr(doc) (cat, cat) 0.1 (cat, dog) 0 (dog, cat) 0.7 (dog, dog) 0.2 n = 0: n = 1: n = 2:
+…
+• Usually, some structure is assumed • Unigram model (assume independence, ignore context):
+• Bigram model (assume dependence on the previous word only):
+• Trigram model (assume dependence on the previous two words):
+Building probabilities over term seq.
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Example of a three-word bigram model:
+Some randomly generated 6-word sentences: – dog mouse cat mouse cat mouse – dog dog dog mouse cat mouse – dog mouse cat mouse cat mouse – cat mouse cat dog mouse cat – cat mouse cat mouse cat mouse
+Bigram Model
+9Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+word Pr(word) cat 0.4 dog 0.5 mouse 0.1
+Pr(row | column) cat dog mouse cat 0 0.1 1 dog 0.2 0.4 0 mouse 0.8 0.5 0
+• Observation: Generative models can be used to… – generate documents, or – recognize documents
+• Document recognition: – “Which document fits a given model best?” – Usually based on probabilities of generation – Popular applications: OCR, speech recognition, …
+Statistical Language Models 
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to apply language models in information retrieval? • Assumptions: – For each document, there is a “true” (but unknown) statistical document model – Each document was generated from its corresponding model by a random generation process, i.e., it is a random sample – The query also is a sample or a description of an underlying language model describing the user’s information need
+Language Models in IR
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Model 1 Model 2 Model 3 Model Q
+Doc 1 Doc 2 Doc 3 Query
+Generation
+Typical application of language models in IR: 1. Estimate a model for each document 2. For each estimated model, compute the probability of generating the query 3. Rank documents by these probabilities
+Language Models in IR (2)
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Model 1 Model 2 Model 3
+Doc 1 Doc 2 Doc 3
+Estimation
+Comparison
+Query
+Problem 1: Which language model should we use (unigram, bigram, …)?
+• For practical reasons, unigram models are used in IR (sometimes bigram models) • “Practical reasons” refers to: – Reduced computational complexity – Problem of sparse data: Documents usually are short and its size and content are fixed – Losses from data sparseness (i.e., bad estimations) tend to outweigh any gains from richer models
+Language Models – Open problems
+13Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Problem 2: How to estimate the “true” language models from the observations (= documents) we have?
+• Straightforward approach: – Given: Document d = (w1, …, wn) – Estimate Pr(wi) by – This is the maximum likelihood estimator (MLE) • Example: – d = (the, big, dog, jumps, over, the, small, dog) – Estimate Pr(dog) by 2 / 8 = 0.25 – Estimate Pr(cat) by 0
+Language Models - Open problems(2)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Document size often is too small – Many terms would be missing in a doc, which implies a zero probability estimate – Probability of terms occurring once in the document normally is overestimated, because this occurrence was partly by chance
+• Solution: Smoothing – Allocate some probability mass to missing terms – Pull all estimates in the direction of the collection mean – There are many ways to do this
+MLE Approach drawback
+15Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+1. Simple smoothing (as used in TF-IDF): – Add some small number a (e.g. 1 or 0.5) to all observed counts – Renormalize to give a probability distribution • Example (use a = 1): – d = (the, big, dog, jumps, over, the, small, dog)
+Smoothing – First Approach
+16Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+word initial estimate the 3 / 8 big 2 / 8 dog 3 / 8 jumps 2 / 8 over 2 / 8 small 2 / 8 cat 1 / 8
+word final estimate the 3 / 15 big 2 / 15 dog 3 / 15 jumps 2 / 15 over 2 / 15 small 2 / 15 cat 1 / 15
+normalize (divide by 15/8)
+2. Linear smoothing: – Estimate Pr(wi) by
+– n: document size – cf(wi): collection frequency of wi, i.e., the number of occurrences of wi in the whole collection – N: collection size, i.e., number of words in the whole collection – ?: some parameter between 0 and 1
+Smoothing – Second Approach
+17Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+3. Approach by Ponte and Croft (1998): – Use corpus data to stabilize document model – If a term is missing in the document: Estimate its probability by its corpus probability (i.e., use an MLE over the whole collection) – If a term appears in the document: Smooth MLE using average MLE (over all documents containing the term)
+• There are many more advanced smoothing methods…
+Smoothing – Third Approach
+18Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to compare a document model to the query? – Compute the query’s generation probability with respect to the model – Given: Query q = (q1, …, qk) – The score of a document then is our estimation of Pr(q1, …, qk) = Pr(q1) · ? · Pr(qk) with respect to the document’s language model
+Ranking
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Pros: – Clear statistical foundation, no ad hoc weightings – Collection statistics are an integral part of the model, rather than being used heuristically – Works good, comparable to the vector space model
+• Cons: – Independence assumption in unigram model – No explicit notion of relevance, integration of user feedback is difficult
+Pros and Cons of Language Models
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 6: Language Models and Evaluation
+1. Language Models 2. Evaluation of IR Systems
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+What should be evaluated in IR?
+1. Efficiency • Use of system resources • Scalability
+2. Effectiveness • Result quality • Usability
+What to Evaluate?
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Efficiency: – Storage space – CPU time – Number of I/O operations – Response time – … • Depends on hardware and software • Goal in IR: “be efficient enough” • Efficiency usually is easy to evaluate, therefore it will not be discussed here any further
+Efficiency
+23Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Effectiveness: How to measure result quality? • Key concept is relevance • There is no fully satisfactory definition of relevance – The same problem as with “information” and “intelligence”… • What we will do next? – Point out some important aspects of relevance – Give a pragmatic approach from the system builder’s point of view • Fortunately, often we don’t need a precise definition (think of probabilistic retrieval)
+Effectiveness
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Saracevic (2007) identifies five manifestations of relevance:
+– System or algorithmic relevance
+– Topical or subject relevance
+– Cognitive relevance or pertinence
+– Situational relevance or utility
+– Affective relevance
+Relevance is Multidimensional
+25Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+subjective (or user-based)
+objective (or system-based)
+• System or algorithmic relevance:
+– Relevance as a static and objective concept – Not influenced by users – The most common and clearest definition of relevance • “How close is the fit between the retrieved set of documents and the user’s query?” – In a narrow sense, system relevance is always perfect – Criteria for measuring relevance: effectiveness in inferring relevance
+System or Algorithmic Relevance
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Topical or subject relevance: – Relevance as a subjective or user-based concept – Still a static concept – The concept of topic is understood as aboutness, not contents, i.e., an intellectual assessment of how a document corresponds to the topical area required and described by the query • “How close is the semantic fit between the query and the topics of the document retrieved?” – Consequently, based on judgments – Criteria for measuring relevance: aboutness independent of the query
+Topical or Subjective Relevance
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Cognitive relevance or pertinence: – Again, subjective – Relevance as relation between documents and the cognitive state of knowledge and information need of a user – “What is the user’s judgment about the applicability of the retrieved documents to the matter at hand?” – Relevance may be dynamic, i.e., change over session time
+Cognitive Relevance or Pertinence
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Situational relevance or utility: – Again, subjective and dynamic – Relevance as the relation between the situation, task, or problem at hand, and documents – “Do the retrieved items allow the user to complete the task at hand?” – Involves serendipity: Information may be useful although you did not expect this in advance
+Situational Relevance or Utility
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Affective relevance: – Again, subjective and dynamic – Relevance as the relation between documents and the intents, goals, emotions, and motivations of a user – Represents the human drive for information
+Affective Relevance
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Manifestations of Relevance
+31Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Type of Relevance Criteria for measurement
+System or algorithmic relevance Rules for comparative judgments
+Topical or subject relevance Aboutness
+Cognitive relevance or pertinence
+Informativeness, novelty, information quality, … Situational relevance or utility Usefulness in decision making, appropriateness of information in resolution of a problem, reduction of uncertainty, … Affective relevance Satisfaction, success, accomplishment, …
+• Our notion of relevance: Topical or subject relevance
+• Current goal of IR: – Build an algorithm resembling topical relevance for “most” users
+• Future goals (current research): – Address the other subjective manifestations of relevance
+What’s Our Notion of Relevance?
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Relevance vs. pertinence:
+• Be careful: – Often “relevant to a query” means “relevant to a ‘typical’ information need that fits the query”
+Queries and Information Needs
+33Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Personal information need
+Query
+IR system
+Answer
+Pertinence
+Relevance
+• Back to our initial question: How to evaluate a system’s result quality? • Traditional approach: Evaluation benchmarks – A benchmark document collection – A benchmark suite of information needs, expressible as queries – An assessment of the relevance of each query–document pair, called “gold standard” or “ground truth” • Usually, relevance is assessed in binary fashion • Example of an information need: – “What are the prospects of the Quebec separatists achieving independence from the rest of Canada?”
+Evaluating Relevance
+34Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• How to completely assess very large collections? • The pooling method is widely used: – Run each query on a set of very different IR systems – “Pool” their results to form a set of documents, which have at least this recommendation of potential relevance (usually, take top k results from each system) – The union of these retrieved sets is presented to human judges for relevance assessment – Assumption: Unassessed documents are irrelevant!
+Evaluating Relevance (2)
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Evaluate algorithmic relevance against topic relevance • Underlying assumptions: – Laboratory retrieval resembles real retrieval – Intersubject reliability: There is at least some consistency between this user’s opinion and those of others – Binary relevance – Independence of interdocument relevance assessments: The relevance of a document can be assessed independently of assessments of other documents
+Test Collections
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The Cranfield collection: – It was the Pioneering test collection – Cranfield University (UK) – Collected in1960s – Total size: 1.6 Mbytes – 1400 abstracts of aerodynamics (aircraft design) journal articles – 225 queries generated by some of the documents’ authors – Exhaustive relevance judgments for all query–document pairs (done by students and “experts”)
+Cranfield Collection
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Rating scale used for relevance judgments: 1. References which are a complete answer to the question 2. References of a high degree of relevance, the lack of which either would have made the research impracticable or would have resulted in a considerable amount of extra work 3. References which were useful, either as general background to the work or as suggesting methods of tackling certain aspects of the work 4. References of minimum interest, for example, those that have been included from an historical viewpoint 5. References of no interest
+Cranfield Collection (2)
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Example document: – “viscous flow along a flat plate moving at high speeds. by the distortion of coordinates, it is shown that, in the case of supersonic viscous flow past a flat plate, the boundary-layer and simple wave theories can be combined to give a complete representation of the velocity and pressure fields. […]”
+• Example query: – “why does the compressibility transformation fail to correlate the high speed data for helium and air”
+Cranfield Collection (3)
+39Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• TREC – Annual Text Retrieval Conference, beginning in 1992 – Sponsored by the U.S. National Institute of Standards and Technology as well as the U.S. Department of Defense – Today: many different tracks, e.g. blogs, genomics, spam http://trec.nist.gov/tracks.html – Provides data sets and test problems – Research competitions
+TREC
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• TREC collections: – Best known: Test collections used for the TREC Ad Hoc track during the first eight TREC evaluations between 1992 and 1999 – In total the test collection comprises: • 1.89 million documents (mainly newswire articles) • 450 information needs (specified in detailed text passages) – Binary relevance judgments (used the pooling method)
+TREC (2)
+41Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Example information need: – Title: Endangered Species (Mammals) – Description: Compile a list of mammals that are considered to be endangered, identify their habitat and, if possible, specify what threatens them. – Narrative: Any document identifying a mammal as endangered is relevant. Statements of authorities disputing the endangered status would also be relevant.  A document containing information on habitat and populations of a mammal identified elsewhere as endangered would also be relevant even if the document at hand did not identify the species as endangered.  Generalized statements about endangered species without reference to specific mammals would not be relevant.
+TREC (3)
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Some more collections: – CACM • 3,204 titles and abstracts from the journal Communications of the ACM – Reuters-21578 • 21,578 newswire articles – Reuters-RCV1 • Reuters Corpus Volume 1 • 806,791 news stories in English • 2.5 Gbytes (uncompressed) – 20 newsgroups • 1,000 articles from each of twenty Usenet newsgroups • 18,941 articles after duplicates have been removed – ClueWeb09 • http://lemurproject.org/clueweb09/ More Collections 43Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• First, we deal with the evaluation of IR systems that return result sets, i.e., they do not provide any ranking • Idea: Compare result set with ground truth result set
+• What sets are involved here?
+Evaluation of Answer Sets
+44Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+relevant returned
+• False positives: – Irrelevant documents returned by the system – Extend the result set unnecessarily – Often inevitable – Usually can be filtered out by the user quite easily
+False Positives
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+relevant returned
+false positives
+• False negatives: – Relevant documents not returned by the system – Problematic, since the user usually is not aware of them • Are there any “better” documents? – Often worse than false positives
+False Negatives
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+relevant returned
+false negatives
+• Remaining sets: True positives and true negatives
+True Positives and True Negatives
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+relevant nonrelevant returned true positives false positives not returned false negatives true negatives
+relevant returned
+true positives
+true negatives
+• Precision, recall, and fallout are important measures of (unranked) answer sets • Precision: – Uses the number of true positives as measure of result quality – How many of the returned documents are relevant? – Definition:
+– Value in [0, 1], where 1 is best – High precision usually is important in Web search (result set = first page of results)
+Precision
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Recall: – Also uses the number of true positives as measure of quality – How many of all relevant documents have been returned? – Definition:
+– Value in [0, 1], where 1 is best – High recall usually is important for professional searchers such as paralegals and intelligence analysts; it is also important for desktop search
+Recall
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Fallout: – Uses false positives to measure retrieval quality – How many returned documents have been nonrelevant? – Definition:
+– Value in [0, 1], where 0 is best – Zero fallout can be achieved by returning empty result sets – Fallout usually only makes sense for large result sets • For typical queries, most documents in the collection are nonrelevant
+Fallout
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Precision and recall clearly trade off against one another: – Achieve perfect recall (but awful precision) by always returning all documents in the collection – Achieve very good precision (but awful recall) by always returning only the single result that seems to match best • Normally, this leads to tradeoffs in system tuning – Small result sets usually lead to better precision but worse recall • What about measurement? – Precision is easy to measure – Measuring recall is at least very difficult, and often impossible
+Precision versus Recall
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Example: Comparison of three retrieval systems
+The Precision–Recall Curve
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Average precision of system 3 at recall level 0.2
+Which system is best?
+What’s more important: Precision or recall?
+• The F measure combines precision and recall – It’s a weighted harmonic mean of precision and recall – Definition:
+– Parameterized by weighting factor a ? [0, 1] – Balanced F measure: a = 1/2 – Value in [0, 1], where 1 is best – Why do we use the harmonic mean? With the arithmetic mean, an F measure of 0.5 could easily by achieved e.g. by returning all documents
+The F Measure
+53Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Now, how to evaluate ordered result lists? – Idea: Compute precision and recall for the set of the top k retrieved documents; repeat this for many different k – We then get the precision at k and the recall at k – Example result list (assume there are 5 relevant docs):
+Ordered Result Lists
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+k Relevant? #Relevant Recall at k Precision at k 1 Yes 1 1/5 = 0.2 1 2 Yes 2 2/5 = 0.4 1 3 No 2 2/5 = 0.4 2/3 ˜ 0.67 4 Yes 3 3/5 = 0.6 3/4 = 0.75 5 No 3 3/5 = 0.6 3/5 = 0.6 6 No 3 3/5 = 0.6 3/6 = 0.5 7 No 3 3/5 = 0.6 3/7 ˜ 0.43
+• Plotting precision at k and recall at k, for many k, again gives us a precision–recall curve • Example from (Manning et al., 2008):
+Ordered Result Lists (2)
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Typical sawtooth shape: If the (k + 1)-th retrieved document is nonrelevant, then recall is the same as for the top k documents, but precision has dropped
+• To get rid of the sawtooth shape, we can use the interpolated precision at a certain recall level instead • Definition: The interpolated precision at recall level r is the highest precision found for any recall level r’ > r
+Ordered Result Lists (3)
+56Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• TREC uses eleven-point interpolated average precision: – Recall levels used are 0.0, 0.1, …, 1.0 – Precision values are averaged over many different queries • Averaged eleven-point interpolated precision/recall; example from (Manning et al., 2008):
+Ordered Result Lists (4)
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Some people like single aggregate values instead of curves • A popular one is the mean average precision (MAP) • Definition: 1. Compute precision at k, for any k such that there is a relevant document at position k in the result list 2. Then compute the arithmetic mean of all these precision values 3. Compute the mean over many different queries; this value is the mean average precision of the IR system • MAP has been shown to have especially good discrimination and stability • Broadly spoken: MAP is the average area under the precision–recall curve for a set of queries
+Ordered Result Lists (5)
+58Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Ordered Result Lists (6)
+59Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+76.0
+5 3
+3 2
+1 1
+3 1 ? ? ? ? ? ? ? ? ??
+Consider the following example, for a given query ??1
+MAP is Average Precision across multiple queries
+Average Precision 
+Example from (Manning et al.)
+• Clustering
+Next Lecture
+60Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig

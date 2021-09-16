@@ -1,0 +1,287 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke and José Pinto
+Lecture 9: Support Vector Machines June15th , 2017
+• Supervised classification: Learn by examples to assign labels to objects. • The learning algorithm takes a training set as input and returns the learned classification function
+• Some classical approaches: – Naïve Bayes – Rocchio – K-nearest neighbor
+Supervised Classification
+2Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Training set Learning algorithm Classifier
+Lecture 9: Support Vector Machines
+1. Linear SVMs 2. Nonlinear SVMs 3. Support Vector Machines in IR 4. Overfitting
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Assumptions: – Binary classification: Let’s assume there are only two classes (e.g. spam/non-spam or relevant/non-relevant) – Vector representation: Any item to be classified can be represented as a d-dimensional real vector
+• Task: – Find a linear classifier (i.e. a hyperplane) that divides the space Rd into two parts
+Problem Definition
+4Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• A two-dimensional example training set. • Task: Separate it by a straight line!
+Example
+5Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Any of these linear classifiers would be fine… Which one is best?
+• Idea: Measure the quality of a linear classifier by its margin!
+Margin
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Margin = The width that the boundary could be increased without hitting a data point
+Margin (2)
+7Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Margin (3)
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• A maximum margin classifier is the linear classifier with a maximum margin
+Maximum Margin Classifiers
+9Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The maximum margin classifier is the simplest kind of support vector machine, called a linear SVM – Let’s assume for now that there always is such a classifier, i.e. the training set is linearly separable!
+Maximum Margin Classifiers (2)
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+The data points that the margin pushes against are called support vectors
+• Why maximum margin? – It’s intuitive to divide the two classes by a large margin – The largest margin guards best against small errors in choosing the “right” separator – This approach is robust since usually only a small fraction of all data points are support vectors – There are some theoretical arguments why this is a good thing – Empirically, it works very well
+Maximum Margin Classifiers (3)
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• How to formalize this approach? • Training data: – Let there be n training examples – The i-th training example is a pair (yi, zi), where yi is a d-dimensional real vector and zi ? {-1, 1} – “-1” stands for the first class and “1” stands for the second class
+Finding MM Classifiers
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++( -1, 1), -1
+(1, 0), -1
+- (1, 2), -1
+-
+(4, 1), 1
+(5, -1), 1
+• What’s a valid linear separator? • Any hyperplane can be defined by a real row vector w and a scalar b – The set of points located on the hyperplane is given by
+– w is a normal vector of the hyperplane, i.e. w is perpendicular to it – b represents a shift from the origin of the coordinate system
+Finding MM Classifiers (2)
+13
+-
++
++
+-
+-
+x1 - x2 - 2 = 0
+(-1, 1)
+(1, 0) (1, 2)
+(4, 1)
+(5, -1) x1 - x2 - 2 < 0 x1 - x2 - 2 > 0 Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Therefore, any valid separating hyperplane (w, b) must satisfy the following constraints, for any i = 1, …, n: – If zi = -1, then w · yi + b < 0 – If zi = 1, then w · yi + b > 0
+Finding MM Classifiers (3)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+x1 - x2 - 2 = 0
+(-1, 1)
+(1, 0) (1, 2)
+(4, 1)
+(5, -1) x1 - x2 - 2 < 0 x1 - x2 - 2 > 0
+• Furthermore, if (w, b) is a valid separating hyperplane, then there are scalars r+ > 0 and r- > 0 such that w · x + b + r- = 0 and w · x + b - r+ = 0 are the hyperplanes that define the boundaries to the “-1” class and the “1” class, respectively – The support vectors are located on these hyperplanes!
+Finding MM Classifiers (4)
+15Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+w · x + b = 0
+w · x + b + r- = 0
+w · x + b - r+ = 0
+• Let (w, b) be a valid separating hyperplane with scalars r+ and r- as defined above • Observation 1: Define b’ = b + (r- - r+) / 2. Then, the hyperplane w · x + b’ = 0 is a valid separating hyperplane with equal shift constants r’ = (r- - r+) / 2 to its bounding hyperplanes (the margin width is the same)
+Finding MM Classifiers (5)
+16Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+w · x + b = 0
+w · x + b + r- = 0 w · x + b’ + r’ = 0
+w · x + b - r+ = 0 w · x + b’ - r’ = 0
+w · x + b’ = 0
+• Now, divide w, b’, and r’ by r’ • This does not change any of the three hyperplanes… • Observation 2: Define w’’ = w / r’ and b’’ = b’ / r’. Then, the hyperplane w’’ · x + b’’ = 0 is a valid separating hyperplane with shift constant 1 to each of its bounding hyperplanes
+Finding MM Classifiers (6)
+17
+-
++
++
+-
+-w · x + b’ + r’ = 0 w’’ · x + b’’ + 1 = 0
+w · x + b’ - r’ = 0 w’’ · x + b’’ - 1 = 0
+w · x + b’ = 0 w’’ · x + b’’ = 0
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Corollary (normalization): If there exists a valid separating hyperplane (w, b), then there always is a hyperplane (w’’, b’’) such that – (w’’, b’’) is a valid separating hyperplane – (w, b) and (w’’, b’’) have equal margin widths – the bounding hyperplanes of (w’’, b’’) are shifted away by 1 • Therefore, to find a maximum margin classifier, we can limit the search to all hyperplanes of this special type • Further advantage: It seems to be a good idea to use a linear classifier that lies equally spaced between its bounding hyperplanes
+Finding MM Classifiers (7)
+18Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Our search space then consists of all pairs (w, b) such that – w ? Rd – b ? R – For any i = 1, …, n: If zi = -1, then w · yi + b = -1 If zi = 1, then w · yi + b = 1 – There is an i such that zi = -1 and w · yi + b = -1 – There is an i such that zi = 1 and w · yi + b = 1
+• Now, what is the margin width of such a hyperplane?
+Finding MM Classifiers (8)
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Linear algebra: The distance of a hyperplane w · x + b = 0 to the origin of coordinate space is |b| / ||w|| • Therefore, the margin width is 2 / ||w|| • Consequently, our goal is to maximize the margin width subject to the constraints from the previous slide
+Finding MM Classifiers (9)
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+w · x + b + 1 = 0
+w · x + b - 1 = 0 w · x + b = 0
+1 / ||w||
+• We arrive at the following optimization problem over all w ? Rd and b ? R: Maximize 2 / ||w|| subject to the following constraints: – For any i = 1, …, n: If zi = -1, then w · yi + b = -1 If zi = 1, then w · yi + b = 1 – There is an i such that zi = -1 and w · yi + b = -1 – There is an i such that zi = 1 and w · yi + b = 1 • Note that due to the “maximize the margin” goal, the last two constraints are not needed anymore since any optimal solution satisfies them anyway
+Finding MM Classifiers (10)
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The problem then becomes:
+Maximize 2 / ||w|| over all w ? Rd and b ? R subject to the following constraints: – For any i = 1, …, n: If zi = -1, then w · yi + b = -1 If zi = 1, then w · yi + b = 1 • Instead of maximizing 2 / ||w||, we also could minimize ||w||, or even minimize 0.5 ||w||2 – Squaring avoids the square root within ||w|| – The factor 0.5 brings the problem into some standard form
+Finding MM Classifiers (11)
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The problem then becomes:
+Minimize 0.5 ||w||2 over all w ? Rd and b ? R subject to the following constraints: – For any i = 1, …, n: If zi = -1, then w · yi + b = -1 If zi = 1, then w · yi + b = 1
+• The two constraints can be combined into a single one: – For any i = 1, …, n: zi · (w · yi + b) - 1 = 0
+Finding MM Classifiers (12)
+23Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Finally: Minimize 0.5 ||w||2 over all w ? Rd and b ? R subject to the following constraints: – For any i = 1, …, n: zi · (w · yi + b) - 1 = 0
+• This is a so-called quadratic programming (QP) problem – There are many standard methods to find the solution… • QPs that emerge from an SVM have a special structure, which can be exploited to speed up computation
+Finding MM Classifiers (13)
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• We will not discuss in detail how QPs emerging from SVMs can be solved • But we will give a quick impression of what can be done • By introducing Lagrange multipliers (already known to us from Rocchio’s relevance feedback) and doing some transformations, one finally arrives at the following optimization problem: Maximize (in a ? Rn)
+subject to ai = 0, for any i, and a1z1 + ? + anzn= 0
+Duality
+25Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Maximize (in a ? Rn)
+subject to ai = 0, for any i, and a1z1 + ? + anzn= 0 • This problem is called the dual optimization problem and has the same optimal solutions as the original problem (if one ignores a); but usually it is easier to solve • Important property: If ai > 0 in a solution of the above problem, then the corresponding data point yi is a support vector – Consequence: Usually, most ai are zero, which makes things easy
+Duality (2)
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Duality (3)
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The classification function then becomes:
+• b can be computed as follows, using any i such that ai > 0:
+• Note that f can be directly expressed in terms of the support vectors • Furthermore, computing f basically depends on scalar products of vectors (yiT · x), which is a key feature in advanced applications of SVMs
+• At the beginning we assumed that our training data set is linearly separable… • What if it looks like this?
+Soft Margin Classification
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• So-called soft margins can be used to handle such cases • We allow the classifier to make some mistakes on the training data • Each misclassification gets assigned an error, the total classification error then is to be minimized
+Soft Margin Classification (2)
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+-
+• We arrive at a new optimization problem • Minimize 0.5 ||w||2 + C · (ß1 + ? + ßn) over all (w, b, ß) satisfying w ? Rd, b ? R, and ß ? Rn subject to the following constraints: – For any i = 1, …, n: ßi = 0 zi · (w · yi + b) - 1 = -ßi • If the i-th data point gets misclassified by ßi, the price we pay for it is C · ßi • C is a positive constant that regulates how expensive errors should be
+Soft Margin Classification (2)
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• With soft margins, we can drop the assumption of linear separability
+• The corresponding dual problem is: Maximize (in a ? Rn)
+subject to C = ai = 0, for any i, and a1z1 + ? + anzn= 0
+• Note that only an upper bound on a is added here – Still, it is possible to find solutions efficiently
+Soft Margin Classification (3)
+31Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• At the beginning, we also assumed that there are only two classes in the training set • How to handle more than that? • Some ideas: – One-versus-all classifiers: Build an SVM for any class that occurs in the training set; To classify new items, choose the greatest margin’s class – One-versus-one classifiers: Build an SVM for any pair of classes in the training set; To classify new items, choose the class selected by most SVMs – Multiclass SVMs: (complicated, will not be covered in this course)
+Multiple Classes
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Lecture 9: Support Vector Machines
+1. Linear SVMs 2. Nonlinear SVMs 3. Support Vector Machines in IR 4. Overfitting
+33Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Now we are able to handle linearly separable data sets (perhaps with a few exceptions or some noise) • But what to do with this (one-dimensional) data set?
+• Obviously, it is not linearly separable, and the reason for that is not noise… • What we want to do:
+Nonlinear SVMs
+34Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+- + + - --
+- + + - --
+• Solution: Transform the data set into some higher-dimensional space and do a linear classification there…
+Nonlinear SVMs (2)
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+- + + - --
+-
+++
+-
+-
+-
+Transform
+• Visualization:
+Nonlinear SVMs (3)
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Source: http://www.youtube.com/watch?v=3liCbRZPrZA
+• But… When working in high-dimensional spaces, computing the transformation and solving the corresponding optimization problem will be horribly difficult • What can we do about it?
+• Observation: There are no problems at all if we are able to compute scalar products in the high-dimensional space efficiently…
+Nonlinear SVMs (4)
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The key technique here is called the “kernel trick” • Let h : Rd ? Rd’ be some function that maps our original d-dimensional data into some d’-dimensional space – Typically d’ » d holds • To deal with our optimization problem and be able to do classification afterwards, we must be able to quickly compute the following expressions:
+Nonlinear SVMs (5)
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Note that we only need to compute scalar products in the high-dimensional space… • If h is some special type of mapping (e.g. polynomial or Gaussian), there are computationally simple kernel functions available, which correspond to the result of scalar products in h’s range • A polynomial transformation of degree 2:
+Nonlinear SVMs (6)
+39Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• A demo of nonlinear SVMs http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+• Applications: – Speaker/speech recognition – Predicting protein structures – Breast cancer prognosis – Stock forecast – … http://clopinet.com/isabelle/Projects/SVM/
+Demo: Nonlinear SVMs
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Lecture 9: Support Vector Machines
+1. Linear SVMs 2. Nonlinear SVMs 3. Support Vector Machines in IR 4. Overfitting
+41Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• An important application of SVMs in information retrieval is text classification • Typically, this means automatically assigning topics to new documents based on a training collection of manually processed documents – But there are also many other applications, e.g. spam detection • In SVMs, document representations known from the vector space model can be used – Plus additional features, e.g. document length • Although the dimensionality is very high then, this usually is not a big problem since most document vectors are very sparse
+Text Classification
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• SVMs have been successfully applied in text classification on small and medium-sized document collections • Some results by Joachims (1998) from experiments on the Reuters-21578 data set (F-measure with a = 0.5)
+Text Classification (2)
+43Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+CATEGORIES NBAYES ROCCHIO DEC. TREES KNN LINEAR SVM RBF-SVM
+C=0.5              C = 1.0 EARN 96.0 96.1 96.1 97.8 98.0 98.2 98.1 ACQ 90.7 92.1 85.3 91.8 95.5 95.6 94.7 MONEY-FX 59.6 67.6 69.4 75.4 78.8 78.5 74.3 GRAIN 69.8 79.5 89.1 82.6 91.9 93.1 93.4 CRUDE 81.2 81.5 75.5 85.8 89.4 89.4 88.7 TRADE 52.2 77.4 59.2 77.9 79.2 79.2 76.6 INTEREST 57.6 72.5 49.1 76.7 75.6 74.8 69.1 SHIP 80.9 83.1 80.9 79.8 87.4 86.5 85.8 WHEAT 63.4 79.4 85.5 72.9 86.6 86.8 82.4 CORN 45.2 62.2 87.7 71.4 87.5 87.8 84.6 MICROAVG. 72.3 79.9 79.4 82.6 86.7 87.5 86.4
+• A very recent application of SVM in information retrieval is called “Learning to Rank” • Here, a special type of SVMs is used: Ranking SVMs • The training set consists of n pairs of documents (yi, yi’) • Each such pair expresses that document yi is preferred to yi’ with respect to some fixed query shared by all training pairs • Example training set for query “Viagra”: – Wikipedia’s entry “Viagra” is preferred to some spam page – Wikipedia’s entry “Viagra” is preferred to the manufacturer’s official page – The manufacturer’s official page is preferred to some spam page Learning to Rank 44Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• The task in Learning to Rank: Find a ranking function that assigns a numerical score s(d) to each document d based on its vector representation such that s(d) > s(d’) if and only if document d is preferred to document d’
+• A straightforward approach are linear ranking functions, i.e. s(d) = w · d, for some row vector w • This reminds us of SVMs…
+Learning to Rank (2)
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• An SVM formulation of our task is… Minimize 0.5 ||w||2 over all w ? Rd subject to the following constraints: – For any i = 1, …, n: w · yi = w · yi’ + 1
+• The constraint is equivalent to w · (yi - yi’) - 1 = 0, which looks familiar… • Of course, we could also use a soft margin or nonlinear scoring functions here…
+Learning to Rank (3)
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+score of yi score of yi’
+Enforce a standard margin of 1 between each pair of scores
+• Where to get the preference pairs from? • Idea from Joachims (2002): – Users tend to linearly read a search engine’s result lists down from its beginning – If users click the r-th result but do not click the (r - 1)-th, then document r likely to be preferred to document r - 1
+Learning to Rank (4)
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Then: 1. Compute an initial result list using some retrieval algorithm 2. Collect user clicks 3. Learn a ranking function 4. Incorporate the ranking function into the retrieval process, i.e. re-rank the result list
+• Of course, one could use the ranking information already in computing the initial result list – … if user feedback on similar queries is available – … if feedback from different users on the same query is available
+Learning to Rank (5)
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Particularly popular: Recognition of handwritten digits Handwritten Digits
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Results – Taken from Decoste/Schölkopf: Training Invariant Support Vector Machines (2002)
+Handwritten Digits (2)
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Only 56 misclassifications in 10,000 test examples: Handwritten Digits (3)
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+Lecture 9: Support Vector Machines
+1. Linear SVMs 2. Nonlinear SVMs 3. Support Vector Machines in IR 4. Overfitting
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Usually, there is a tradeoff in choosing the “right” type of classifier – Ignoring specific characteristics of the training set leads to a systematic bias in classification – Accounting for all individual properties of the training set leads to a large variance over classifiers when the training set is randomly chosen from some large “true” data set • Learning error = bias + variance • So, what type of SVM is the “right” one? • Typically, you cannot have both! (small bias & small variance)
+The Bias–Variance Tradeoff 
+53Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• If we use a mapping to a high-dimensional space that is “complicated enough,” we could find a perfect linear separation in the transformed space, for any training set • Example: How to separate this data set into two parts?
+High Variance learning methods
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+-
++
++
+-
+-
+-
+-
+-
++
++
++
++
++
++
++
+-
+• A perfect classification for the training set could generalize badly on new data • Fitting a classifier too strongly to the specific properties of the training set is called overfitting • What can we do to avoid it? 1)  Cross-validation: – Randomly split the available data into two parts (training set + test set) – Use the first part for learning the classifier and the second part for checking the classifier’s performance – Choose a classifier that maximizes performance on the test set
+Overfitting (1)
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+2) Regularization: – If you know how a “good” classifier roughly should look like (e.g. polynomial of low degree) you could introduce a penalty value into the optimization problem – Assign a large penalty if the type of classifier is far away from what you expect, and a small penalty otherwise – Choose the classifier that minimizes the overall optimization goal (original goal + penalty) – An example of regularization is the soft margin technique since classifiers with large margins and few errors are preferred
+Overfitting (2)
+56Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig
+• Introduction to Web retrieval
+Next Lecture
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke and José Pinto— Technische Universität Braunschweig

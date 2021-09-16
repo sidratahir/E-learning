@@ -1,0 +1,1326 @@
+Relational Database Systems 1
+Wolf-Tilo Balke / Stephan Mennicke Hermann Kroll / Janus Wawrzinek Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+7.0 Introduction
+? Besides relational algebra, there are two other major query paradigms within the relational model
+? Tuple relational calculus (TRC) ? Domain relational calculus (DRC)
+
+? All three provide the theoretical foundation of the relational database model ? They are mandatory for certain DB features:
+? Relational algebra ? Query optimization ? TRC ? SQL query language ? DRC ? Query-by-example paradigm
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+2
+
+7.0 Introduction
+? Relational algebra has some procedural aspects
+? you specify an order of operations describing how to retrieve data ? Algebra: ?the mathematics of operations?
+
+? Relational calculi (TRC, DRC) are declarative
+? based on first-order logics (FOL) ? you just specify how the desired tuples look like ? the query contains no information about how to create the result set ? provides an alternative approach to querying ? Calculus: ?the mathematics of change?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+3
+
+7.0 Introduction
+? Both calculi are special cases of the first-order predicate calculus
+? TRC = logical expressions on tuples ? DRC = logical expressions on attribute domains
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+4
+
+7 Relational Calculus
+? Tuple relational calculus
+? SQUARE, SEQUEL
+
+? Domain relational calculus
+? Query-by-example (QBE)
+
+? Relational Completeness
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+5
+
+7.1 Tuple Relational Calculus
+? Query
+? Find all students having an exam result better than 2.7.
+
+? TRC
+? describe the properties of the desired tuples ? Get all students s for which an exam report r exists such that s? student number is the same as the student number mentioned in r, and the result mentioned in r is better than 2.7.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+7.1 Tuple Relational Calculus
+? Tuple Relational Calculus is an applied and extended Monadic Predicate Calculus
+? Fragment of first-order predicate logic using no functions, and only monadic predicates (i.e., with just a single argument)
+? Pure monadic predicate calculi are decidable because of their lack of expressiveness ? In TRC, monadic predicates will have an interpretation corresponding to database relations
+
+? Additionally, TRC adds a small set of dyadic predicates
+? Covers the common binary comparison operator
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7
+
+7.1 Tuple Relational Calculus
+? Queries in TRC ? { t | CONDITION(t) }
+? t is a tuple variable
+? t usually ranges over all potential tuples of a relation ? t may take the value of any possible tuple
+
+? CONDITION(t) is a logical statement involving t
+? all those tuples t are retrieved that satisfy CONDITION(t)
+
+? reads as: Retrieve all tuples t for that CONDITION(t) holds.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+7.1 Tuple Relational Calculus
+? Example: Select all female students.
+{ t | Student(t) ? t.sex = ?f? }
+Range = Student relation Student mat_no 1005 2832 4512 5119 6676 8024 9876 firstname Clark Louise Lex Charles Erik Jeanne Logan lastname Kent Lane Luther Xavier Magnus Gray sex m f m m m f m
+9
+
+Condition for result tuples
+
+This type of expression resembles relational algebra?s selection!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 Tuple Relational Calculus
+? It is possible to retrieve only a subset of attributes
+? the result attributes
+
+? Example: Select the names of all female students.
+{ t.firstname, t.lastname | Student(t) ? t.sex = ?f? }
+Student
+mat_no 1005 2832 firstname Clark Louise
+
+Result attributes
+lastname Kent Lane sex m f
+
+4512
+5119 6676 8024
+
+Lex
+Charles Erik Jeanne
+
+Luther
+Xavier Magnus Gray
+
+m
+m m f
+
+This type of expression resembles relational algebra?s projection!
+
+9876
+
+Logan
+
+m
+10
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 Tuple Relational Calculus
+? Full query syntax: ? { t1.A1, t2.A2, ?, tn.An | CONDITION(t1, t2, ?, tn) }
+? t1, t2, ?, tn are tuple variables ? A1, A2, ?, An are attributes, where Ai is an attribute of tuple ti ? CONDITION specifies a condition on tuple variables
+? more precisely: CONDITION is a formula with free variables t1, t2, ?, tn
+
+? the result is the set of all tuples (t1.A1, t2.A2, ?, tn.An) fulfilling the formula CONDITION(t1, t2, ?, tn)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+11
+
+7.1 Tuple Relational Calculus
+? What is a formula?
+? a formula is a logical expression made up of atoms
+
+? Atom types
+? range atom R(t)
+? true if a tuple is an element of the relation R
+? Binds R to the tuple variable t as range relation
+
+? e.g., Student(t)
+
+? comparison atom (s.A ? t.B)
+? ? ? ? provides a simple condition based on comparisons s and t are tuple variables, A and B are attributes ? is a comparison operator, ? ? {=, <, ?, ?, >, ?} e.g., t1.id = t2.id
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+12
+
+7.1 Tuple Relational Calculus
+? constant comparison atom (t.A ? c) or (c ? t.A)
+? a simple condition comparing an attribute t.A value with some constant c ? t is a tuple variable, A is an attribute, c is a constant ? ? is a comparison operator, ? ? {=, <, ?, ?, >, ?} ? e.g., t1.name = ?Peter Parker?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+7.1 Tuple Relational Calculus
+? Tuple variables have to be substituted by tuples ? For each substitution, atoms evaluate either to true or false
+? range atoms are true iff a tuple variable?s value is an element of the range relation ? comparison atoms are either true or false for the currently substituted tuple variable values
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+7.1 Tuple Relational Calculus
+? Formulas are defined recursively by four rules
+1. Every atom is a formula. 2. If F1 and F2 are formulas, then also the following are formulas:
+? ? ? ? (F1 ? F2): true iff both F1 and F2 are true (F1 ? F2): true iff F1 or F2 are true (F1 ? F2): true iff F1 is false or F2 is true ? F1: true iff F1 is false
+
+Rules 3 and 4 later ?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+15
+
+7.1 Tuple Relational Calculus
+? Evaluating formulas
+? The theory of evaluating formulas is rather complex (see KBS lecture or a course on logics), so we keep it simple?
+
+? TRC relies on the open world assumption
+? i.e., every substitution for variables is possible
+
+? Evaluating { t1, ?, tn | F(t1, ?, tn) }
+
+? substitute all tuple variables in F by all combinations of all possible tuples
+? open world: Really, all! ? Also all really stupid ones! ? ALL! Even those which do not exist!
+
+? put all those tuple combinations for which F is true into the result set
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+7.1 Tuple Relational Calculus
+? Example: { t | Student(t) ? t.first_name = ?Clark? }
+? substitute t, one after another, with all possible tuples
+? <>, <1>, <2>, ? , <1005, Clark, Kent, m>, ?, <Hurz!, Blub, 42, Balke, Spiderman>, ? ? open world!
+
+? of course, the formula will only be true for those tuples in the students? relation
+? great way of saving work: bind t one after another to all tuples which are contained in the Student relation ? only those tuples (in Student) whose first_name value is Clark will be returned ? Therefore: Your statement must have a range atom for every tuple variable mentioned in the query!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+17
+
+7.1 Tuple Relational Calculus
+? Example: All male students with matriculation number greater than 6000. ? { t | Student(t) ? t.mat_no > 6000 ? t.sex = ?m? }
+? evaluate formula for every tuple in students
+Student
+mat_no 1005 2832 4512 5119 firstname Clark Louise Lex Charles lastname Kent Lane Luther Xavier sex m f m m
+
+true ? false ? true = false true ? false ? false = false Result tuples true ? true ? true = true true ? true ? false = false
+18
+
+6676
+8024 9876
+
+Erik
+Jeanne Logan
+
+Magnus
+Gray
+
+m
+f m
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 TRC: Examples
+Student
+mat_no 1005 2832 4512 firstname Clark Louise Lex lastname Kent Lane Luther sex m f m
+
+Course
+crs_no 100 101 102 title Intro. to being a Superhero Secret Identities 2 How to take over the world
+
+5119
+6676 8024 9876
+
+Charles
+Erik Jeanne Logan
+
+Xavier
+Magnus Gray
+
+m
+m f m
+
+exam
+student
+9876 2832 1005 1005
+
+course
+100 102 101 100
+
+result
+3.7 2.0 4.0 1.3
+
+6676
+5119
+
+102
+101
+
+4.3
+1.7
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+19
+
+7.1 TRC: Examples
+? Selection
+Select all female students.
+Student
+mat_no 1005 firstname Clark lastname Kent sex m
+
+?sex = ?f? Student
+{ t | Student(t) ? t.sex=?f? }
+
+2832
+4512 5119 6676
+
+Louise
+Lex Charles Erik
+
+Lane
+Luther Xavier Magnus
+
+f
+m m m
+
+8024
+9876
+
+Jeanne
+Logan
+
+Gray
+
+f
+m
+
+mat_no
+
+firstname
+
+lastname
+
+sex
+
+2832
+8024
+EN 6
+
+Louise
+Jeanne
+
+Lane
+Gray
+
+f
+f
+20
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 TRC: Examples
+Retrieve first name and last name of all female students.
+
+?firstname, lastname ?sex=?f? Student {t.firstname, t.lastname | Student(t) ? t.sex=?f?}
+Student
+mat_no firstname lastname sex { t | Student(t) ? t.sex=?f? }
+
+1005
+2832 4512 5119 6676 8024
+
+Clark
+Louise Lex Charles Erik Jeanne
+
+Kent
+Lane Luther Xavier Magnus Gray
+
+m
+f m m m f
+
+mat_no
+
+firstname
+
+lastname
+
+sex
+
+2832
+8024
+
+Louise
+Jeanne
+
+Lane
+Gray
+
+f
+f
+
+{ t.firstname, t.lastname | Student(t) ? t.sex=?f? } firstname Loise Jeanne lastname Lane Gray
+21
+
+9876
+EN 6
+
+Logan
+
+m
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 TRC: Examples
+Compute the union of all courses with the numbers 100 and 102.
+
+?crs_no= 100 Course ? ?crs_no = 102 Course { t | Course(t) ? (t.crs_no = 100 ? t.crs_no = 102) }
+?crs_no=100 Course
+crs_no 100 title Intro. to being a Superhero
+
+?crs_no=100 Course? ?crs_no=102 Course
+crs_no 100 102 title Intro. to being a Superhero How to take over the world
+
+?crs_no=102 Course
+crs_no
+102
+
+title
+How to take over the world
+
+Get all courses with a number greater than 100, excluding those with a number of 102.
+
+?crs_no> 100 Course ? ?crs_no= 102 Course { t | Course(t) ? (t.crs_no > 100 ? ? t.crs_no = 102) }
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+7.1 TRC: Examples
+Compute the cross product of students and exams.
+
+Student ? exam { t1, t2 | Student(t1) ? exam(t2) }
+Compute a join of students and exams.
+
+Student ?mat_no=student exam { t1, t2 | Student(t1) ? exam(t2) ? t1.mat_no = t2.student }
+Student
+mat_no 1005 2832 4512 firstname Clark Louise Lex lastname Kent Lane Luther sex m f m
+
+exam
+student 9876 2832 1005 course 100 102 101 result 3.7 2.0 4.0
+
+5119
+
+Charles
+
+Xavier
+
+m
+
+1005
+
+100
+
+1.3
+23
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 TRC: Another Example
+? Do we need anything more? ? Example: Find all students? first names having an exam result better than 2.7.
+Student
+mat_no firstname lastname sex
+
+exam
+student
+9876 2832 1005 1005
+
+1005
+2832 4512 5119
+
+Clark
+Louise Lex Charles
+
+Kent
+Lane Luther Xavier
+
+m
+f m m
+
+course
+100 102 101 100
+
+result
+3.7 2.0 4.0 1.3
+
+6676
+8024 9876
+
+Erik
+Jeanne Logan
+
+Magnus
+Gray
+
+m
+f m
+
+6676
+5119
+
+102
+101
+
+4.3
+1.7
+24
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 Tuple Relational Calculus
+? Additionally, in TRC there can be formulas considering all tuples
+? universal quantifier ?
+? can be used with a formula that evaluates to true if the formula is true for all tuples ? All students have passed the exam.
+
+? existential quantifier ?
+? can be used with a formula that evaluates to true if the formula is true for at least one tuple ? There are students who passed the exam.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+25
+
+7.1 Tuple Relational Calculus
+? With respect to quantifiers, tuple variables can be either free or bound
+? if F is an atom (and thus also a formula), each tuple variable occurring in F is free within F
+? example
+? F = (t1.crs_no = t2.crs_no) ? Both t1 and t2 are free in F
+
+? if t is a free tuple variable in F, then it can be bound in formula F? either by
+? F? = ?t (F), or ? F? = ?t (F)
+? t is free in F and bound in F?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+7.1 Tuple Relational Calculus
+? If F1 and F2 are formulas combined by F? = (F1 ? F2) or F?= (F1 ? F2) and t is a tuple variable occurring in F1 and/or F2, then
+? t is free in F? if it is free in both F1 and F2 ? t is free in F? if it is free in one of F1 and F2 but does not occur in the other ? if t is bound in both F1 and F2, t is also bound in F? ? if t is bound in F1 or F2 but free in the other, one says that t is bound and free in F?
+
+? The last two cases are a little complicated and should be avoided altogether by renaming the variables (see next slides)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+27
+
+7.1 Tuple Relational Calculus
+? If a formula contains no free variables, it is called closed. Otherwise, it is called open.
+? open formulas should denote all free variables as parameters
+? the truth value of open formulas depends on the value of free variables ? closed formulas do not depend on specific variable values, and are thus constant
+
+? example
+? F1(t1, t2) is open and has t1 and t2 as free variables ? F2() is closed and has no free variables
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+7.1 Tuple Relational Calculus
+? Examples
+? F1(t1) = (t1.name = ?Clark Kent?)
+? t1 is free, F1 is open
+
+? F2(t1, t2) = (t1.mat_no = t2.mat_no)
+? t1 and t2 are free, F2 is open
+
+? F3(t1) = ?t2(F2(t1,t2)) = ?t2(t1.mat_no = t2.mat_no)
+? t1 is free, t2 is bound, F3 is open
+
+? F4() = ?t1(t1.sex = ?female?)
+? t1 is bound, F4 is closed
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+29
+
+7.1 Tuple Relational Calculus
+? Examples
+? F1(t1) = (t1.name = ?Clark Kent?) ? F3(t1) = ?t2(F2(t1, t2)) = ?t2(t1.mat_no = t2.mat_no)
+
+? F5(t1) = F1(t1) ? F3(t1) = (t1.name = ?Clark Kent?
+? ?t2(t1.mat_no = t2.mat_no))
+? t1 is free, t2 is bound, F5 is open
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+30
+
+7.1 Tuple Relational Calculus
+? Examples
+? F1(t1) = (t1.name = ?Clark Kent?) ? F4() = ?t1(t1.sex = ?female?) ? F6(t1) = F1(t1) ? F4() = (t1.name = ?Clark Kent? ? ?t1(t1.sex = ?female?))
+? t1 is free, t1 is also bound, F6 is open
+
+? In F6, t1 is bound and free at the same time
+? actually, the t1 in F4 is different from the t1 in F1 because F4 is closed
+? the t1 of F4 is only valid in F4, thus it could (and should!) be renamed without affecting F1
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+7.1 Tuple Relational Calculus
+? Convention: Avoid conflicting variable names!
+? rename all conflicting bound tuple variables when they are combined with another formula
+
+? Examples
+? F1(t1) = (t1.name = ?Clark Kent?) ? F4() = ?t1(t1.sex = ?female?) ? ?t2(t2.sex = ?female?) ? F7(t1) = F1(t1) ? F4() ? (t1.name = ?Clark Kent? ? ?t2(t2.sex = ?female?))
+? t1 is free, t2 is bound, F7 is open
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+32
+
+7.1 Tuple Relational Calculus
+? What are formulas?
+1. Every atom is a formula 2. If F1 and F2 are formulas, then also their logical combination are formulas 3. If F is an open formula with the free variable t, then F? = ?t(F) is a formula
+? F? is true if there is at least one tuple a such that F(a) is true
+
+4. If F is an open formula with the free variable t, then F? = ?t(F) is a formula
+? F? is true if F is true for all tuples
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+33
+
+7.1 TRC: Examples
+List the names of all students that took some exam.
+?firstname (Student ?mat_no=student exam)
+
+{ t1.firstname | Student(t1) ? ?t2(exam(t2) ? t1.mat_no = t2.student) }
+
+Student
+mat_no 1005 2832 4512 firstname Clark Louise Lex lastname Kent Lane Luther sex m f m
+
+exam
+student 9876 2832 1005 course 100 102 101 result 3.7 2.0 4.0
+
+5119
+
+Charles
+
+Xavier
+
+m
+
+1005
+
+100
+
+1.3
+34
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.1 TRC: Examples
+?List students having at least those exams Clark Kent had? SC ? (?crsNr ?name = ?Clark Kent? SC)
+
+{ t1.matNr, t1.name | SC(t1) ? F1(t1) }
+F1(t1) = ?t2 (?SC(t2) ? ?t2.name = ?Clark Kent? ? F2(t1)) F2(t1) = ?t3 (SC(t3) ? t3.matNr = t1.matNr ? t3.crsNr = t2.crsNr)
+SC (= students and courses)
+matNr 1000 1000 1001 1002 name Clark Kent Clark Kent Louise Lane Lex Luther crsNr C100 C102 C100 C102
+
+For all tuples of Clark Kent, F2 is true There is a tuple of the same student originally selected who has the same course than the currently selected tuple of Clark Kent in F2 Result
+matNr 1000 1002 name Clark Kent Lex Luther
+35
+
+1002
+1002 1003 1003 EN 6
+
+Lex Luther
+Lex Luther Charles Xavier
+
+C100
+C101 C103
+
+CharlesRelational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig Xavier C100
+
+7.1 TRC: Examples
+? Social Question-Answering
+? User (uid, name) ? Question (qid, author ? User, title, text) ? Answer (aid, author ? User, question ? Question, text)
+
+? Query: Find the ID and title of all questions which have exactly one answer.
+? {q.qid, q.titel | Question(q) ? ?a1(Answer(a1) ? a1.question = q.qid ? ?? a2(Answer(a2) ? a2.question = q.qid ? a2.aid ? a1.aid))}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+36
+
+7.1 Tuple Relational Calculus
+? Thoughts on quantifiers
+? any formula with an existential quantifier can be transformed into one with a universal quantifier and vice versa ? quick rule: replace ? by ? and negate everything
+? ?t (F(t)) ? ??t (?F(t)) ? ?t (F(t)) ? ??t (?F(t)) ? ?t (F1(t) ? F2(t)) ? ??t (?F1(t) ? ?F2(t)) ? ?t (F1(t) ? F2(t)) ? ??t (?F1(t) ? ?F2(t)) ? ?t (F1(t) ? F2(t)) ? ??t (?F1(t) ? ?F2(t)) ? ?t (F1(t) ? F2(t)) ? ??t (?F1(t) ? ?F2(t))
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+7.1 Tuple Relational Calculus
+? More considerations on evaluating TRC: What happens to quantifiers and negation?
+? again: open world!
+mat_no 1776 8024 name Leni Zauber Jeanne Gray sex f f
+
+? Consider relation Students
+? ?t (t.sex = ?m?) ? true
+
+? t can represent any tuple, and there can be a tuple for that the condition holds, e.g. <7312, Scott Summers, m> or <-1, &cjndks, m>
+
+? ?t (Student(t) ? t.sex = ?m?) ? false
+? there is no male tuple in the Student relation
+
+? ?t (t.sex = ?f ?) ? false ? ?t (?Student(t) ? t.sex = ?f ?) ? true
+? all tuples are either female or they are not in Student ? All tuples in the relation are girls.
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+38
+
+7.1 Tuple Relational Calculus
+? Consider the TRC query { t | ?Student(t) }
+? this query returns all tuples which are not in the Students relation ? ? the number of such tuples is infinite! ? all queries that return an infinite number of tuples are called unsafe
+
+? Unsafe queries should be avoided and cannot be evaluated (reasonably)!
+? one reliable way of avoiding unsafe expressions is the closed world assumption
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+7.1 Tuple Relational Calculus
+? The closed world assumption states that only those tuples may be substitutes for tuple variables that are actually present in the current relations
+? assumption usually not applied to TRC ? however, is part of most applications of TRC like SEQUEL or SQL ? removes the need of explicitly dealing with unknown tuples when quantifiers are used ? however, it?s a restriction of expressiveness
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+7.1 Tuple Relational Calculus
+? Open world vs. closed world
+Student
+mat_no 1776 Name Leni Zauber sex f
+
+8024
+
+Jeanne Gray
+
+f
+
+Expression ?t (t.sex = ?m?) ?t (Student(t) ? t.sex = ?m?)
+
+Open World true false
+
+Closed World false false
+
+?t (t.sex = ?f?) ?t (?Student(t) ? t.sex = ?f?)
+
+false true
+
+true true
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+7.1 Tuple Relational Calculus
+? Why did we do this weird calculus?
+? because it is the logical foundation of SQL, the standard language for database querying!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+7.1 SQUARE & SEQUEL
+? The design of relational query languages
+? Donald D. Chamberlin and Raymond F. Boyce worked on this task ? both of IBM Research in San Jose, California ? main concern: Querying relational databases is too difficult with current paradigms.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+7.1 SQUARE & SEQUEL
+? Current paradigms at that time
+? Relational algebra
+? requires users to define how and in which order data should be retrieved ? the specific choice of a sequence of operations has an enormous influence on the system?s performance
+
+? Relational calculi (tuple, domain)
+? provide declarative access to data, which is good ? just state what you want and not how to get it ? relational calculi are quite complex: many variables and quantifiers
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+7.1 SQUARE & SEQUEL
+? Chamberlin and Boyce?s first result was a query language called SQUARE
+? Specifying queries as relational expressions ? based directly on tuple relational calculus ? main observations
+? ? ? ? most database queries are rather simple complex queries are rarely needed quantification confuses people under the closed-world assumption, any TRC expression with quantifiers can be replaced by a join of quantifier-free expressions
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+45
+
+7.1 SQUARE & SEQUEL
+? SQUARE is a notation for (or interface to) TRC
+? no quantifiers, implicit notation of variables ? adds additional functionality needed in practice (grouping, aggregating, among others) ? solves safety problem by introducing the closed world assumption
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+7.1 SQUARE & SEQUEL
+? Retrieve the names of all female students
+? TRC: { t.name | Student(t) ? t.sex = ?f? } ? SQUARE: nameStudentsex (?f?) Conditions
+What part of the result tuples should be returned? Attributes with conditions The range relation of the result tuples
+
+? Get all exam results better than 2.0 in course 101
+? TRC: { t.result | exam(t) ? t.course = 101 ? t.result < 2.0}
+? SQUARE: resultexamcourse, result (101, <2.0)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+7.1 SQUARE & SEQUEL
+? Get a list of all exam results better than 2.0 along with the according student name
+? TRC:
+{ t1.name, t2.result | Student(t1) ? exam(t2) ? t1.mat_nr = t2.student ? t2.result < 2.0 }
+
+? SQUARE: name result Student mat_nr
+?
+
+studentexamresult
+
+(<2.0)
+
+Join of two SQUARE queries
+
+Also, ?, ?, and ? can be used to combine SQUARE queries.
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+48
+
+7.1 SQUARE & SEQUEL
+? Also, SQUARE is relationally complete
+? you do not need explicit quantifiers ? everything you need can be done using conditions and query combining
+
+? However, SQUARE was not well received
+? syntax was difficult to read and parse, especially when using text console devices:
+? name result Student mat_nr crs_nr result (102, <2.0) ? student exams
+
+? SQUARE?s syntax is too mathematical and artificial
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+7.1 SQUARE & SEQUEL
+? In 1974, Chamberlin & Boyce proposed SEQUEL
+? Structured English Query Language ? based on SQUARE
+
+? Guiding principle
+? use natural English keywords to structure queries ? supports fluent vocalization and notation
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+50
+
+7.1 SQUARE & SEQUEL
+? Fundamental keywords
+? SELECT: what attributes should be retrieved? ? FROM: what relations are involved? ? WHERE: what conditions should hold?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+7.1 SQUARE & SEQUEL
+? Get all exam results better than 2.0 for course 101
+? SQUARE:
+resultexamcourse result (101, <
+
+2.0)
+
+? SEQUEL:
+SELECT result FROM exam WHERE course = 101 AND result < 2.0
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+52
+
+7.1 SQUARE & SEQUEL
+? Get a list of all exam results better than 2.0, along with the according student names
+? SQUARE:
+name result
+
+Student mat_no ? student result exam result (< 2.0)
+
+? SEQUEL: SELECT name, result FROM Student, exam WHERE Student.mat_no = exam.student AND result < 2.0
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+53
+
+7.1 SQUARE & SEQUEL
+? IBM integrated SEQUEL into System R ? It proved to be a huge success
+? unfortunately, the name SEQUEL already has been registered as a trademark by the Hawker Siddeley aircraft company ? name has been changed to SQL (spoken: Sequel)
+? Structured Query Language
+
+? patented in 1985 by IBM
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+54
+
+7.1 SQUARE & SEQUEL
+? Since then, SQL has been adopted by all(?) relational database management systems ? This created a need for standardization:
+? 1986: SQL-86 (ANSI standard, ISO standard) ? SQL-92, SQL:1999, SQL:2003, SQL:2006, SQL:2008 ? the official pronunciation is es queue el
+
+? However, most database vendors treat the standard as some kind of recommendation
+? more on this later (next lecture)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+55
+
+7 Relational Calculus
+? Tuple relational calculus
+? SQUARE, SEQUEL
+
+? Domain relational calculus
+? Query-by-example (QBE)
+
+? Relational Completeness
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+56
+
+7.2 Domain Relational Calculus
+? The domain relational calculus is also a calculus like TRC, but
+? Variables are different ? TRC: tuple variables ranging over all tuples ? DRC: domain variables ranging over the values of the domains of individual attributes
+
+? Query form ? { x1, ?, xn | CONDITION(x1, ?, xn) }
+? x1, ?, xn are domain variables ? CONDITION is a formula over the domain variables, where x1, ?, xn are CONDITION?s free variables
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+57
+
+7.2 Domain Relational Calculus
+? DRC also defines formula atoms
+? relation atoms: R(x1, x2, ?, xn)
+? ? ? ? also written without commas as R(x1x2?xn) R is a n-ary relation x1, ?, xn are (all) domain variables of R atom evaluates to true iff, for a list of attribute values, an according tuple is in the relation R
+
+? comparison atoms: (x ? y)
+? xi and xj are domain variables ? ? is a comparison operator, ? ? {=, <, ?, ?, >, ?}
+
+? constant comparison atoms: (x ? c) or (c ? x)
+? x is a domain variable, c is a constant value ? ? is a comparison operator, ? ? {=, <, ?, ?, >, ?}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+58
+
+7.2 Domain Relational Calculus
+? The recursive construction of DRC formulas is analogous to TRC
+1. Every atom is a formula 2. If F1 and F2 are formulas, then also their logical combinations are formulas 3. If F is a open formula with the free variable x, then ?x(F) is a formula 4. If F is a open formula with the free variable x, then ?x(F) is a formula
+
+? Also other aspects of DRC are similar to TRC
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+59
+
+7.2 DRC: Examples
+Retrieve first name and last name of all female students.
+
+Relational algebra: ?firstname, lastname ?sex = ?f? Student
+TRC: { t.firstname, t.lastname | Student(t) ? t.sex = ?f? }
+
+{ fn, ln | ?mat, s (Student(mat, fn, ln, s) ? s = ?f?) }
+Student
+mat_no firstname lastname sex { mat, fn, ln, s | Student(mat, fn, ln, s) ? s=?f?}
+
+1005
+2832 4512 5119 6676 8024
+
+Clark
+Louise Lex Charles Erik Jeanne
+
+Kent
+Lane Luther Xavier Magnus Gray
+
+m
+f m m m f
+
+mat_no
+
+firstname
+
+lastname
+
+sex
+
+2832
+8024
+
+Louise
+Jeanne
+
+Lane
+Gray
+
+f
+f
+
+{ fn, ln | ?mat, s (Student(mat, fn, ln, s) ? s=?f?) } firstname lastname
+
+9876
+EN 6
+
+Logan
+
+m
+
+Louise
+Jeanne
+
+Lane
+Gray
+60
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.2 DRC: Examples
+List the first names of all students that took at least one exam.
+Relational algebra: ?firstname (Student ?mat_no=student exam)
+
+TRC: { t1.firstname | Student(t1) ? ?t2(exam(t2) ? t2.student = t1.mat_no) }
+
+DRC: { fn | ?mat, ln, s (Student(mat, fn, ln, s) ? ?st, co, r (exam(st, co, r) ? st=mat)) }
+Student
+mat_no 1005 2832 4512 firstname Clark Louise Lex lastname Kent Lane Luther sex m f m
+
+exam
+student 9876 2832 1005 course 100 102 101 result 3.7 2.0 4.0
+
+5119
+
+Charles
+
+Xavier
+
+m
+
+1005
+
+100
+
+1.3
+61
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.2 DRC: Examples
+? Reconsider last lecture: Algebra Division
+? ?? ? ??
+? Read relational algebra division as a ?forall? statement
+
+? Given relation ?? and ??:
+? ??(??1 , ? , ???? , ??1 , ? , ???? ) ? ??(??1 , ? , ???? )
+
+? R ? S = { a1, ..., an | ?b1, ..., bm (?S(b1, ..., bm) ? R(a1, ..., an, b1, ..., bm))} = { a1, ..., an | ?b1, ..., bm (S(b1, ..., bm) ? R(a1, ..., an, b1, ..., bm))}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+62
+
+7.2 DRC: Examples
+Division:
+SC = ?SC (?matnr, lastname, crsnr (Student ?matnr=student exam))
+matnr 1000 lastname Kent crsnr 100
+
+CCK = ?CCK(?crsnr?lastname=?Clark Kent? SC)
+crsnr 100
+
+1000
+1001 1002 1002
+
+Kent
+Lane Luther Luther
+
+102
+100 102 100
+
+SC ? CCK
+matnr 1000 1002 lastname Kent Luther
+
+102
+
+1002
+1003 1003
+
+Luther
+Xavier Xavier
+
+101
+103 100
+
+SC ? CCK = { matnr, lastname | ?crsnr ( CCK(crsnr) ? SC(matnr, lastname, crsnr) )}
+
+Result contains all those students who took at least the same courses as Clark Kent.
+EN 6 Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+63
+
+7.2 Domain Relational Calculus
+? There are formally incorrect shorthands which can be used
+? When dealing with equality, you can shorten your expressions a bit:
+{fn, ln | ? mat, s (Student(mat, fn, ln, s) ? s = ?f ?)} = {fn, ln | ? mat (Student(mat, fn, ln, ?f?)}
+
+? Which is also useful for joins:
+{fn | ?mat, ln, r (Student(mat, fn, ln, r) ? ?st, co, r (exam(st, co, r) ? st = mat))} = {fn | ?mat, ln, r (Student(mat, fn, ln, r) ? ?co, r (exam(mat, co, r)))}
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+64
+
+7.2 Domain Relational Calculus
+? An even worse shorthand sometimes encountered is the use implicit existential quantifiers
+? You may NOT do this in exercises /exams!
+? {fn, ln | Student(mat, fn, ln, ?f?)} ? {fn | Student(mat, fn, ln, s) ? ?co, r(exam(mat, co, r))}
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+65
+
+7.2 QBE
+? The first version of SQL, SEQUEL, was developed in early 1970 by D. Chamberlin and R. Boyce at IBM Research in San Jose, California
+? based on the tuple relational calculus
+
+? At the same time, another query language, QBE, was developed independently by M. Zloof at IBM Research in Yorktown Heighs, New York
+? based on the domain relational calculus (DRC)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+66
+
+7.2 QBE
+? Query by Example (QBE) is an alternative database query language for relational databases ? First graphical query language
+? it used visual tables where the user would enter commands, example elements and conditions ? based on the domain relational calculus
+
+? Devised by Mosh? M. Zloof at IBM Research during the mid-1970s
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+67
+
+7.2 QBE
+? QBE has a two dimensional syntax
+? queries look like tables
+
+? QBE queries are expressed by example
+? instead of formally describing the desired answer, the user gives an example of what is desired
+
+? This was of course much easier for users than specifying difficult logical formulae
+? The age of the nonprogrammer user of computing systems is at hand, bringing with it the special need of persons who are professionals in their own right to have easy ways to use a computing system.
+? M. Zloof: Office-by-Example: A Business Language that Unifies Data and Word Processing and Electronic Mail. IBM Systems Journal, Vol. 21(3), 1982
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+68
+
+7.2 QBE
+? Skeleton tables show the relational schema of the database
+? users select the tables needed for the query and fill the table with example rows
+? example rows consist of constants and example elements (i.e. domain variables) ? domain variables are denoted beginning with an underscore
+
+? conditions can be written in a special condition box ? arithmetic comparisons, including negation, can be written directly into the rows ? to project any attribute ?P.? is written before the domain variable
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+69
+
+7.2 QBE
+?mat_no?lastname = ?Parker? Student
+
+{ mat | ? fn, ln, s (Student(mat, fn, ?Parker?, s)) }
+Student mat_no P. firstname lastname Parker sex
+
+QBE
+
+{ st | ?co, r (exam(st, co, r) ? r > 2.0) }
+exam student P. course result > 2.0
+
+{ st | ? co, r (exam(st, co, r) ? co ? 102 }
+exam student
+P.
+
+course
+? 102
+
+result
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+70
+
+7.2 QBE
+? Add a row if you need to connect conditions
+? Get the matriculation number of students who took exams in courses 100 and 102. ? {st | ?r (exam(st,100, r)) ? ?r(exam(st, 102, r))}
+exam student P._st _st course 100 102 result
+
+_st is the example in query-by-example!
+
+? get the mat_no of students who took exams in course 100 or 102
+exam student P. P. course 100 102
+71
+
+result
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.2 QBE
+? Get the matriculation number of those students who took at least one course that also the student 1005 took.
+exam student P. 1005 course _co _co result
+
+? also grouping (G.) and aggregate functions (in an additional column) are supported
+? Get the average results of each student.
+exam student G.P._st course result _res P.AVG._res
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+72
+
+7.2 QBE
+? This can of course also be applied between tables
+? analogous to joins in relational algebra ? e.g. What are the last names of all female students who got a very good grade in some exam?
+Student mat_no firstname lastname sex
+
+_st
+exam student _st course result < 1.3
+
+P.
+
+f
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+73
+
+7.2 QBE
+? Besides the DML aspect for querying also the DDL aspect is covered
+? single tuple insertion
+Student mat_no firstname lastname sex
+
+I.
+
+1005
+
+Clark
+
+Kent
+
+m
+
+? or from other tables by connecting them with domain variables ? insert (I.), delete (D.), or update (U.)
+? update directly in columns
+exam student 2832 course 102 result U._res +1.0
+74
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7.2 QBE
+? The graphical query paradigm was transported into databases for end users
+? desktop databases like Microsoft Access, Fox Pro, Corel Paradox, etc. ? tables are shown on a query design grid ? lines can be drawn between attributes of two tables instead of a shared variable to specify a join condition
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+75
+
+7.2 QBE
+? Example: What results did the student with last name Parker get in the exams?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+76
+
+7.2 QBE
+? The current state of QBE
+? popular to query object relational databases ? not very widespread anywhere else ... ? when used to query a relational database, QBE usually is implemented on top of SQL (wrapper)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+77
+
+7 Relational Calculus
+? Tuple relational calculus
+? SQUARE, SEQUEL
+
+? Domain relational calculus
+? Query-by-example (QBE)
+
+? Relational Completeness
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+78
+
+7.3 Relational Completeness
+? Up to now, we have studied three query paradigms
+? Extended Relational Algebra ? Tuple Relational Calculus ? Domain Relational Calculus
+
+? However, these paradigms have the same expressiveness
+? any query can be written in either one of them and can easily be transformed ? every query language that can be mapped to one of those three is called relational complete
+? E.F. Codd, ?Relational Completeness of Data Base Sublanguages?, 1971
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+79
+
+7.3 Relational Completeness
+? A language is relational complete, giving a set of relations, if it permits creating the same relations as safe TRC
+? i.e. if it allows at least creating equivalent queries
+
+? Which parts are relational complete?
+? basic relational algebra
+? just five basic operations ? Selection ?, Projection ?, Renaming ?, Union ?, Set Difference ?, Cartesian Product ?
+
+? safe TRC queries ? safe DRC queries
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+80
+
+7.3 Relational Completeness
+? Also, extended basic relational algebra is relationally complete
+? Intersection ?, Theta Join ?(?-cond) , Equi-Join ?(=-cond), Natural Join ? , Left Semi-Join ?, Right Semi-Join ?, Division ? ? new operations can be composed of the basic operations ? new operations are just for convenience
+
+? Advanced relational algebra is also relational complete but additionally more expressive
+? Left Outer Join ?, Right Outer Join ?, Full Outer Join ?, Aggregation ?? ? these operations cannot be expressed with either DRC, TRC, nor with Basic Relational Algebra
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+81
+
+7.3 Relational Completeness
+? Relational Completeness does not describe that all useful queries that one would want! ? Missing from relational completeness:
+? Aggregation and statistics
+? Advanced Relational Algebra and SQL can do this
+
+? Sorting and result orders (i.e. transition from set to lists)
+? SQL can do this (however, beside sorting there are no guarantees)
+
+? 3-Valued Logic with NULL values
+? SQL and Advanced Relational Algebra can do this
+
+? Transitive Closures (i.e. recursive joins)
+? Vanilla SQL cannot do this, but there is an extension called Recursive SQL
+
+? Multisets (i.e. duplicate tuples)
+? SQL can do this
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+82
+
+7 Next Lecture
+? SQL
+? queries
+? SELECT
+
+? Data Manipulation Language (in two lecture)
+? INSERT ? UPDATE ? DELETE
+
+? Data Definition Language (in two lecture)
+? CREATE TABLE ? ALTER TABLE ? DROP TABLE
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+83
+
+

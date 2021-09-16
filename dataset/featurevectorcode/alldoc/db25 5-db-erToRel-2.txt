@@ -1,0 +1,597 @@
+Introduction to Database Systems Mapping ER Models to Relational Schemas
+
+Werner Nutt
+
+1
+
+Conceptual and Logical Design
+name
+
+Conceptual Model:
+price
+
+PRODUCT
+
+BUYS name
+
+PERSON ssn
+
+Relational Model:
+
+2
+
+Mapping an E-R Diagram to a Relational Schema
+We cannot store date in an ER schema (there are no ER database management systems) We have to translate our ER schema into a relational schema What does ?translation? mean?
+
+3
+
+Translation: Principles
+? Maps ? ER schemas to relational schemas ? ER instances to relational instances ? Ideally, the mapping should ? be one-to-one in both directions ? not lose any information ? Difficulties: ? what to do with ER-instances that have identical attribute values, but consist of different entities? ? in which way do we want to preserve information?
+4
+
+Mapping Entity Types to Relations
+? ? ? ? ? ? For every entity type create a relation Every atomic attribute of the entity type becomes a relation attribute Composite attributes: include all the atomic attributes Derived attributes are not included (but remember their derivation rules) Relation instances are subsets of the cross product of the domains of the attributes Attributes of the entity key make up the primary key of the relation
+given name STUDENT studno family no. of students courseno equip COURSE
+
+subject 5
+
+Mapping Entity Types to Relations (cntd.)
+
+given name
+
+family no. of students
+
+courseno equip COURSE
+
+STUDENT studno
+
+subject
+
+STUDENT (studno, givenname, familyname) COURSE (courseno, subject, equip)
+6
+
+Mapping Many:many Relationship Types to Relations
+Create a relation with the following set of attributes:
+N (degree of relationship)
+
+U primary_key(Ei)
+primary keys of each entity type participating in the relationship
+given name STUDENT studno family labmark
+
+U {a1,?,aM}
+attributes of the relationship type (if any)
+
+i=1
+
+no. of students
+
+courseno equip COURSE
+
+ENROLLED
+exammark
+
+subject 7
+
+Mapping Many:many Relationship Types to Relations (cntd.)
+given name STUDENT studno family labmark no. of students courseno equip COURSE
+
+ENROLLED
+exammark
+
+subject
+
+ENROL(studno, courseno, labmark, exammark) Foreign Key ENROL(studno) references STUDENT(studno) Foreign Key ENROL(courseno) references COURSE(courseno)
+8
+
+Mapping Many:one Relationship Types to Relations
+given studno name m STUDENT 1 family slot name roomno
+
+TUTOR
+
+STAFF
+
+Idea: ?Post the primary key? ? Given E1 at the ?many? end of relationship and E2 at the ?one? end of the relationship, add information to the relation for E1 ? The primary key of the entity at the ?one? end (the determined entity) becomes a foreign key in the entity at the ?many? end (the determining entity). Include any relationship attributes with the foreign key entity
+
+E1 U primary_key(E2) U {a1,?,an}
+relation for entity E1 primary key for E2, is now a foreign key to E2 attributes on the relationship type (if any)
+
+9
+
+Mapping Many:one Relationship Types to Relations: Example
+given studno name m STUDENT 1 family slot name roomno
+
+TUTOR
+
+STAFF
+
+The relation STUDENT(studno, givenname, familyname) is extended to STUDENT(studno, givenname, familyname, tutor, roomno, slot) and the constraint Foreign Key STUDENT(tutor,roomno) references STAFF(name,roomno)
+10
+
+Mapping Many:one Relationship Types to Relations (cntd.)
+STUDENT studno s1 s2 s3 s4 s5 s6 given fred mary sue fred peter jill family jones brown smith bloggs jones peters tutor bush kahn goble goble zobel kahn roomno 2.26 IT206 2.82 2.82 2.34 IT206 slot 12B 12B 10A 11A 13B 12A
+
+STAFF name kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+11
+
+Mapping Many:one Relationship Types to Relations (cntd.)
+given studno name m STUDENT 1 family slot name roomno
+
+TUTOR
+
+STAFF
+
+Another Idea: If ? the relationship type is optional to both entity types, and ? an instance of the relationship is rare, and ? there are many attributes on the relationship then? ? create a new relation with the set of attributes:
+
+primary_key(E1) U primary_key(E2) U {a1,?,am}
+primary key for E1, is now a foreign key to E1; also the PK for this relation primary key for E2, is now a foreign key to E2 attributes on the relationship type12 (if any)
+
+Mapping Many:one Relationship Types to Relations (cntd.)
+given studno name m STUDENT 1 family slot name roomno
+
+TUTOR
+
+STAFF
+
+TUTOR(studno, staffname, rommno, slot) and
+
+Compare with the mapping of many:many relationship types!
+
+Foreign key TUTOR(studno) references STUDENT(studno) Foreign key TUTOR(staffname, roomno) references STAFF(name, roomno)
+
+13
+
+Mapping Many:one Relationship Types to Relations (cntd.)
+STUDENT studno s1 s2 s3 s4 s5 s6 given fred mary sue fred peter jill family jones brown smith bloggs jones peters
+TUTOR studno s1 s2 s3 s4 s5 s6 tutor bush kahn goble goble zobel kahn roomno 2.26 IT206 2.82 2.82 2.34 IT206 slot 12B 12B 10A 11A 13B 12A
+
+STAFF name kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+14
+
+Optional Participation of the Determined Entity (?one end?)
+A student entity instance must participate in a relationship instance of REG
+given studno name STUDENT family hons 1 faculty
+
+A school entity instance need not participate in a relationship instance of REG
+
+REG
+
+SCHOOL
+
+SCHOOL (hons, faculty) STUDENT (studno, givenname, familyname,
+
+???
+
+)
+15
+
+Optional Participation of the Determined Entity
+STUDENT studno s1 s2 s3 s4 s5 s6 given fred mary sue fred peter jill family hons jones ca brown cis smith cs bloggs ca jones cs peters ca ?hons? cannot be NULL because it is mandatory for a student to be registered for a school ?not null? constraint
+
+SCHOOL hons ac is cs ce mi ma faculty accountancy information systems computer science computer science medicine mathematics No student is registered for ?mi?, so ?mi? doesn?t occur as a foreign key value (but that?s no problem)
+16
+
+Optional Participation of the Determinant Entity (?many end?)
+given studno name m STUDENT 1 family slot name roomno
+
+TUTOR
+
+STAFF
+
+A student entity instance need not participate in a relationship instance of TUTOR
+
+A staff entity instance must participate in a relationship instance of TUTOR
+
+17
+
+Optional Participation of the Determinant Entity
+1. STUDENT (studno, givenname, familyname, tutor, roomno, slot) STAFF(name, roomno) Integrity constraint: ?name,roomno STAFF \ ?tutor,roomno STUDENT = ? 2. STUDENT(studno, givenname, familyname) STAFF(name, roomno) TUTOR(studno, tutor, roomno, slot) Do we also need an integrity constraint?
+
+18
+
+Optional Participation of the Determinant Entity (cntd.)
+STUDENT studno s1 s2 s3 s4 s5 s6 given fred mary sue fred peter jill family jones brown smith bloggs jones peters tutor bush kahn goble goble zobel kahn roomno 2.26 IT206 2.82 2.82 2.34 IT206 slot 12B 12B 10A 11A 13B 12A
+
+STAFF name kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+19
+
+Optional Participation of the Determinant Entity (cntd.)
+STUDENT studno s1 s2 s3 s4 s5 s6 given fred mary sue fred peter jill family jones brown smith bloggs jones peters tutor bush kahn goble goble NULL kahn roomno 2.26 IT206 2.82 2.82 NULL IT206 slot 12B 12B 10A 11A NULL 12A
+
+STAFF name kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+20
+
+Mapping One:one Relationship Types to Relations
+year YEAR 1 YEARTUTOR 1 STAFF roomno
+
+? Post the primary key of one of the entity types into the other entity type as a foreign key, including any relationship attributes with it or ? Merge the entity types together Which constraint holds in this case?
+
+YEAR year 1 2 3 STAFF name kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 year NULL 2 NULL 1 NULL NULL 3 NULL NULL 21 yeartutor zobel bush capon
+
+name
+
+Multi-Valued Attributes
+For each multi-valued attribute of Ei, create a relation with the attributes primary_key(Ei) U multi-valued attribute The primary key comprises all attributes
+STUDENT
+given studno name STUDENT family
+
+studno given family s1 fred jones s2 mary brown
+
+STUDENT_CONTACT studno s1 s1 s2 s2 s2 contact Mr. Jones Mrs Jones Bill Brown Mrs Jones Billy-Jo Woods
+
+contact
+
+22
+
+Mapping Roles and Recursive Relationships
+name STAFF roomno appraiser appraisee
+
+APPRAISAL APPRAISAL
+
+How can the entity STAFF appear in both of its roles ?
+
+STAFF(name, roomno, appraiser, approomno )
+23
+
+Multiple Relationships between Entity Types
+1. Treat each relationship type separately 2. Represent distinct relationships by different foreign keys drawing on the same relation
+name
+1
+
+given SUPERVISE
+m
+
+family studno
+
+name STUDENT
+
+STAFF
+1
+
+EXAMINE
+
+m
+
+roomno
+
+STAFF(name, roomno) STUDENT(studno, given, family, STUDENT(studno, given, family, EXAMINER( SUPERVISOR( EXAMINER-SUPERVISOR( ??? ??? ??? ??? ??? ) ) ) )
+24
+
+)
+
+Non-binary Relationship
+roomno name STAFF STAFF p given name STUDENT family m
+TUTORS
+
+courseno equip n COURSE slot subject
+
+studno
+
+COURSE(courseno, subject, equip) STUDENT(studno, givenname, familyname) STAFF(staffname, roomno) TUTORS( ??? )
+25
+
+Weak Entities
+? Strong entity type ? Identifying entity for ORDER ? Identifying entity for LINE_ITEM ? Weak entity type ? Identifying entity for LINE_ITEM
+c-name
+
+CUSTOMER
+1
+
+address
+
+CUST-ORDER
+m
+
+orderid
+
+ORDER
+1
+
+date
+
+ORDER-MAKEUP
+m
+
+lineno quantity
+
+? Weak entity type
+
+LINE_ ITEM
+
+26
+
+Mapping Weak Entities to Relations
+Create a relation with the attributes:
+n
+
+primary_key(E0) U U discriminator(Ei) U {a1,?,an}
+i=1
+Primary key of identifying strong entity type Discriminators of identifying weak entity types c-name Attributes of the weak entity type
+
+CUSTOMER
+1
+
+address
+
+CUST-ORDER
+m
+
+orderid
+27
+
+ORDER date
+
+Association Entity Types
+An entity type that represents a relationship type:
+
+given name
+
+family courseno equip
+
+STUDENT
+1
+
+m
+
+studno subject
+m m
+
+COURSE
+1
+
+STUD_ENROL labmark
+
+ENROL exammark
+
+COURSE_ENROL
+
+28
+
+Association Entity Types
+We have: ? COURSE(courseno, subject, equip) ? STUDENT(studno, givenname, familyname)
+given name STUDENT
+1 m m m
+
+family courseno equip
+
+studno subject ENROL exammark
+
+COURSE
+1
+
+STUD_ENROL labmark
+
+COURSE_ENROL
+
+Then: ? ENROL(courseno, studno, labmark, exammark)
+29
+
+Translation of the University Diagram
+given studno name family REG hons STUDENT year m labmark ENROL slot 1 courseno n m COURSE subject equip TEACH n 1 TUTOR YEARREG 1 YEAR 1 YEARTUTOR faculty 1 SCHOOL
+
+STUDENT (studno, givenname, familyname, hons, tutor, tutorroom, slot, year) ENROL(studno, courseno, labmark,exammark) COURSE(courseno, subject, equip) STAFF(lecturer,roomno, appraiser, approom)
+name
+
+exammark
+
+1 STAFF m roomno appraisee APPRAISAL
+
+TEACH(courseno, lecturer,lecroom ) YEAR(year, yeartutor, yeartutorroom) SCHOOL(hons, faculty)
+30
+
+appraiser
+
+Exercise: Supervision of PhD Students
+A database needs to be developed that keeps track of PhD students: ? For each student store the name and matriculation number. Matriculation numbers are unique. Each student has exactly one address. An address consists of street, town and post code, and is uniquely identified by this information. For each lecturer store the name, staff ID and office number. Staff ID's are unique. Each student has exactly one supervisor. A staff member may supervise a number of students. The date when supervision began also needs to be stored.
+31
+
+?
+
+?
+
+?
+
+?
+
+Exercise: Supervision of PhD Students
+? ? For each research topic store the title and a short description. Titles are unique. Each student can be supervised in only one research topic, though topics that are currently not assigned also need to be stored in the database.
+
+Tasks: a) Design an entity relationship diagram that covers the requirements above. Do not forget to include cardinality and participation constraints. b) Based on the ER-diagram from above, develop a relational database schema. List tables with their attributes. Identify keys and foreign keys.
+32
+
+Translating of Hierarchies: Options
+To store information about these classes, We have to define appropriate relations. For each relation, we have to define: ? set of attributes ? primary key In principle, there are three options:
+year given name STUDENT
+m
+
+family
+
+studno
+
+d
+
+?
+
+thesis title
+
+?
+
+UNDERGRADUATE
+
+POSTGRADUATE
+
+A. Create a relation for each entity type in the schema,
+
+i.e., for both, superclass and subclasses B. Create only relations for subclasses C. Create only one relation, for the superclass
+33
+
+Translation into Relations: Option A
+1. Create a relation for the superclass 2. For each subclass, create a relation over the set of attributes primary_key(superclass) U attributes of subclass The key for each subclass relation is: primary_key(superclass)
+Inclusion constraint (foreign keys): ?key(superclass) ? ?key(subclassi) Covering constraint ( n = number of subclasses): n
+given name STUDENT
+m
+
+family
+
+studno
+
+U
+i=1
+
+?key(subclassi) ? ?key(superclass) d
+year
+
+Disjointness constraint: ?key(subclassi) ? ?key(subclassj) = ? for i ? j
+
+?
+
+thesis title
+
+?
+
+UNDERGRADUATE
+
+POSTGRADUATE 34
+
+Translation into Relations: Option B
+Create only relations for subclasses. Each subclass becomes a relation over the set of attributes: attributes of superclass U attributes of subclass The key for each subclass relation is: ? Works only if coverage is total and disjoint ? Partial coverage: entities that are not in a subclass are lost ? Overlapping classes: redundancy ? Recovery of the superclass: OUTER UNION on the subclass relations
+Codd: union that extends the schema to all common attributes d
+year
+
+primary_key(superclass)
+given name STUDENT
+m
+
+family
+
+studno
+
+?
+given name
+m
+
+thesis title
+
+?
+
+UNDERGRADUATE
+
+POSTGRADUATE 35
+
+Translation into Relations: Option C
+Create a single relation over the set of attributes
+attributes of superclass U n ? attributes of subclassi U { class } i=1
+
+The key is: primary_key(superclass)
+family
+
+? Drawback: many ?not-applicable? nulls ? Benefit: No need for joins ? Disjoint coverage: one attribute class which indicates the subclass the tuple represents ? Overlapping coverage: class has to represent a set of classes ? Partial coverage: class is null ? entity is from superclass
+
+STUDENT
+
+studno
+
+d
+year
+
+?
+
+thesis title
+
+?
+
+UNDERGRADUATE
+
+POSTGRADUATE 36
+
+Applying the Three Translations (Overlapping Coverage)
+payroll no
+STAFF
+
+name
+
+A. STAFF(payrollno, name, lengthOfService) ACADEMIC(payrollno, level) TECHNICAL(payrollno, project) ADMIN(payrollno, grade) B. ACADEMIC(payrollno, name, lengthOfService, level) TECHNICAL(payrollno, name, lengthOfService, project) ADMIN(payrollno, name, lengthOfService, grade)
+
+length of service
+
+o
+level
+
+ACADEMIC
+
+Specialisation Lattice with Shared Subclass
+payroll no
+
+task
+
+?
+
+title
+
+Manager
+salary
+
+Academic
+
+Technical
+
+Admin
+
+Salaried Staff
+phone
+
+expertise
+
+Admin Manager
+
+Exercise: For each of the approaches A, B, C, decide ? Which tables need to be created? ? Which are the attributes? And which are their possible values?
+
+?
+
+?
+
+d
+
+?
+
+?
+
+?
+
+?
+
+? ??
+TECHNICAL
+
+grade
+
+ADMIN ADMIN
+
+C. STAFF(payrollno, name, lengthOfService, level, project, grade, class1, class2, class3) or STAFF(payrollno, name, lengthOfService, level, project, grade, class) class = powerset of classes
+37
+
+project
+
+Staff
+dept
+
+d
+
+no_hours
+
+?
+Hourly Staff
+
+?
+
+38
+
+References
+In preparing these slides I have used several sources. The main ones are the following: Books: ? A First Course in Database Systems, by J. Ullman and J. Widom ? Fundamentals of Database Systems, by R. Elmasri and S. Navathe Slides from Database courses held by the following people: ? Enrico Franconi (Free University of Bozen-Bolzano) ? Carol Goble and Ian Horrocks (University of Manchester)
+
+39
+
+

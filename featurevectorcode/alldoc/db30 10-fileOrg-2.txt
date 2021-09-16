@@ -1,0 +1,226 @@
+File Organisation and Indexing
+
+Werner Nutt
+Introduction to Databases Free University of Bozen-Bolzano
+
+Data Storage Principles
+2
+
+? Database relations are implemented as ?les of records. ? This is still an abstraction: the real storage medium are disks, which consist of pages (ca. 0.5?5 kbytes) ? Pages are read from disk and written to disk: high cost operations! ? Mapping: each record has a record identity (rid), which identi?es the page where it is stored and its o?set on that page ? The DBMS reads (and writes) entire pages and stores a number of them in a bu?er pool ? The bu?er manager decides which pages to load into the bu?er
+(Replacement policy: e.g., ?least recently used? or ?clock?)
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Alternative File Organisations
+3
+
+Alternatives are ideal for some situation, and not so good in others: Heap Files: No order on records. Suitable when typical access is a ?le scan retrieving all records. Sorted Files: Sorted by a speci?c record ?eld (key). Best if records must be retrieved in some order, or only a ?range? of records is needed. Hashed Files: ? File is a collection of buckets. (Bucket = primary page plus zero or more over?ow pages.) ? Hashing function h: computes h(r) = bucket into which record r belongs (looks at only some of the ?elds of r, the search ?elds.) Good for equality selections.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Cost Model
+4
+
+We ignore CPU costs, for simplicity: ? P : number of data pages ? D: (average) time to read or write disk page Simpli?cations: ? Measuring number of page I/O?s ignores gains of pre-fetching blocks of pages ; even I/O cost is only approximated ? Average case analysis
+(based on several simplistic assumptions)
+
+Good enough to show overall trends!
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Assumptions in Our Analysis
+5
+
+? Single record insert and delete ? Heap Files: ? Equality selection on key; exactly one match ? Insert always at end of ?le ? Sorted Files: ? Selections on sort ?eld(s) ? Files compacted after deletions ? Hashed Files: ? No over?ow buckets, 80% page occupancy
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Cost of Operations
+6
+
+Heap File Scan all recs Equality Search Range Search Insert Delete
+
+Sorted File
+
+Hashed File
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Indexes
+7
+
+An index on a ?le speeds up selections on the search key ?elds for the index ? Any subset of the ?elds of a relation can be the search key for an index on the relation ? Search key is not the same as key (minimal set of ?elds that uniquely identify a record in a relation) An index contains a collection of data entries, and supports e?cient retrieval of all data entries K ? with a given key value K.
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Data Entries in Indexes
+8
+
+Three alternatives: ? Data record with key value K ? K, r , where r is rid of a record with search key value K ? K, [r1 , . . . , rn ] , where [r1 , . . . , rn ] is a list or rid?s of records with search key value K Choice of alternative for data entries is orthogonal to the indexing technique used to locate data entries with a given key value K ? Examples: B+-trees, hash-based structures ? Index may contain auxiliary information that directs searches
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Data Entries in Indexes: Alternative 1
+9
+
+?Data record with key value K? ? Means: index structure is a ?le organisation for data records (like heap ?les or sorted ?les) ? For a given collection of data, at most one index can use this.
+Otherwise, duplication of data records ; redundant storage ; potential inconsistency
+
+? If: large data records =? high number of pages containing data entries =? large size of auxiliary information
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Data Entries in Indexes: Alternatives 2 and 3
+0
+
+? K, r ? or ? K, [r1 , . . . , rn ] ?, with rids r, r1 , . . . , rn ? Typically, data entries are much smaller than data records =? better than Alt1 (with large data records), especially if search keys are small
+Portion of index structure to direct search is much smaller than with Alt1.
+
+? If more than one index is required on a given ?le, at most one index can use Alt1; the rest must use Alt2 or Alt3 ? Alt3 is more compact than Alt2, but leads to variable sized data entries even if search keys are of ?xed length
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Index Classi?cation
+1
+
+Primary vs. Secondary: Primary, if search key contains a primary key ? Unique index: search key contains a candidate key Clustered vs. Unclustered: Clustered, if order of data records is the same as, or ?close to?, order of data entries ? Alternative 1 implies clustered, but not vice-versa ? A ?le can be clustered on at most one search key ? Cost of retrieving data records through index varies greatly based on whether index is clustered or not
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Clustered vs. Unclustered
+2
+Index file
+
+Clustered
+Index entries direct search for data entries
+
+Unclustered
+
+Data entries
+
+Data records
+
+Data file
+
+If Alt2 is used for data entries, and data records are stored in a heap ?le: ? To build clustered index, ?rst sort the heap ?le (with some free space on each page for future inserts) ? Over?ow pages may be needed for inserts ; order of data recs is ?close to?, but not identical to the sort order
+Introduction to Databases Werner Nutt Free University of Bozen-Bolzano
+
+Dense vs. Sparse
+3
+
+Dense, if there is at least one data entry per search key value ? Alternative 1 always leads to dense index ? Every sparse index is clustered ? Sparse indexes are smaller; however, some optimisations are based on dense indexes
+Sparse Index on Name
+Ashby Cass Smith
+
+Ashby, 25, 3000 Basu, 33, 4003 Bristow, 30, 2007 22 25 30 Cass, 50, 5004 Daniels, 22, 6003 Jones, 40, 6003 40 44 Smith, 44, 3000 Tracy, 44, 5004 44 50 33
+
+Data File
+
+Dense Index on Age
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Composite Key Indexes
+4
+
+age, sal 31, 80 32, 10 32, 20 33, 75 cal sal, age 10, 32 20, 32 75, 33 80, 31
+Data entries in index sorted by <sal,age> Data records sorted by <name>
+
+age 31 name bob age 32 31 32 33 sal 10 80 20 75 sal 10 20 75 80
+Data entries sorted by <sal>
+
+32 32 33
+
+joe sue
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Summary
+5
+
+? Many alternative ?le organisations exist, each appropriate in some situation. ? If selection queries are frequent, sorting the ?le or building an index is important. ? Hash-based indexes only good for equality search ? Sorted ?les and tree-based indexes best for range search (and also equality search)
+(?les rarely sorted in practice; B+-tree index is better)
+
+? Index is a collection of data entries plus a way to quickly ?nd entries with given key values
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+Summary (Cntd.)
+6
+
+? Data entries can be (1) actual data records, (2) key, rid -pairs, (3) key, rid-list -pairs
+Choice orthogonal to indexing technique used to locate data entries with a a given key value.
+
+? There may be several indexes on a given ?le of data records, each with a di?erent search key. ? Indexes can be classi?ed as ? clustered vs. unclustered ? primary vs. secondary ? dense vs. sparse. Di?erences have important consequences for utility/performance
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+References
+7
+
+These slides are based on Chapter 8 of the book Database Management Systems by R. Ramakrishnan and J. Gehrke, and on slides by the authors published at
+www.cs.wisc.edu/~dbbook/openAccess/thirdEdition/slides/slides3ed.html
+
+Introduction to Databases
+
+Werner Nutt
+
+Free University of Bozen-Bolzano
+
+

@@ -1,0 +1,1021 @@
+Relational Database Systems 1
+Wolf-Tilo Balke Hermann Kroll, Janus Wawrzinek, Stephan Mennicke Institut f?r Informationssysteme Technische Universit?t Braunschweig www.ifis.cs.tu-bs.de
+
+9 SQL 2
+? SQL data definition language ? SQL data manipulation language (apart from SELECT)
+? SQL ? SQL ? Some advanced SQL concepts
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+2
+
+9.1 Recap
+? Last week, you learned how to query an existing relational database
+SELECT <attribute, function, scalar subquery> FROM <table, table subquery> [WHERE <condition>] [GROUP BY <attribute list>] [HAVING <condition>] [UNION/INTERSECT/EXCEPT <query>] [ORDER BY <attribute list>]
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+3
+
+9.1 SQL DDL
+
+? What?s missing?
+? how to create schemas, tables, ... ? how to drop schemas, tables, ... ? how to alter schemas, tables, ... ? how to insert new tuples into existing tables? ? how to delete tuples from existing tables? ? how to update tuples in existing tables?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+DDL
+
+DML
+
+4
+
+9.1 SQL DDL: Schemas
+? CREATE SCHEMA creates a new schema with a given name for a given owner
+? if no schema name is provided, the current username is used ? if no explicit owner is provided, also the current user is used
+
+? Example
+? CREATE SCHEMA heroes AUTHORIZATION batman
+schema name CREATE SCHEMA AUTHORIZATION schema name user name AUTHORIZATION user name
+5
+
+?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.1 SQL DDL: Tables
+? CREATE TABLE creates a new table with a given name
+? contains column definition for each column ? contains additional table-specific structural constraints
+, CREATE TABLE
+name
+
+(
+
+column def
+
+) ?
+
+table constraint
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+6
+
+9.1 SQL DDL: Tables
+? each column has a name and a data type ? each column may have multiple column options ? example
+? CREATE TABLE person ( name VARCHAR(200), age INTEGER )
+column name data type column option
+
+column def
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+7
+
+data type
+
+9.1 SQL DDL: Tables
+SMALLINT INTEGER DECIMAL ( precision ) scale ,
+
+FLOAT CHAR ( length )
+
+VARCHAR ( length ) DATE TIME TIMESTAMP ?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+8
+
+9.1 SQL DDL: Tables
+Name Integer Float Syntax INTEGER FLOAT description Integer value depending on system Floating point number of approximate precision (the supported precision is implementation-dependent)
+
+Numeric
+
+Character Character varying Date Time Timestamp
+
+NUMERIC(p,s) A decimal number with p digits. (p-s) before the decimal point and s digits after the decimal point CHAR(x) A textual string of length x VARCHAR(x) DATE TIME TIMESTAMP A textual string of length at most x Year, month, and day Hours, minutes, and seconds A date and a time
+9
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+column def
+
+9.1 SQL DDL: Tables
+column name
+
+data type
+column option
+
+column option
+
+NOT NULL DEFAULT NULL constant CHECK ( check condition ) ?
+
+CONSTRAINT
+
+const. name
+
+PRIMARY KEY UNIQUE
+reference clause
+
+?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+10
+
+9.1 SQL DDL: Tables
+? NOT NULL: the NULL value is not allowed for the column ? example
+? CREATE TABLE person ( name VARCHAR(200) NOT NULL, age INTEGER NOT NULL )
+
+? DEFAULT: defines the default value if a value is not explicitly set
+? usually a constant or NULL ? if omitted, NULL is the default
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+11
+
+9.1 SQL DDL: Tables
+? Column constraints
+? restricts possible values for the current column ? may have a unique name indicated by CONSTRAINT <name>
+? if name is omitted, system creates a default name
+
+? CHECK: user-defined constraint. To be valid, values have to satisfy the condition. ? example
+? CREATE TABLE person ( name VARCHAR(200), age INTEGER CONSTRAINT adult CHECK (age >= 18) )
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+12
+
+9.1 SQL DDL: Tables
+? UNIQUE: no duplicate values are allowed within this attribute
+? this option can only be used if the uniqueness constraints concerns only a single attribute ? for multi-attribute uniqueness constraints, there is a different option (later) ? implies NOT NULL
+? note: in DB2, NOT NULL has to be specified nevertheless ...
+
+? example
+? CREATE TABLE person ( name VARCHAR(200) NOT NULL UNIQUE, age INTEGER NOT NULL )
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+13
+
+9.1 SQL DDL: Tables
+? PRIMARY KEY: each table may have a primary key (optionally, but recommended) made up of at least one column
+? this option can only be used if the primary key consists of only one column ? for multi-column primary keys, you need a different option (later) ? implies NOT NULL and UNIQUE
+? again, DB2 needs an explicit NOT NULL
+
+? additionally, a referential clause may be specified (see next slides)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+14
+
+9.1 SQL DDL: Referential Integrity ? Rows in tables may refer to rows in other tables to capture relationships ? Of course, you should not be allowed to refer to a non-existing row
+? referential integrity between primary keys and foreign keys ensures that references are correct
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+15
+
+9.1 SQL DDL: Referential Integrity
+Example
+Conceptual ER schema
+
+alias id real name
+
+power strength
+
+id has (0,*)
+
+Hero
+
+(0,*)
+
+Power
+
+name description
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+16
+
+9.1 SQL DDL: Referential Integrity
+Resulting tables Tables refer to others by primary keys and foreign keys
+real_name
+
+has_alias hero primary key
+
+alias
+
+hero id
+
+foreign key
+
+has_power hero primary key power id
+
+power
+
+power_strength
+
+name
+
+description
+17
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.1 SQL DDL: Referential Integrity ? Referential integrity can be defined using the REFERENCES clause
+? either used by constraints in column options or within table constraints
+REFERENCESclause
+
+REFERENCES
+
+table name
+
+(
+
+column name
+
+)
+
+, ON DELETE NO ACTION SET NULL CASCADE ON UPDATE NO ACTION CASCADE
+18
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.1 SQL DDL: Referential Integrity ? Example
+? CREATE TABLE employee( id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(100) NOT NULL ) ? CREATE TABLE managed_by( employee INTEGER NOT NULL REFERENCES employee, manager INTEGER NOT NULL REFERENCES employee )
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+19
+
+9.1 SQL DDL: Referential Integrity
+? Optionally, you may specify what happens if a row that is referenced will be deleted or modified
+? ON DELETE: if a referenced row is deleted, ...
+? NO ACTION: ...reject the deletion (that is, it cannot be performed) ? SET NULL: ...delete it and set all referencing foreign keys to NULL ? CASCADE: ...delete it along with all rows referring to it
+
+? ON UPDATE: if the primary key of a referenced row is modified, ...
+? NO ACTION: ...reject the modification (that is, it cannot be performed) ? CASCADE: ...change all values of referencing foreign keys
+
+? default
+? ON DELETE NO ACTION ON UPDATE NO ACTION
+
+ON DELETE
+
+NO ACTION SET NULL CASCADE
+
+ON UPDATE
+
+NO ACTION CASCADE
+20
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.1 SQL DDL: Table Constraints
+, CREATE TABLE
+name
+
+(
+
+column def
+
+) ?
+
+table constraint
+
+table constraint CONSTRAINT
+const. name
+
+CHECK( check condition PRIMARY KEY (
+column name
+
+)
+
+,
+
+)
+
+FOREIGN KEY
+
+(
+
+column name
+
+)
+
+reference clause
+
+,
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+21
+
+9.1 SQL DDL: Table Constraints
+? Table constraints behave similar to constraints in column options
+? if no name is provided, a name is automatically generated ? the CHECK condition may contain any Boolean predicate ? in contrast to column options, table constraints may declare primary keys consisting of multiple attributes ? foreign keys declare references to primary keys of other tables
+? see referential integrity
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+22
+
+9.1 SQL DDL:Table Example
+has_alias hero primary key hero id
+real_name alias
+
+foreign key
+
+has_power hero primary key power id
+
+power
+
+power_strength
+
+name
+
+description
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+23
+
+9.1 SQL DDL:Table Example
+CREATE TABLE hero( id INTEGER NOT NULL PRIMARY KEY, real_name VARCHAR(100) ) CREATE TABLE power( id INTEGER NOT NULL PRIMARY KEY, name VARCHAR(100), description VARCHAR(255) ) CREATE TABLE has_alias ( hero INTEGER REFERENCES hero ON DELETE CASCADE ON UPDATE CASCADE, alias VARCHAR(100) NOT NULL, PRIMARY KEY (hero, alias) )
+
+link has_alias to hero delete alias if hero is deleted update alias if hero is updated
+composed primary key
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+24
+
+9.1 SQL DDL:Table Example
+? CREATE TABLE has_power( hero INTEGER NOT NULL, power INTEGER NOT NULL, power_strength INTEGER NOT NULL, PRIMARY KEY (hero, power), FOREIGN KEY (hero) REFERENCES hero ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (power) REFERENCES power ON DELETE CASCADE ON UPDATE CASCADE )
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+25
+
+9.1 SQL DDL: Drop Tables
+? For deleting tables, there is the DROP TABLE command
+, DROP TABLE table name CASCADE RESTRICT
+
+? if RESTRICT is used, you may only drop empty tables that are not referenced by any other table ? if CASCADE is used, all referencing tables are also deleted (including all stored rows)
+? DB2 does not support CASCADE ?
+
+? if neither is used, the table does not have to be empty, but must not be referenced by another one ? example
+? DROP TABLE hero CASCADE, power CASCADE
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+26
+
+9.1 SQL DDL: Alter Tables
+? After a table has been created, you may alter it by adding/removing columns or constraints
+ALTER TABLE name ADD COLUMN table constraint DROP PRIMARY KEY CONSTRAINT CHECK FOREIGN KEY column name RESTRICT CASCADE
+27
+
+column def
+
+name
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.1 SQL DDL: Alter Tables
+? if you add a new column with a NOT NULL constraint, you also need to provide a default value ? when dropping a column, you must either choose
+? CASCADE to also delete any views, indexes, and constraints dependent on that column ? RESTRICT to allow the drop only if there is no referring column (default)
+
+? if the name of a constraint is auto-generated, you need to look it up in the system catalog ? example
+? ALTER TABLE has_power DROP power_strength ALTER TABLE has_power ADD COLUMN since DATE
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+28
+
+9 SQL 2
+? SQL data definition language ? SQL data manipulation language (apart from SELECT)
+? SQL ? SQL ? Some advanced SQL concepts
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+29
+
+9.2 SQL DML
+? Data definition language (DDL)
+? creating, changing, altering schemas, tables, ...
+? ? ? ? CREATE SCHEMA CREATE TABLE ALTER TABLE DROP TABLE
+
+? Data manipulation language (DML)
+? querying
+? SELECT
+
+? adding and updating data
+? INSERT INTO ? UPDATE ? DELETE
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+30
+
+9.2 SQL DML: Insert
+? Now we have wonderful, empty tables ? We need to put data into them!
+? INSERT INTO statement ? you can specify into what columns you want to insert data
+? default: all columns
+
+? new values are stated as a literal table or inline view (query)
+? of course the attribute domains have to match
+literal table
+
+INSERT INTO
+
+table name
+
+(
+
+column name
+
+)
+query
+
+,
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+31
+
+9.2 SQL DML: Insert
+literal table NULL VALUES ( expression
+, NULL
+
+)
+
+expression , ,
+
+? A literal table is defined extensionally:
+James VALUES ('James', 'Howlet') VALUES ('Charles', 'Xavier'), ('Jean', 'Grey') VALUES 'Wolverine', ('Professor X'), 'Phoenix'
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+Howlet
+
+Charles Xavier Jean Grey
+Wolverine
+
+Professor X Phoenix
+32
+
+9.2 SQL DML: Insert
+? INSERT INTO hero(id, real_name) VALUES (1, 'Charles F. Xavier'), (2, 'Jean Grey') INSERT INTO has_alias VALUES (1, 'Professor X'), (1, 'Onslaught'), (2, 'Phoenix'), (2, 'Marvel Girl')
+
+,
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+33
+
+9.2 SQL DML: Insert
+? Of course, subqueries may also be used in INSERT statements
+? INSERT INTO heroes_starting_with_a( SELECT * FROM hero WHERE real_name LIKE 'A%' )
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+34
+
+9.2 SQL DML: Update
+? Existing rows can also be changed using the UPDATE statement
+? very similar to the SELECT statement ? update finds rows fulfilling a given condition and changes some of its rows by assigning new values
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+35
+
+9.2 SQL DML: Update
+UPDATE
+table name
+
+AS
+alias name
+
+SET
+
+column name
+
+=
+
+expression
+
+NULL , (
+column name
+
+DEFAULT
+
+)= ( NULL
+
+,
+expression
+
+)
+
+DEFAULT
+
+( WHERE
+search condition
+
+query
+
+)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+36
+
+9.2 SQL DML: Update
+? Replace the real name of each hero with NULL
+? UPDATE hero SET real_name = NULL
+
+? Multiply all power_strength values by 10
+? UPDATE has_power SET power_strength = power_strength * 10
+
+? Change the name of hero with id 1
+? UPDATE hero SET name= 'Charles Francis Xavier' WHERE id = 1
+
+? Change name and id of Jean Grey
+? UPDATE hero SET (id, name) = ('3', 'Jean Grey-Summers') WHERE name = 'Jean Grey'
+
+? Change of id is propagated to other tables when ON UPDATE CASCADE is used in table definition
+
+? Again, subqueries can be used in the WHERE clause
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+37
+
+9.2 SQL DML: Delete
+? The DELETE statement is used to delete rows from a table
+? deletes all rows satisfying a certain search condition ? example
+? delete Jean Grey
+? DELETE FROM hero WHERE name = 'Jean Grey'
+
+? delete all heroes
+? DELETE FROM hero
+DELETE FROM
+table name
+
+AS
+alias name
+
+WHERE
+
+search condition
+38
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.2 SQL DML: Delete
+? Again, subqueries can be used here
+? DELETE FROM hero h WHERE NOT EXISTS( SELECT * FROM has_alias a WHERE a.hero = h.id )
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+39
+
+9 SQL 2
+? SQL data definition language ? SQL data manipulation language (apart from SELECT)
+? SQL ? SQL ? Some advanced SQL concepts
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+40
+
+9.3 SQL ? SQL
+? First, the good news:
+? SQL has been standardized by the ISO in 1987 ? the standard is well-maintained and under active development
+? SQL-86, SQL-89, SQL-92, SQL:1999, SQL:2003, SQL:2006, SQL:2008
+
+? many big database vendors participate in the standardization process
+? IBM, Ingres, Microsoft, Oracle, Sybase, ...
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+41
+
+9.3 SQL ? SQL
+A timeline of SQL standardization:
+? 1986
+? ANSI SQL ? relations, attributes, views ? SELECT ... FROM ... WHERE ...
+
+? 1987
+? SQL-86 (ISO/IEC 9075:1986)
+
+? 1989
+? SQL-89 (SQL1)
+? ? SQL-86 + restricted referential integrity
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+42
+
+9.3 SQL ? SQL
+? 1992
+? SQL-92 (SQL2) ? 3 parts, 1120 pages ? Entry Level
+? ? SQL-89 + CHECK (attribute)
+
+? Intermediate Level
+
+? ? Entry Level + domains, CHECK (relation), CASE, CAST, JOIN, EXCEPT, INTERSECT
+
+? Full Level
+
+? ? Intermediate Level + assertions, nested select, nested from
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+43
+
+9.3 SQL ? SQL
+? 1999/2000
+? SQL:1999 (SQL3) ? 5 parts, 2084 pages ? ? SQL-92 + object-orientation, recursive queries, triggers, OLAP, user-defined types, regular expressions
+? Boolean data type
+
+? computationally complete, object-oriented database programming language, descriptive and procedural ? core (about180 features)
+? ? SQL92 Entry Level + parts of Intermediate and Full Level
+
+? 9 Packages (about 240 features)
+? enhanced date/time, enhanced integrity, OLAP, PSM, CLI, basic object support, enhanced object support, trigger, SQL/MM
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+44
+
+9.3 SQL ? SQL
+? Recursive queries (SQL:1999):
+? How to find all rivers that flow into the North Sea? ? Multiple joins?
+flows_into river Oker Aller Weser Elbe Edder Fl?th Wietze Isar Inn mouth Aller Weser North Sea North Sea Wietze Wietze Aller Danube Danube
+45
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.3 SQL ? SQL
+? Solution
+WITH RECURSIVE flows_into_ns(river) AS ( SELECT river FROM flows_into WHERE mouth = 'North Sea'
+
+UNION
+SELECT fi.river FROM flows_into AS fi JOIN flows_into_ns AS fins ON fi.mouth = fins.river ) SELECT river FROM flows_into_ns
+
+? Note: DB2 uses a different syntax
+
+? No RECURSIVE, UNION ALL instead of UNION, no explicit JOIN
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+46
+
+9.3 SQL ? SQL
+? 2003
+? SQL:2003 ? 14 parts, 3606 pages ? MULTISET as an explicit construct (with numerous operations, such as: MULTISET UNION, MULTISET EXCEPT, MULTISET INTERSECT, CARDINALITY) ? sequence generators
+? CREATE SEQUENCE <sequence name> AS <type name> [START WITH <value>] [INCREMENT BY <value>] [NO MINVALUE | MINVALUE <value>] [NO MAXVALUE | MAXVALUE <value>] [NO CYCLE | CYCLE] ? Many databases use non-standard syntax for this task?
+
+? base type XML for mappings between SQL and XML ? CREATE TABLE AS / CREATE TABLE LIKE
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+47
+
+9.3 SQL ? SQL
+? 2006
+? SQL:2006 ? successor of SQL:2003 ? a new extension for XML handling
+? importing, storing, querying, and manipulating XML data ? support for XQuery ? concurrently access (object-)relational data and XML data
+
+? 2008
+? SQL:2008 ? successor of SQL:2006 ? maintenance release (some new but minor features)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+48
+
+9.3 SQL ? SQL
+? 2011
+? SQL:2011 ? successor of SQL:2008 ? adds support for time periods
+CREATE TABLE mutation( name VARCHAR(255) PRIMARY KEY NOT NULL, person INTEGER REFERENCES person(id), from DATE, until DATE, PERIOD FOR period_of_validity (from, until)); SELECT name, person FROM mutation WHERE period_of_validity CONTAINS '2014-12-19';
+
+? temporal predicates, temporal primary keys, temporal referential integrity
+? This might be very useful for work planning or scheduling applications
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+49
+
+9.3 SQL ? SQL
+? Well, here are the bad news
+? there are still too many variants of SQL (both syntactic and semantic differences)
+? true application portability remains a challenge
+
+? the standard has been used to introduce two kinds of features
+1. features that are well-understood and widely implemented 2. new and largely untried technologies, hoping that vendors follow the lead and deliver new functionalities
+
+? vendors don?t care too much about the standard
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+50
+
+9.3 SQL ? SQL
+? A common myth among software developers
+
+If your application uses only standard SQL, then it is portable.
+
+? If you don?t believe me, here are some examples ...
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+51
+
+9.3 SQL ? SQL
+? CREATE TABLE name ( first VARCHAR(100), middle VARCHAR(100), last VARCHAR(100) )
+INSERT INTO name VALUES ('George', 'Walker', 'Bush') INSERT INTO name VALUES ('Horst', '', 'Kr') INSERT INTO name VALUES ('Angela', NULL, 'Merkel')
+
+? ''(empty string) means that we know that there is no middle name ? NULL means that we don?t know whether there is a middle name
+
+? Sounds like a good design? What do you think?
+? according to the SQL standard, this approach is fine ... ? ... unless your RDBMS is Oracle ('' is the same as NULL)
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+52
+
+9.3 SQL ? SQL
+? What about terminology?
+? the SQL standard defines the following notions
+? ? ? ? ? ? ? ? Environment Cluster Catalog Schema Database server (unsupported) Database Schema
+
+? the reality
+
+? but attention
+
+? in MySQL, there are no catalogs, schema and database are synonyms ? in Oracle, there is exactly one schema per user. CREATE/ALTER SCHEMA x <command> executes <command> on all objects located in schema x
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+53
+
+9.3 SQL ? SQL
+? The statement terminator ;
+? according to the SQL standard, (almost) every SQL statement has to be terminated by a semicolon ? What?s happening in practice?
+? many RDBMS treat the terminator as being optional (which is fine, but may cause some problems) ? some RDBMS either strictly require a terminator or complain if it is present ? in some RDBMS, this behavior can be configured ...
+
+? summary: No matter what you do, it causes problems!
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+54
+
+9.3 SQL ? SQL
+? The BOOLEAN data type
+? CREATE TABLE customers ( id INTEGER PRIMARY KEY, name VARCHAR(100), is_vip BOOLEAN, is_blacklisted BOOLEAN ) SELECT id, name FROM customers WHERE is_vip AND NOT is_blacklisted
+
+? practice?
+? not supported by Oracle, DB2, and MS SQL Server
+? official workarounds: use CHAR or INTEGER ...
+
+? supported by MySQL and PostgreSQL
+? where in MySQL BOOLEAN is just a short hand for TINYINT(1)?
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+55
+
+9.3 SQL ? SQL
+? Summary
+? SQL is not SQL ? in some cases, even identical SQL statements works differently on different RDBMS
+
+? Current trends?
+? open-source RDBMS (PostgreSQL, MySQL, Derby, ...) typically try to adhere to the standard
+? however, many advanced features are not supported yet
+
+? recently, DB2 added support for Oracle?s SQL (in DB2 9.7)
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+56
+
+9 SQL 2
+? SQL data definition language ? SQL data manipulation language (apart from SELECT)
+? SQL ? SQL ? Some advanced SQL concepts
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+57
+
+9.4 Type Casting
+? SQL is a strongly typed language
+? Basically, this means that e.g. INTEGER is different from VARCHAR(100)
+
+? If data types are incompatible, type casting may be used to make them compatible
+
+? CAST expression ? during casting, precision may be lost (e.g. FLOAT ? INTEGER) ? example
+? CAST (power_strength AS NUMERIC(3, 2)) CAST (alias || real_name AS CHAR(255))
+
+CAST expression CAST
+
+(
+
+expression
+
+AS
+
+data type
+
+)
+
+NULL
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+58
+
+9.4 Type Casting
+? In DB2, possible castings are
+Source SMALLINT, INTEGER, DECIMAL, FLOAT CHAR, VARCHAR, LONG VARCHAR, CLOB CHAR, VARCHAR SMALLINT, INTEGER, DECIMAL DATE, TIME, TIMESTAMP DATE TIME TIMESTAMP GRAPHICS, VARGRAPHICS, LONG VARGRAPHICS, DBCLOB PossibleTarget SMALLINT, INTEGER, DECIMAL, FLOAT CHAR, VARCHAR, LONG VARCHAR, CLOB, BLOB SMALLINT, INTEGER, DECIMAL, DATE, TIME, TIMESTAMP, VARGRAPHICS CHAR CHAR, VARCHAR DATE TIME TIMESTAMP GRAPHICS, VARGRAPHICS, LONG VARGRAPHICS, DBCLOB
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+59
+
+9.4 Ranking Functions
+? Since SQL:2003, there are special functions for working with result lists ? Examples
+? output only every other row of the list ? create a ranking with explicit ranks (1, 2, 3, ...) ? on what rank position is some given row?
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+60
+
+9.4 Ranking Functions
+? ROW_NUMBER()returns the position of each row in the result list ? Example
+SELECT name, salary, ROW_NUMBER() OVER ( ORDER BY salary DESC ) AS pos FROM salary
+name Simon Wolf-Tilo Larry Christoph salary 45000 75000 200000000 50000
+
+person
+
+name Larry Wolf-Tilo Christoph Simon
+
+salary 200000000 75000 50000 45000
+
+pos 1 2 3 4
+
+Depending on the implementation, the last two rows may switch positions
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+61
+
+9.4 Ranking Functions
+? example: At which position is Wolf-Tilo?
+? SELECT name, salary, ROW_NUMBER() OVER ( ORDER BY salary DESC ) AS pos FROM salary WHERE name = 'Wolf-Tilo'
+person name Simon Wolf-Tilo Larry Christoph salary 45000 75000 200000000 50000 name Wolf-Tilo salary 75000 pos 2
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+62
+
+9.4 Ranking Functions
+? example: Show only rows at even positions.
+? SELECT name, salary, ROW_NUMBER() OVER ( ORDER BY salary DESC ) AS pos
+FROM salary
+
+WHERE (pos % 2) = 0
+modulo person name Simon Wolf-Tilo Larry Philipp salary 45000 75000 200000000 45000 name Wolf-Tilo Simon salary pos 75000 45000 2 4
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+63
+
+9.4 Ranking Functions
+? RANK()returns the rank of each row in the result list
+? example
+SELECT name, salary, RANK() OVER ( ORDER BY salary DESC ) AS rank FROM salary
+person name Simon Wolf-Tilo Larry Phil salary 45000 75000 200000000 45000 name Larry Wolf-Tilo Phil Simon salary 200000000 75000 45000 45000 rank 1 2 3 3
+64
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.4 Ranking Functions
+? DENSE_RANK() works like RANK() but does not skip ranks on ties (as it is usually done)
+? example
+SELECT name, salary, RANK() OVER ( ORDER BY salary ASC ) AS rank, DENSE_RANK() OVER ( ORDER BY salary ASC ) AS drank FROM salary
+name Simon Wolf-Tilo Larry Philipp salary 45000 75000 200000000 45000 name
+Simon
+
+person
+
+salary
+45000
+
+rank
+1
+
+drank
+1
+
+Philipp Wolf-Tilo Larry
+
+45000 75000 200000000
+
+1 3 4
+
+1 2 3
+65
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.4 CASE Expressions
+? Very often codes are used for storing more complex information
+? retrieving the account information for owner Clark with appropriate account descriptions needs a join ? Indicate all customers with a negative balance with the string not creditworthy in the query result
+account owner balance Clark Louis Clark 367,00 -675,00 54987,00 type 0 0 1 acc_type type description 0 1 2 checking account savings account credit card account
+66
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.4 CASE Expressions
+? The CASE expression allows a value to be selected based on the evaluation of one or more conditions (similar to if-then-else)
+? comes in two flavors
+CASE expression CASE
+simpleWHEN-clause searchedWHEN-clause
+
+ELSE NULL END ELSE
+result expression
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+67
+
+9.4 CASE Expressions
+? the simple WHEN clause
+? compares an expression to each case expression one by one
+? if expression is equal to search value, the corresponding result expression is returned
+
+? if no match is found, then some default (ELSE clause) is returned
+Simple WHEN clause
+
+? if ELSE is omitted, then NULL is returned
+
+expression
+
+WHEN
+
+case expression
+
+THEN
+
+result expression
+
+NULL
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+68
+
+9.4 CASE Expressions
+? Example: simple WHEN clause
+? directly decode the account type
+? SELECT owner, CASE type WHEN 0 THEN 'checking account' WHEN 1 THEN 'savings account' WHEN 2 THEN 'credit card account' END AS verbose_type FROM account
+account owner balance Clark Louis Clark 367,00 -675,00 54987,00 type 0 0 1
+69
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9.4 CASE Expressions
+? the searched WHEN clause
+? checks search conditions from left to right ? stops as soon as a search condition evaluates to true
+? returns the corresponding result then
+
+? if no condition is true, the value given by the ELSE clause is returned (or NULL, if there is no ELSE clause)
+
+searched WHEN clause
+
+WHEN
+
+search condition
+
+THEN
+
+result expression
+
+NULL
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+70
+
+9.4 CASE Expressions
+? Example: searched WHEN clause
+? retrieve credit rating of customers based on their checking accounts
+? SELECT owner, CASE WHEN balance < 0 THEN 'not credit-worthy' WHEN balance = 0 THEN 'questionable' ELSE 'credit-worthy' END AS credit_worthyness FROM account account owner balance type WHERE type = 0 Clark 367,00 0
+Louis Clark -675,00 54987,00 0 1
+71
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+9 More on SQL
+? There are many more SQL statements than we are covering in our lectures ? Moreover, there are many different SQL dialects ? If you don?t want to get mad, do the following
+? don?t care too much about the SQL standard (unless you are actually implementing an RDBMS) ? read the SQL manuals of your RDBMS!
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+72
+
+9 More on SQL
+? Example: DB2?s SQL reference (version 10.5)
+? http://www01.ibm.com/support/knowledgecenter/SSEPGG_10.5.0/com.ibm.db2.luw.sql.ref.doc/doc/c0004100.ht ml?cp=SSEPGG_10.5.0%2F2-12 ? http://publib.boulder.ibm.com/epubs/pdf/dsnsqn05.pdf
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+73
+
+9 Next Lecture
+? Normalization ? Functional Dependencies ? Normal Forms
+? 1NF, 2NF, 3NF, BCNF, 4NF, 5NF, 6NF
+hero_id team_id hero_name team_name join_year
+It?s that simple!
+
+hero_id
+
+hero_name
+
+hero_id
+
+team_id
+
+team_name
+
+join_year
+74
+
+Relational Database Systems 1 ? Wolf-Tilo Balke ? Institut f?r Informationssysteme ? TU Braunschweig
+
+

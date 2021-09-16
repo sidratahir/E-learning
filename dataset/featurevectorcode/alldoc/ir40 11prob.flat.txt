@@ -1,0 +1,486 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 11: Probabilistic Information Retrieval
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2011-05-23
+
+1 / 51
+
+Overview
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+2 / 51
+
+Outline
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+3 / 51
+
+Relevance feedback: Basic idea
+
+The user issues a (short, simple) query. The search engine returns a set of documents. User marks some docs as relevant, some as nonrelevant. Search engine computes a new representation of the information need ? should be better than the initial query. Search engine runs new query and returns new results. New results have (hopefully) better recall.
+
+4 / 51
+
+Rocchio illustrated
+
+qopt ?R ?NR
+
+?R ? ?NR x
+
+x x x x
+
+x
+
+5 / 51
+
+Types of query expansion
+
+Manual thesaurus (maintained by editors, e.g., PubMed) Automatically derived thesaurus (e.g., based on co-occurrence statistics) Query-equivalence based on query log mining (common on the web as in the ?palm? example)
+
+6 / 51
+
+Query expansion at search engines
+
+Main source of query expansion at search engines: query logs Example 1: After issuing the query [herbs], users frequently search for [herbal remedies].
+? ?herbal remedies? is potential expansion of ?herb?.
+
+Example 2: Users searching for [?ower pix] frequently click on the URL photobucket.com/?ower. Users searching for [?ower clipart] frequently click on the same URL.
+? ??ower clipart? and ??ower pix? are potential expansions of each other.
+
+7 / 51
+
+Take-away today
+
+Probabilistically grounded approach to IR Probability Ranking Principle Models: BIM, BM25 Assumptions these models make
+
+8 / 51
+
+Outline
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+9 / 51
+
+Relevance feedback from last lecture
+
+Previous lecture: in relevance feedback, the user marks documents as relevant/nonrelevant Given some known relevant and nonrelevant documents, we compute weights for non-query terms that indicate how likely they will occur in relevant documents Today: develop a probabilistic approach for relevance feedback and also a general probabilistic model for IR
+
+10 / 51
+
+Probabilistic Approach to Retrieval
+
+Given a user information need (represented as a query) and a collection of documents (transformed into document representations), a system must determine how well the documents satisfy the query
+An IR system has an uncertain understanding of the user query, and makes an uncertain guess of whether a document satis?es the query
+
+Probability theory provides a principled foundation for such reasoning under uncertainty
+Probabilistic models exploit this foundation to estimate how likely it is that a document is relevant to a query
+
+11 / 51
+
+Probabilistic IR Models at a Glance
+
+Classical probabilistic retrieval model
+Probability ranking principle
+Binary Independence Model, BestMatch25 (Okapi)
+
+Bayesian networks for text retrieval Language model approach to IR
+Important recent work, will be covered in the next lecture
+
+Probabilistic methods are one of the oldest but also one of the currently hottest topics in IR
+
+12 / 51
+
+Exercise: Probabilistic model vs. other models
+
+Boolean model
+Probabilistic models support ranking and thus are better than the simple Boolean model.
+
+Vector space model
+The vector space model is also a formally de?ned model that supports ranking. Why would we want to look for an alternative to the vector space model?
+
+13 / 51
+
+Probabilistic vs. vector space model
+
+Vector space model: rank documents according to similarity to query. The notion of similarity does not translate directly into an assessment of ?is the document a good document to give to the user or not?? The most similar document can be highly relevant or completely nonrelevant. Probability theory is arguably a cleaner formalization of what we really want an IR system to do: give relevant documents to the user.
+
+14 / 51
+
+Outline
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+15 / 51
+
+Basic Probability Theory
+For events A and B
+Joint probability P(A ? B) of both events occurring Conditional probability P(A|B) of event A occurring given that event B has occurred
+
+Chain rule gives fundamental relationship between joint and conditional probabilities: P(AB) = P(A ? B) = P(A|B)P(B) = P(B|A)P(A) Similarly for the complement of an event P(A): P(AB) = P(B|A)P(A) Partition rule: if B can be divided into an exhaustive set of disjoint subcases, then P(B) is the sum of the probabilities of the subcases. A special case of this rule gives: P(B) = P(AB) + P(AB)
+16 / 51
+
+Basic Probability Theory
+Bayes? Rule for inverting conditional probabilities: P(A|B) = P(B|A)P(A) = P(B) P(B|A) P(A) X ?{A,A} P(B|X )P(X )
+
+Can be thought of as a way of updating probabilities: Start o? with prior probability P(A) (initial estimate of how likely event A is in the absence of any other information) Derive a posterior probability P(A|B) after having seen the evidence B, based on the likelihood of B occurring in the two cases that A does or does not hold Odds of an event provide a kind of multiplier for how probabilities change: P(A) P(A) = Odds: O(A) = 1 ? P(A) P(A)
+17 / 51
+
+Outline
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+18 / 51
+
+The Document Ranking Problem
+
+Ranked retrieval setup: given a collection of documents, the user issues a query, and an ordered list of documents is returned Assume binary notion of relevance: Rd,q is a random dichotomous variable, such that
+Rd,q = 1 if document d is relevant w.r.t query q Rd,q = 0 otherwise
+
+Probabilistic ranking orders documents decreasingly by their estimated probability of relevance w.r.t. query: P(R = 1|d, q) Assume that the relevance of each document is independent of the relevance of other documents
+
+19 / 51
+
+Probability Ranking Principle (PRP)
+
+PRP in brief
+If the retrieved documents (w.r.t a query) are ranked decreasingly on their probability of relevance, then the e?ectiveness of the system will be the best that is obtainable
+
+PRP in full
+If [the IR] system?s response to each [query] is a ranking of the documents [...] in order of decreasing probability of relevance to the [query], where the probabilities are estimated as accurately as possible on the basis of whatever data have been made available to the system for this purpose, the overall e?ectiveness of the system to its user will be the best that is obtainable on the basis of those data
+
+20 / 51
+
+Binary Independence Model (BIM)
+
+Traditionally used with the PRP Assumptions: ?Binary? (equivalent to Boolean): documents and queries represented as binary term incidence vectors
+E.g., document d represented by vector x = (x1 , . . . , xM ), where xt = 1 if term t occurs in d and xt = 0 otherwise Di?erent documents may have the same vector representation
+
+?Independence?: no association between terms (not true, but practically works - ?naive? assumption of Naive Bayes models)
+
+21 / 51
+
+Binary incidence matrix
+Anthony and Cleopatra 1 1 1 0 1 1 1 Julius Caesar The Tempest Hamlet Othello Macbeth ...
+
+0 0 Anthony 1 0 Brutus 1 0 1 0 1 1 Caesar 1 0 0 0 Calpurnia 1 0 Cleopatra 0 0 0 0 mercy 0 1 1 1 1 1 worser 0 1 ... Each document is represented as a binary vector ? {0, 1}|V | .
+
+1 0 1 0 0 1 0
+
+22 / 51
+
+Binary Independence Model
+
+To make a probabilistic retrieval strategy precise, need to estimate how terms in documents contribute to relevance Find measurable statistics (term frequency, document frequency, document length) that a?ect judgments about document relevance Combine these statistics to estimate the probability P(R|d, q) of document relevance Next: how exactly we can do this
+
+23 / 51
+
+Binary Independence Model
+P(R|d, q) is modeled using term incidence vectors as P(R|x, q) P(R = 1|x, q) = P(R = 0|x, q) = P(x|R = 1, q)P(R = 1|q) P(x|q) P(x|R = 0, q)P(R = 0|q) P(x|q)
+
+P(x|R = 1, q) and P(x|R = 0, q): probability that if a relevant or nonrelevant document is retrieved, then that document?s representation is x Use statistics about the document collection to estimate these probabilities
+
+24 / 51
+
+Binary Independence Model
+P(R|d, q) is modeled using term incidence vectors as P(R|x, q) P(R = 1|x, q) = P(R = 0|x, q) = P(x|R = 1, q)P(R = 1|q) P(x|q) P(x|R = 0, q)P(R = 0|q) P(x|q)
+
+P(R = 1|q) and P(R = 0|q): prior probability of retrieving a relevant or nonrelevant document for a query q Estimate P(R = 1|q) and P(R = 0|q) from percentage of relevant documents in the collection Since a document is either relevant or nonrelevant to a query, we must have that: P(R = 1|x, q) + P(R = 0|x, q) = 1
+25 / 51
+
+Deriving a Ranking Function for Query Terms (1)
+
+Given a query q, ranking documents by P(R = 1|d, q) is modeled under BIM as ranking them by P(R = 1|x, q) Easier: rank documents by their odds of relevance (gives same ranking) P(R = 1|x, q) = O(R|x, q) = P(R = 0|x, q) =
+P(R=1|q) P(R=0|q) P(R=1|q)P(x |R=1,q) P(x |q) P(R=0|q)P(x |R=0,q) P(x |q)
+
+P(R = 1|q) P(x|R = 1, q) ? P(R = 0|q) P(x|R = 0, q)
+
+is a constant for a given query - can be ignored
+
+26 / 51
+
+Deriving a Ranking Function for Query Terms (2)
+
+It is at this point that we make the Naive Bayes conditional independence assumption that the presence or absence of a word in a document is independent of the presence or absence of any other word (given the query): P(x|R = 1, q) = P(x|R = 0, q) So: O(R|x, q) = O(R|q) ?
+t=1 M t=1
+
+P(xt |R = 1, q) P(xt |R = 0, q)
+
+M
+
+P(xt |R = 1, q) P(xt |R = 0, q)
+
+27 / 51
+
+Exercise
+
+Naive Bayes conditional independence assumption: the presence or absence of a word in a document is independent of the presence or absence of any other word (given the query). Why is this wrong? Good example? PRP assumes that the relevance of each document is independent of the relevance of other documents. Why is this wrong? Good example?
+
+28 / 51
+
+Deriving a Ranking Function for Query Terms (3)
+
+Since each xt is either 0 or 1, we can separate the terms: O(R|x, q) = O(R|q)?
+t:xt =1
+
+P(xt = 1|R = 1, q) ? P(xt = 1|R = 0, q)
+
+t:xt =0
+
+P(xt = 0|R = 1, q) P(xt = 0|R = 0, q)
+
+29 / 51
+
+Deriving a Ranking Function for Query Terms (4)
+
+Let pt = P(xt = 1|R = 1, q) be the probability of a term appearing in relevant document Let ut = P(xt = 1|R = 0, q) be the probability of a term appearing in a nonrelevant document Can be displayed as contingency table:
+
+Term present Term absent
+
+document xt = 1 xt = 0
+
+relevant (R = 1) pt 1 ? pt
+
+nonrelevant (R = 0) ut 1 ? ut
+
+30 / 51
+
+Deriving a Ranking Function for Query Terms
+Additional simplifying assumption: terms not occurring in the query are equally likely to occur in relevant and nonrelevant documents If qt = 0, then pt = ut Now we need only to consider terms in the products that appear in the query: O(R|x, q) = O(R|q) ?
+t:xt =qt =1
+
+pt ? ut
+
+t:xt =0,qt =1
+
+1 ? pt 1 ? ut
+
+The left product is over query terms found in the document and the right product is over query terms not found in the document
+
+31 / 51
+
+Deriving a Ranking Function for Query Terms
+Including the query terms found in the document into the right product, but simultaneously dividing by them in the left product, gives: O(R|x, q) = O(R|q) ?
+t:xt =qt =1
+
+pt (1 ? ut ) ? ut (1 ? pt )
+
+t:qt =1
+
+1 ? pt 1 ? ut
+
+The left product is still over query terms found in the document, but the right product is now over all query terms, hence constant for a particular query and can be ignored. ? The only quantity that needs to be estimated to rank documents w.r.t a query is the left product Hence the Retrieval Status Value (RSV) in this model: RSVd = log
+t:xt =qt =1
+
+pt (1 ? ut ) = ut (1 ? pt )
+
+log
+t:xt =qt =1
+
+pt (1 ? ut ) ut (1 ? pt )
+32 / 51
+
+Deriving a Ranking Function for Query Terms
+Equivalent: rank documents using the log odds ratios for the terms in the query ct : ct = log pt (1 ? ut ) pt ut = log ? log ut (1 ? pt ) (1 ? pt ) 1 ? ut
+
+The odds ratio is the ratio of two odds: (i) the odds of the term appearing if the document is relevant (pt /(1 ? pt )), and (ii) the odds of the term appearing if the document is nonrelevant (ut /(1 ? ut )) ct = 0: term has equal odds of appearing in relevant and nonrelevant docs ct positive: higher odds to appear in relevant documents ct negative: higher odds to appear in nonrelevant documents
+33 / 51
+
+Term weight ct in BIM
+
+pt ut ct = log (1?pt ) ? log 1?ut functions as a term weight.
+
+Retrieval status value for document d: RSVd =
+
+xt =qt =1 ct .
+
+So BIM and vector space model are identical on an operational level . . . . . . except that the term weights are di?erent. In particular: we can use the same data structures (inverted index etc) for the two models.
+
+34 / 51
+
+How to compute probability estimates
+For each term t in a query, estimate ct in the whole collection using a contingency table of counts of documents in the collection, where df t is the number of documents that contain term t: Term present Term absent documents xt = 1 xt = 0 Total relevant s S ?s S pt = s/S ut = (df t ? s)/(N ? S) ct = K (N, df t , S, s) = log s/(S ? s) (df t ? s)/((N ? df t ) ? (S ? s)) nonrelevant df t ? s (N ? df t ) ? (S ? s) N ?S Total df t N ? df t N
+
+35 / 51
+
+Avoiding zeros
+
+If any of the counts is a zero, then the term weight is not well-de?ned. Maximum likelihood estimates do not work for rare events. To avoid zeros: add 0.5 to each count (expected likelihood estimation = ELE) For example, use S ? s + 0.5 in formula for S ? s
+
+36 / 51
+
+Exercise
+
+Query: Obama health plan Doc1: Obama rejects allegations about his own bad health Doc2: The plan is to visit Obama Doc3: Obama raises concerns with US health plan reforms Estimate the probability that the above documents are relevant to the query. Use a contingency table. These are the only three documents in the collection
+
+37 / 51
+
+Simplifying assumption
+
+Assuming that relevant documents are a very small percentage of the collection, approximate statistics for nonrelevant documents by statistics from the whole collection Hence, ut (the probability of term occurrence in nonrelevant documents for a query) is df t /N and log[(1 ? ut )/ut ] = log[(N ? df t )/df t ] ? log N/df t This should look familiar to you . . . The above approximation cannot easily be extended to relevant documents
+
+38 / 51
+
+Probability estimates in relevance feedback
+
+Statistics of relevant documents (pt ) in relevance feedback can be estimated using maximum likelihood estimation or ELE (add 0.5).
+Use the frequency of term occurrence in known relevant documents.
+
+This is the basis of probabilistic approaches to relevance feedback weighting in a feedback loop The exercise we just did was a probabilistic relevance feedback exercise since we were assuming the availability of relevance judgments.
+
+39 / 51
+
+Probability estimates in adhoc retrieval
+Ad-hoc retrieval: no user-supplied relevance judgments available In this case: assume that pt is constant over all terms xt in the query and that pt = 0.5 Each term is equally likely to occur in a relevant document, and so the pt and (1 ? pt ) factors cancel out in the expression for RSV Weak estimate, but doesn?t disagree violently with expectation that query terms appear in many but not all relevant documents Combining this method with the earlier approximation for ut , the document ranking is determined simply by which query terms occur in documents scaled by their idf weighting For short documents (titles or abstracts) in one-pass retrieval situations, this estimate can be quite satisfactory
+40 / 51
+
+Outline
+
+1
+
+Recap Probabilistic Approach to IR Basic Probability Theory Probability Ranking Principle Appraisal&Extensions
+
+2
+
+3
+
+4
+
+5
+
+41 / 51
+
+History and summary of assumptions
+
+Among the oldest formal models in IR
+Maron & Kuhns, 1960: Since an IR system cannot predict with certainty which document is relevant, we should deal with probabilities
+
+Assumptions for getting reasonable approximations of the needed probabilities (in the BIM):
+Boolean representation of documents/queries/relevance Term independence Out-of-query terms do not a?ect retrieval Document relevance values are independent
+
+42 / 51
+
+How di?erent are vector space and BIM?
+
+They are not that di?erent. In either case you build an information retrieval scheme in the exact same way. For probabilistic IR, at the end, you score queries not by cosine similarity and tf-idf in a vector space, but by a slightly di?erent formula motivated by probability theory. Next: how to add term frequency and length normalization to the probabilistic model.
+
+43 / 51
+
+Okapi BM25: Overview
+
+Okapi BM25 is a probabilistic model that incorporates term frequency (i.e., it?s nonbinary) and length normalization. BIM was originally designed for short catalog records of fairly consistent length, and it works reasonably in these contexts For modern full-text search collections, a model should pay attention to term frequency and document length BestMatch25 (a.k.a BM25 or Okapi) is sensitive to these quantities BM25 is one of the most widely used and robust retrieval models
+
+44 / 51
+
+Okapi BM25: Starting point
+
+The simplest score for document d is just idf weighting of the query terms present in the document: RSVd =
+t?q
+
+log
+
+N df t
+
+45 / 51
+
+Okapi BM25 basic weighting
+Improve idf term [log N/df] by factoring in term frequency and document length. RSVd =
+t?q
+
+log
+
+N (k1 + 1)tf td ? df t k1 ((1 ? b) + b ? (Ld /Lave )) + tf td
+
+tf td : term frequency in document d Ld (Lave ): length of document d (average document length in the whole collection) k1 : tuning parameter controlling the document term frequency scaling b: tuning parameter controlling the scaling by document length
+
+46 / 51
+
+Exercise
+
+Interpret BM25 weighting formula for k1 = 0 Interpret BM25 weighting formula for k1 = 1 and b = 0 Interpret BM25 weighting formula for k1 ? ? and b = 0 Interpret BM25 weighting formula for k1 ? ? and b = 1
+
+47 / 51
+
+Okapi BM25 weighting for long queries
+For long queries, use similar weighting for query terms RSVd =
+t?q
+
+log
+
+(k3 + 1)tf tq (k1 + 1)tf td N ? ? df t k1 ((1 ? b) + b ? (Ld /Lave )) + tf td k3 + tf tq
+
+tf tq : term frequency in the query q k3 : tuning parameter controlling term frequency scaling of the query No length normalization of queries (because retrieval is being done with respect to a single ?xed query) The above tuning parameters should ideally be set to optimize performance on a development test collection. In the absence of such optimization, experiments have shown reasonable values are to set k1 and k3 to a value between 1.2 and 2 and b = 0.75
+48 / 51
+
+Which ranking model should I use?
+
+I want something basic and simple ? use vector space with tf-idf weighting. I want to use a state-of-the-art ranking model with excellent performance ? use language models or BM25 with tuned parameters In between: BM25 or language models with no or just one tuned parameter
+
+49 / 51
+
+Take-away today
+
+Probabilistically grounded approach to IR Probability Ranking Principle Models: BIM, BM25 Assumptions these models make
+
+50 / 51
+
+Resources
+
+Chapter 11 of IIR Resources at http://cislmu.org
+
+51 / 51
+
+

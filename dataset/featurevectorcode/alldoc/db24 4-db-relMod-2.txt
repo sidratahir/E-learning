@@ -1,0 +1,446 @@
+Introduction to Database Systems The Relational Data Model
+
+Werner Nutt
+
+1
+
+4. The Relational Data Model
+4.1 Schemas
+
+1. 2. 3.
+
+Schemas Instances Integrity Constraints
+
+2
+
+Different Schemas are Based on Different Concepts
+Conceptual Schema Logical Schema Physical Schema
+
+ER: ? Entities, ? Relationships, ? Attributes
+
+Tables/Relations: ? column names/attributes ? rows/tuples
+
+File organisation: ? File types ? Index structures
+
+3
+
+A Table
+Table name Product:
+Name Price Category Manufacturer
+
+Column names
+
+gizmo Power gizmo SingleTouch MultiTouch
+
+$19.99 $29.99 $149.99 $203.99
+
+gadgets gadgets photography household
+
+GizmoWorks GizmoWorks Canon Hitachi
+
+Rows
+
+4
+
+Review of Mathematical Concepts (1)
+? Sets: S, T, S1, ..., Sn, T1, ..., Tn, { } Cardinality of a set S denoted as |S| ? Cartesian Product of sets (also cross product): S ? T set of all pairs (s,t) where s ? S and t ? T S1 ? ... ? Sn set of all n-tuples (s1,..., sn) where si ? Si ? Relation R over S, T: subset of S ? T, written R ? S ? T We write (s,t)?R or, equivalently, sRt
+5
+
+Review of Mathematical Concepts (2)
+? Relation R over S1, ..., Sn: subset R ? S1 ? ... ? Sn The number n is the arity of R (R is binary if n=2 and ternary if n=3) ? Function f from S to T, written f: S ? T associates to every element s?S exactly one element of T, denoted as f(s)
+
+6
+
+Review of Mathematical Concepts (3)
+? Partial function f from S to T, written f: S ?? T associates to some element s?S exactly one element of T, still denoted as f(s) We write f(s) = ? (read ?bottom?) if f does not associate any element of T to s ? A relation R over S1,...,Sn is total on Si if for every si ? Si there are sj ? Sj, j? i, such that (s1,..., sn) ? R In other words: every element of Si occurs in some tuple of R
+7
+
+Review of Mathematical Concepts (4)
+? A relation R over S and T is functional in its first argument if sRt1 and sRt2 implies that t1= t2 for all s?S, t1, t2 ?T. In other words, for every s?S, there is at most one t?T related by R to s ? Analogously, a relation R over S1, ..., Sn can be functional ? in an argument i, or ? in a tuple of arguments, say (i,j,k)
+8
+
+How Many ? ?
+Consider sets S, T with |S| = N and |T| = M S1, ..., Sn with |Si| = Ni ? How many elements can a relation over S1, ..., Sn have? At least? At most? ? How many relations over S, T are there? How many over S1, ..., Sn? ? How many functions from S to T are there? ? How many partial functions from S to T are there?
+9
+
+How Many ? ? (Cntd.)
+? How many relations are there over S and T that are functional in the first argument? ? How many relations are there over S and T that are total on S?
+
+10
+
+Tables Look Like Relations ?
+A1 A2 A3 ... An C a r d i n a l i t y a1 a2 a3 b1 b2 a3 a1 c3 b3 . . . x1 v2 d3 Arity an cn bn Component wn Tuple Attributes
+
+{(a1, a2, a3, ?, an),
+(b1, b2, a3, ?, cn), (a1, c3, b3, ?, bn), ... (x1, v2, d3, ?, wn)} Over which sets does this relation range?
+
+In Databases: Distinguish between ? Schema (structure ) and ? Instance (content)
+
+11
+
+Relation Schemas
+A relation schema R(A1:D1, ..., An:Dn) consists of ? a name, say R ? a nonemtpy set of attributes, say A1,..., An ? a type or domain, say Di = dom(Ai) , for each attribute Ai Example:
+Product (Prodname: Name, Price: DollarPrice, Category: Name, Manufacturer: Name)
+
+12
+
+Types and Domains
+Type: Class of atomic values, e.g., ? integers, reals, strings ? integers between 15 and 80, strings of (up to) 50 characters Domain: Set of atomic values, that have a specific meaning in an application, e.g., ? Name, EmployeeAge ? Domains have a type, e.g., ? EmployeeAge = Int[15,80] Domains allow for an additional layer ? Domains may have default values of abstraction
+13
+
+4. The Relational Data Model
+4.2 Instances
+
+1. 2. 3.
+
+Schemas Instances Integrity Constraints
+
+14
+
+Relation Schema and Instance
+? A tuple of values (v1, ..., vn ) satisfies the relation schema R(A1:D1, ..., An:Dn) if vi ? Di (i=1,?n) An instance of R is a set of tuples that satisfy the schema of R (i.e., a relation over D1, ...,Dn) Analogy with programming languages: ? schema = type ? instance = value Important distinction: ? Relation Schema = stable over long periods of time ? Relation Instance = changes constantly, as data is inserted/updated/deleted
+15
+
+?
+
+?
+
+?
+
+Example
+Domain declaration:
+Name=String(30), DollarPrice=Decimal (10,2),
+
+Relation schema:
+Product(Prodname: Name, Price: DollarPrice, Category: Name, Manufacturer: Name)
+
+Instance: Prodname
+gizmo Power gizmo SingleTouch MultiTouch
+
+Price
+19.99 29.99 149.99 203.99
+
+Category
+gadgets gadgets photography household
+
+Manufacturer
+GizmoWorks GizmoWorks Canon Hitachi
+16
+
+Database Schema and Instance
+Database Schema Set of relation schemas, e.g.,
+Product (Productname, Price, Category, Manufacturer), Vendor (Vendorname, Address, Phone), ? To keep things simple, we have dropped types/domains Database Instance
+
+Set of relation instances, one for each relation in the schema Important distinction: ? Database Schema = stable over long periods of time ? Database Instance = changes constantly
+17
+
+Updates
+A database reflects the state of an aspect of the real world: The world changes the database has to change Updates to an instance: 1) adding a tuple 2) deleting a tuple 3) modifying an attribute of a tuple What could be updates to a schema? ? Updates to the data happen very frequently. ? Updates to the schema: relatively rare, rather painful. Why?
+
+18
+
+Null Values
+Attribute values ? are atomic ? have a known domain ? can sometimes be ?null? Three meanings of null values 1. not applicable 2. not known 3. absent (not recorded)
+
+Student
+studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis null ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 thesis title null null null null null ?A CS Survey?
+
+19
+
+Order and Duplication
+In tables: ? Order of attributes is fixed ? Order of rows is fixed (i.e., tables with different order
+of rows are different)
+
+? Duplicate rows matter In mathematical relations: ? Order of tuples and duplicate tuples do not matter ? Order of attributes is still fixed Question: Can we model relations so that we get rid of attribute order?
+20
+
+Reminder: Relations as Subsets of Cartesian Products
+? Tuple as elements of String x Int x String x String
+E.g., t = (gizmo, 19.99, gadgets, GizmoWorks)
+
+? Relation = subset of String x Int x String x String ? Order in the tuple is important !
+? (gizmo, 19.99, gadgets, GizmoWorks) ? (gizmo, 19.99 , GizmoWorks, gadgets)
+
+? No explicit attributes, hidden behind positions
+21
+
+Alternative Definition: Relations as Sets of Functions
+? Fix the set A of attributes, e.g.
+A = {Name, Price, Category, Manufacturer}
+
+? Fix D as the union of the attribute domains, e.g.,
+D = dom(Name) ? dom(Price) ? dom(Category) ? dom(Manufacturer)
+
+? A tuple is a function t: A ? D ? E.g. Price
+{Prodname Category Manufacturer gizmo, 19.99, gadgets, GizmoWorks}
+
+This is the model underlying SQL
+
+? Order in a tuple is not important, attribute names are important!
+
+22
+
+Notation
+Schema R(A1, ..., An), tuple t that satisfies the schema Then: ? t[Ai] = value of t for attribute Ai ? t[Ai, Aj, Ak] = subtuple of t, with values for Ai, Aj, Ak Example: t = (gizmo, 19.99, gadgets, GizmoWorks)
+? t[Price] = 19.99 ? t[ProdName, Manufacturer] = (gizmo, GizmoWorks)
+
+23
+
+Two Definitions of Relations
+? Positional tuples, without attribute names ? Tuples as mappings/functions of attributes In theory and practice, both are used, e.g., ? SQL: tuples as functions ? QBE (query by example): positional tuples We will switch back and forth between the two?
+
+24
+
+Why Relations?
+? Very simple model ? Often a good match for the way we think about our data ? Foundations in logic and set theory ? Abstract model that underlies SQL, the most important language in DBMSs today ? But SQL uses ?bags? while the abstract relational model is set-oriented
+
+25
+
+4. The Relational Data Model
+4.3 Integrity Constraints
+
+1. 2. 3.
+
+Schemas Instances Integrity Constraints
+
+26
+
+Integrity Constraints
+Ideal: DB instance reflects the real world In real life: This is not always the case Goal: Find out, when DB is out of sync Observation: Not all mathematically possible instances make sense Idea: ? Formulate conditions that hold for all plausible instances ? Check whether the condition holds after an update Such conditions are called integrity constraints!
+
+27
+
+Common Types of Integrity Constraints
+? Functional Dependencies (FDs)
+? ?Employees in the same department have the same boss?
+
+? Superkeys and keys (special case of FDs)
+? ?Employees with the same tax code are identical?
+
+? Referential Integrity (also ?foreign key constraints?)
+? ?Employees can only belong to a department that is mentioned in the Department relation?
+
+? Domain Constraints
+? ?No employee is younger than 15 or older than 80?
+
+Integrity constraints (ICs) are part of the schema We allow only instances that satisfy the ICs
+
+28
+
+Functional Dependencies (Example)
+Emp (Name, taxCode, Dept, DeptHead) A state of Emp that contains two tuples with ? the same Dept, but different DeptHead ? the same taxCode, but different Name, Dept, or DeptHead is definitely out of sync. We write the desired conditions symbolically as ? Dept ? DeptHead ? taxCode ? Name, Dept, DeptHead. We read: ? ?Dept functionally determines DeptHead?, or ? ?Name, Dept, and DeptHead functionally depend on taxCode?
+29
+
+Functional Dependencies
+DB relation R. A functional dependency on R is an expression A1,...,Am ? B1, ...,Bn where A1,...,Am and B1, ...,Bn are attributes of R. An instance r of R satisfies the FD if for all tuples t1, t2 in R t1[A1,...,Am] = t2[A1,...,Am] implies t1[B1, ...,Bn] = t2[B1, ...,Bn] How many FDs are there on a given relation?
+30
+
+FDs: Example
+Emp (EmpID, Name, Phone, Position) with instance EmpID E0045 E1847 E1111 E9999 Name Smith Jones Smith Brown Phone 1234 9876 9876 1234 Position Clerk Salesrep Salesrep Lawyer
+
+Which FDs does this instance satisfy? ? EmpID ? Name, Phone, Position ? Position ? Phone ? Phone ? Position
+31
+
+General Approach for Checking FDs
+To check A ? B on an instance, ? erase all other columns
+? A X1 X2 ? ? B Y1 Y2 ?
+
+? check if the remaining relation is functional in A Why is that correct?
+
+32
+
+FDs: Example (Cntd.)
+Check Position ? Phone !
+
+EmpID E0045 E1847 E1111 E9999
+
+Name Smith Jones Smith Brown
+
+Phone 1234 9876 9876 1234
+
+Position Clerk Salesrep Salesrep Lawyer
+
+Is the white relation functional in Position?
+
+33
+
+FDs, Superkeys and Keys
+Person (SSN, Name, DOB) SSN ? Name, DOB Product (Name, Price, Manufacturer) Name ? Price, Manufacturer Name ? Name, Price, Manufacturer Name, Price ? Name, Price, Manufacturer Book (Author, Title, Edition, Price) Author, Title, Edition ? Price
+
+? A set of attributes of a relation is a superkey if it functionally determines all the attributes of the relation ? A superkey is a candidate key if none of its subsets is a superkey Candidate keys are minimal superkeys
+34
+
+Keys: Definitions
+? Superkey ? a set of attributes whose values together uniquely identify a tuple in a relation ? Candidate Key ? a superkey for which no proper subset is a superkey: a superkey that is minimal ? Can be more than one for a relation ? Primary Key ? a candidate key chosen to be the main key ? One for each relation, indicated by underlining the key attributes Student(studno,name,tutor,year)
+35
+
+Example: Multiple Keys
+Student (Lastname, Firstname, MatriculationNo, Major)
+
+Candidate key (2 attributes)
+
+Candidate key
+
+Superkey Note: There are alternate candidate keys
+
+? Candidate keys are
+{Lastname, Firstname} and {StudentID}
+36
+
+Foreign Keys
+A set of attributes in a relation that exactly matches the primary key in another relation ? the names of the attributes don?t have to be the same but must be of the same domain Student (studno, name, hons, tutor, tutorroom, year) Staff (lecturer, roomno, appraiser, approom)
+
+Notation: FK1: Student (tutor, tutorroom) references Staff (lecturer, roomno) FK2: Staff (appraiser, approom) references Staff (lecturer, roomno)
+37
+
+Satisfaction of Foreign Key Constraints
+?FK: R(A) references S(B)? is satisfied by an instance of R and S if for every t1 in R there is a t2 in S such that t1[A] = t2[B], provided t1[A] is not null
+Student studno s1 s2 s3 s4 s5 s6
+Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+To keep things simple, we assume that ?lecturer? alone is the primary kay of Staff
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+Foreign key constraints are also called ?referential integrity constraints.?
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+38
+
+Updates May Violate Constraints ?
+Updates are Insertions, Deletions, Modifications of tuples Example DB with tables as before: Student (studno, name, hons, tutor, year) Staff (lecturer, roomno, appraiser) The DB has key and foreign key constraints Questions: ? What can go wrong? ? How should the DBMS react?
+39
+
+Insertions (1)
+If the following tuple is inserted into Student, what should happen? Why? (s1, jones, cis, capon, 3)
+Student studno s1 s2 s3 s4 s5 s6
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+40
+
+Insertions (2)
+If the following tuple is inserted into Student, what should happen? Why? (null, jones, cis, capon, 3)
+Student studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 appraiser watson capon capon watson barringer barringer watson woods null
+41
+
+Insertions (3)
+If the following tuple is inserted into Student, what should happen? Why? (s7, jones, cis, null, 3)
+Student studno s1 s2 s3 s4 s5 s6 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+42
+
+Insertions (4)
+If the following tuple is inserted into Student, what should happen? Why? (s7, jones, cis, calvanese, 3)
+Student studno s1 s2 s3 s4 s5 s6 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+43
+
+Deletions (1)
+If the following tuple is deleted from Student, is there a problem? And what should happen? (s2, brown, cis, kahn, 2)
+Student studno s1 s2 s3 s4 s5 s6 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+44
+
+Deletions (2)
+And if this one is deleted from Staff ? (kahn, IT206, watson)
+
+Student studno s1 s2 s3 s4 s5 s6
+
+name jones brown smith bloggs jones peters
+
+hons ca cis cs ca cs ca
+
+tutor bush kahn goble goble zobel kahn
+
+year 2 2 2 1 1 3
+
+Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer
+
+roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125
+
+appraiser watson capon capon watson barringer barringer watson woods null
+45
+
+Modifications (1)
+What if we change in Student (s1, jones, ca, bush, 2) to (s1, jones, ca, watson, 2) ?
+Student studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 appraiser watson capon capon watson barringer barringer watson woods null
+46
+
+Modifications (2)
+And what if we change in Student (s2, brown, cis, kahn, 2) to (s1, jones, ca, bloggs, 2) ?
+Student studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 appraiser watson capon capon watson barringer barringer watson woods null
+47
+
+Modifications (3)
+And what if we change in Staff (lindsey, 2.10, woods) to (lindsay, 2.10, woods) ?
+Student studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 appraiser watson capon capon watson barringer barringer watson woods null
+48
+
+Modifications (4)
+Now, let?s change in Staff (goble, 2.82, capon) to (gobel, 2.82, capon) ?
+Student studno s1 s2 s3 s4 s5 s6 name jones brown smith bloggs jones peters hons ca cis cs ca cs ca tutor bush kahn goble goble zobel kahn year 2 2 2 1 1 3 Staff lecturer kahn bush goble zobel watson woods capon lindsey barringer roomno IT206 2.26 2.82 2.34 IT212 IT204 A14 2.10 2.125 appraiser watson capon capon watson barringer barringer watson woods null
+49
+
+Summary: Reactions to Integrity Violations
+If an update violates an IC, the DBMS can ? Reject the update ? Repair the violation by ? inserting null ? inserting a default value ? cascading a deletion ? cascading a modification
+
+50
+
+Summary
+? The relational model is based on concepts from set theory (and logic) ? It formalises the concept of a table ? Distinguish: ? relation schema: relation name, attributes, domains/types ? relation instance: relation over domains of attributes ? Two formalisations of tuples ? positional tuples vs. tuples as functions on attributes ? Integrity constraints: Domain cs, FDs, Keys, FKs ? Updates may violate ICs ? and the DMBS has to react
+51
+
+

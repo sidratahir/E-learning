@@ -1,0 +1,299 @@
+Information Retrieval and Web Search Engines
+Wolf-Tilo Balke
+Lecture 4: Indexing April 27th, 2017
+• In Boolean retrieval, queries have been evaluated using inverted indexes (aka inverted files) • Document collection: – Document1 = {step, mankind} – Document2 = {step, China} • Inverted index: – step: {Document1, Document2} – mankind: {Document1} – China: {Document2} • Query: – “mankind AND step”
+Recap: Inverted Indexes
+2Information Retrieval and Web Search Engines — Wolf-Tilo Balke — Technische Universität Braunschweig
+• These keywords are used as a (possibly intermediate) representation of each document • Some problems we are faced with: – “3/12/91” vs. “Mar 12, 1991” vs. “12/3/1991” – “<h1>Document heading</h1>” vs.  “Document heading” – computer vs. computers vs. Computer vs. computer’s – aren’t vs. are not
+Indexing
+3Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Indexing: “The process of assigning keywords to each document”
+Lecture 4: Indexing
+1. Document Preparation 2. Index Construction 3. Query Evaluation
+4Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig Some slides have been adapted from lecture notes by Hinrich Schütze, Universität Stuttgart
+Document Preparation
+5
+Y2K Around the World As computers all over the world switched to 2000, few Y2K bugs were reported in several labs. […]
+INPUT DOCUMENT
+DOCUMENT  TEXT TOKENIZATION y2k around the world as computers all over the world switched to 2000 few y2k bugs were reported in several labs […]
+FILTRATION y2k world computers world switched 2000 y2k bugs reported labs […]
+STEMMING y2k world computer world switch 2000 y2k bug report lab […]
+y2k (2), world (2), computer (1), switch (1), 2000 (1), bug (1), report (1), lab (1)
+DOCUMENT REPRESENTATION
+Character sequence decoding
+Document delinearization
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Let’s assume some document has to be indexed • First step: Getting a textual representation • Sounds easy, but might be pretty complicated – Many different document formats: DOC, plain text, PDF, HTML, XLS, PPT, RTF, XML, …
+1. Character Sequence Decoding
+6Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Y2K Around the World As computers all over the world switched to 2000, few Y2K bugs were reported in several labs. […] DOCUMENT  TEXT
+• Many document formats can be converted into a plain text representation (possibly with some markup information) using special converters • Example: pdftohtml (open source tool)
+1. Character Sequence Decoding (2)
+7
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><HTML> <HEAD> <TITLE></TITLE> </HEAD> <BODY> <A name=1></a><b>Homework:&nbsp;Exercise&nbsp;14a</b><br> •&nbsp;Given&nbsp;a collection,&nbsp;a&nbsp;query,&nbsp;and&nbsp;an IR&nbsp;system:<br> – &nbsp;<b>Collection:&nbsp;20&nbsp;relevant&nbsp;</b>documents,<b>180 non-relevant</b><br> <b>Information&nbsp;Retrieval&nbsp;and</b><br> –&nbsp;<b>Found:&nbsp;8 relevant&nbsp;</b>documents,&nbsp;10 non-relevant<br> <b>Web&nbsp;Search Engines</b><br> •&nbsp;Precision,&nbsp;recall,&nbsp;and&nbsp;fallout?<br> <b>Lecture&nbsp;8:&nbsp;Support&nbsp;Vector&nbsp;Machines</b><br> 8&nbsp;/ 18&nbsp;˜&nbsp;0.44<br> <b>January&nbsp;7,&nbsp;2009</b><br> 8&nbsp;/ 20&nbsp;= 0.4<br> <b>WolfTilo&nbsp;Balke&nbsp;with&nbsp;Joachim&nbsp;Selke<br></b>Institut&nbsp;für Informationssysteme<br> Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• But even plain text can be problematic • A plain text document is a sequence of bytes • What does the following byte sequence mean? 102 195 164 104 114 116 • This depends on the character encoding – A character encoding assigns byte sequences to characters • It means: – “fährt” in UTF-8 – “fÃ¤hrt” in ISO-8859-1 – “f??hrt” in ASCII (ASCII is a 7-bit character encoding!)
+1. Character Sequence Decoding (3)
+8Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Unfortunately, a text document’s character encoding often is unknown or wrongly specified • There are many heuristics for auto-detecting encodings: – Coding Scheme Method: Exclude certain encodings by looking for illegal bytes or byte sequences, which are not defined within this encoding – Character Distribution Method: Use statistics to exploit the fact that in any given language, some characters are used more often than other characters – Two-Char Sequence Distribution Method: Exploit statistical information about 2-grams, i.e. look at pairs of adjacent characters
+1. Character Sequence Decoding (4)
+9
+Source: http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Sometimes, the documents to be indexed are very large and should be split up into smaller parts • Examples: – E-books (large PDFs) – E-mail collections, including attachments (e.g. in UNIX’s mbox format) • Again, this normally can be done using heuristics…
+2. Document Delinearization
+10Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+[…]
+INPUT DOCUMENT
+DOCUMENT  TEXT 1
+[…] DOCUMENT  TEXT n ?
+• Tokenization: – Remove formatting information (e.g. HTML tags) – Remove punctuation – Carry out basic normalization (e.g. remove capitalization) – Goal: Convert the text into a sequence of “tokens”
+3. Tokenization
+11Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Y2K Around the World As computers all over the world switched to 2000, few Y2K bugs were reported in several labs. […] DOCUMENT  TEXT TOKENIZATION y2k around the world as computers all over the world switched to 2000 few y2k bugs were reported in several labs […]
+• Tokenization is difficult!
+• Let’s tokenize the following sentence! “Mr. O’Neill thinks that the boys’ stories about Chile’s capital aren’t amusing.”
+• One token or two? – Hewlett-Packard – State-of-the-art – Data base – San Francisco – York University vs. New York University
+3. Tokenization (2)
+12Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Identical tokens (Telephones)? – (0531) 391 3271 – +49 531 391-3271 – 531.391.3271
+• Identical tokens (Dates)? – 4/15/99 – 15/4/99 – Apr 15, 1999
+3. Tokenization (3)
+13Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Specific problems in other languages: – This two Chinese characters can be treated as one word meaning “monk” or as sequence of two words meaning “and” and “still”
+– How to handle compounds? • Donaudampfschifffahrtsgesellschaftskapitänsfrau • Lebensversicherungsgesellschaftsfachangestellter
+3. Tokenization (4)
+14Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Normalization handles most of the problematic cases • Define equivalence classes of character sequences that get mapped to the same token – U.S.A. and USA – naïve and naive • Define these classes implicitly by transformation rules – Omit all accents – Remove periods between two characters, where there is no whitespace around (e.g. in U.S.A.) – Do case folding, i.e. reduce all letters to lower case – Maybe you need exceptions for names: windows ? Windows   (Not important, since users ask queries in lowercase anyway)… 3. Tokenization (5) 15Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Removal of stop words! • Stop words: Extremely common words, which are of little value in selecting which documents match a user’s query • Examples: a, an, and, are, as, at, be, by, for, from, has, he, in, is, it, its, of, on, that, the, to, was, were, which, will, with • “to be or not to be”?
+4. Filtration
+16
+TOKENIZATION y2k around the world as computers all over the world switched to 2000 few y2k bugs were reported in several labs […]
+FILTRATION y2k world computers world switched 2000 y2k bugs reported labs […]
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• In classical IR systems, stop words have been rigorously deleted • But stop words are needed for phrase queries, e.g. “King of Finland” or “As We May Think” • For example, Google does not remove stop words:
+4. Filtration (2)
+17Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• A general strategy for stop words removal: – Sort tokens by collection frequency – Take top-k of this list as stop words • Alternatively, use a (possibly domain-specific) predefined stop word list
+• But: – One can handle large indexes by exploiting the statistics of language for compression, so the cost for including stop words is not high for modern systems – The trend goes to smaller stop word lists, e.g. 200–300 or even less
+4. Filtration (3)
+18Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Lemmatization: The process of grouping together the different inflected forms of a word, e.g. walking ? walk,  better ? good
+• Stemming: Trying to do lemmatization using crude heuristics, usually without knowledge of the word’s context or any rules of grammar, e.g. walking ? walk,  but better ? better
+5. Stemming
+19Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+FILTRATION y2k world computers world switched 2000 y2k bugs reported labs […]
+STEMMING y2k world computer world switch 2000 y2k bug report lab […]
+• Of course, lemmatization would be the “right” thing and there are software tools for this task • But: – “Good” lemmatization is computationally expensive if very large document collections are to be processed – Gains of lemmatizers over stemmers in retrieval quality (mean average precision) are very modest for English (0–5%) – Larger gains have been reported for other languages, e.g. German, Spanish, and Finnish (10–30%)
+• In this lecture, we will discuss only stemming
+5. Stemming (2)
+20Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The most common stemmer is the Porter stemmer (Porter, 1980) • It is designed to fit the characteristics of English language – Idea: Suffixes in the English language are mostly made up of a combination of smaller and simpler suffixes • How does it work? – The algorithms runs through five steps, one by one – In each step, several rules are applied that change the word’s suffix
+5. Stemming (3)
+21Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Some (simplified!) examples of rules used in the Porter stemmer:
+5. Stemming (4)
+22Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Rule Example SSES ? SS caresses ? caress IES ? I ponies ? poni S ? cats ? cat ING ? motoring ? motor Y ? I happy ? happi ATIONAL ?ATE relational ? relate FULNESS ? FUL hopefulness ? hopeful ICAL ? IC electrical ? electric ABLE ? adjustable ? adjust ATE ? activate ? activ
+• Some transformations made by the Porter stemmer: 5. Stemming (5)
+23
+Input word Stemmed word gen gen gender gender genders gender general gener generally gener generals gener generation gener generations gener generative gener generosity generos generous gener genitive genit genitivo genitivo
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• A comparison of different stemmers: – Sample text: Such an analysis can reveal features that are not easily visible from the variations in the individual genes and can lead to a picture of expression that is more biologically transparent and accessible to interpretation – Porter stemmer: such an analysi can reveal featur that ar not easili visibl from the variat in the individu gene and can lead to a pictur of express that is more biolog transpar and access to interpret – Lovins stemmer: such an analys can reve featur that ar not eas vis from th vari in th individu gen and can lead to a pictur of expres that is mor biolog transpar and acces to interpres – Paice stemmer: such an analys can rev feat that are not easy vis from the vary in the individ gen and can lead to a pict of express that is mor biolog transp and access to interpret
+5. Stemming (6)
+24Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• There are some additional things apart from stemming that could be done during this step • Take care of umlauts and accents – Usually, just remove them (e.g. ä ? a) or transliterate them (e.g. ä ? ae) – But be careful: unbeschränkt ? unbeschrankt • Take care of synonyms, e.g. auto ? car – Again, be very careful when doing this!
+Further Normalization
+25
+FILTRATION y2k world computers world switched 2000 y2k bugs reported labs […]
+STEMMING y2k world computer world switch 2000 y2k bug report lab […]
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Finally, we arrive at the bag-of-words representation
+• The preparation of original documents is finished now, but we need to talk about efficient data structures for managing the inverted indexes…
+6. Document Representation
+26Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+STEMMING y2k world computer world switch 2000 y2k bug report lab […]
+y2k (2), world (2), computer (1), switch (1), 2000 (1), bug (1), report (1), lab (1)
+DOCUMENT REPRESENTATION
+Preparing Chemical Documents
+27Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Preparing chemical documents is particularly problematic – A lot of information is encoded in figures – Text references figures and figures may contain tabular data – Names (e.g. of substances) implicitly contain structural information
+• The preparation process (for PDFs): – Extracting text – Recognize chemical entities and reactions within text, tables, and figures – Derive structural data from named entities
+• PDF (portable document format) – The standard for exchanging digital documents • ISO 15930, 19005, 24517, 32000 etc. – Documents are collections of objects (characters, vector-based graphics, bitmap images, ...) – Objects are positioned by absolute coordinates
+• “Pseudo-PDFs” – Non-digital documents, scanned or photographed – Rule of thumb: Everything published before 1995 • Journal publications • Research reports • Project reports • ...
+PDF
+28Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• PDF-to-text converters are of no help – Only extract the text objects from PDF – pdftotext, PDFBox, PDFExtractor, PDFTextStream
+• Screen reader and OCR software – Input can be arbitrary ? bitmap images – Tries to find regions, lines, words, and characters in the image
+Solution: Extraction Tools?
+29Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• “Perfect” documents can be processed easily – Single column, well-structured – Direct output of the authoring or production process – Or converted from other digital formats (XML, Word, LaTeX, ...) – Not much markup • The only problem: segmentation!
+The Perfect Document
+30Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Segmentation
+31
+Textual output
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Problematic documents: – Compound documents (pictures + text) – Complex layouts (magazines, journals) – Complex markup (math + chemical formulas)
+• Already a lot of problems! 
+More Problematic Sources
+32Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+33
+Table with figure of a reaction
+2a–i: Correspond to entities explained elsewhere
+Figure with a reference to one special step in the table above (2c)
+“Basic” reaction scheme
+Long chemical entity names (row span) 
+References to entities mentioned in the table
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Markup
+34
+3. Suppose there are two events, x and y, in question with m possibilities for the ï¬• rst and n for the second. Let pi j be the probability of the joint occurrence of i for the ï¬• rst and j for the second. The entropy of the joint event is H x y = , âˆ‘ pi j log pi j i; j while H x = , âˆ‘ pi j log âˆ‘ pi j H y = , âˆ‘ pi j log âˆ‘ pi j i; j i i; j j It is easily shown that
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Scanned or photographed documents with a rich structure – ... in bad quality • Can only be processed with OCR software – Usually, a lot of errors
+The Ultimate Horror
+35Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 4: Indexing
+1. Document Preparation 2. Index Construction 3. Query Evaluation
+36Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Some slides have been adapted from (Zobel and Moffat, 2006)
+• Building an inverted index looks easy: 1. Assign an ID to each document: docID 2. Run the document preparation process on each document 3. Compile a list of all index terms 4. Assign an ID to each index term: termID 5. Create a list of all (termID, docID, tf) triplets 6. Sort this list: Primarily by termID, secondarily by docID • Essentially, this corresponds to a matrix transposition
+• Let’s have a look at an example…
+Index Construction
+37Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Our example collection of six documents: 1. The old night keeper keeps the keep in the town 2. In the big old house in the big old gown 3. The house in the town had the big old keep 4. Where the old night keeper never did sleep 5. The night keeper keeps the keep in the night 6. And keeps in the dark and sleeps in the light • Case-folding, stopping, and stemming reduces the vocabulary to ten index terms:
+Example
+38Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+1. big 2. dark 3. gown
+4. house 5. keep 6. light
+7. night 8. old 9. sleep
+10. town
+• Then, we get the following (termID, docID, tf) triplets: (5, 1, 3),  (7, 1, 1),  (8, 1, 1),  (10, 1, 1),  (1, 2, 2),  (3, 2, 1),  (4, 2, 1), (8, 2, 2),  (1, 3, 1),  (4, 3, 1),  (5, 3, 1),  (8, 3, 1),  (10, 3, 1),  (5, 4, 1), (7, 4, 1),  (8, 4, 1),  (9, 4, 1),  (5, 5, 3),  (7, 5, 2),  (2, 6, 1),  (5, 6, 1), (6, 6, 1),  (9, 6, 1)
+Example (2)
+39Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+tf 1 2 3 4 5 6 7 8 9 10 1 3 1 1 1 2 2 1 1 2 3 1 1 1 1 1 4 1 1 1 1 5 3 2 6 1 1 1 1
+(5, 1, 3),  (7, 1, 1),  (8, 1, 1),  (10, 1, 1),  (1, 2, 2),  (3, 2, 1),  (4, 2, 1), (8, 2, 2),  (1, 3, 1),  (4, 3, 1),  (5, 3, 1),  (8, 3, 1),  (10, 3, 1),  (5, 4, 1), (7, 4, 1),  (8, 4, 1),  (9, 4, 1),  (5, 5, 3),  (7, 5, 2),  (2, 6, 1),  (5, 6, 1), (6, 6, 1),  (9, 6, 1)
+• Now, sort: Primarily by termID, secondarily by docID (1, 2, 2),  (1, 3, 1),  (2, 6, 1),  (3, 2, 1),  (4, 2, 1),  (4, 3, 1),  (5, 1, 3), (5, 3, 1),  (5, 4, 1),  (5, 5, 3),  (5, 6, 1),  (6, 6, 1),  (7, 1, 1),  (7, 4, 1), (7, 5, 2),  (8, 1, 1),  (8, 2, 2),  (8, 3, 1),  (8, 4, 1),  (9, 4, 1),  (9, 6, 1), (10, 1, 1),  (10, 3, 1)
+Example (3)
+40Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+(1, 2, 2),  (1, 3, 1),  (2, 6, 1),  (3, 2, 1),  (4, 2, 1),  (4, 3, 1),  (5, 1, 3), (5, 3, 1),  (5, 4, 1),  (5, 5, 3),  (5, 6, 1),  (6, 6, 1),  (7, 1, 1),  (7, 4, 1), (7, 5, 2),  (8, 1, 1),  (8, 2, 2),  (8, 3, 1),  (8, 4, 1),  (9, 4, 1),  (9, 6, 1), (10, 1, 1),  (10, 3, 1) • The inverted index: Example (4)
+41
+Term Posting List 1: big (2, 2),  (3, 1) 2: dark (6, 1) 3: gown (2, 1) 4: house (2, 1), (3, 1) 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) 6: light (6, 1) 7: night (1,1),  (4, 1),  (5, 2) 8: old (1,1),  (2, 2),  (3, 1),  (4, 1) 9: sleep (4, 1),  (6, 1) 10:town (1, 1),  (3, 1) Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Building the inverted index isn’t difficult if the whole document collection fits in main memory • Now, let’s get serious: Typical collections are very large… • What can we do? – Sort-based inversion: Use a external (i.e. disk-based) sorting algorithm that works on compressed disk blocks (for performance reasons) – Merge-based inversion: Read and index documents in memory until a fixed capacity is exceeded; when memory is full, the index is flushed to disk and merged with the index already stored on disk
+Large Collections
+42Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Merge-Based Inversion
+43Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Merge-based indexing has several advantages:
+• It is practical for collections of all sizes • It even scales well and operates effectively in as little as 100 MB of main memory • Disk space overheads can be restricted to a small fraction of the final index • With clever data compression methods, the number of merge runs can be reduced further
+Merge-Based Inversion (2)
+44Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The problem of building the index essentially is solved – OK, Google uses massive replication and data distribution but these are very special requirements… • Now, how to store an inverted index on disk? • Since disk accesses are very expensive (e.g. compared to computations), there are two major requirements:
+• Since computational power comes at (almost) no cost, effective data compression is our first way to go!
+Index Representations
+45Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Keep the index as small as possible! Read as little data as possible from disk!
+• A simple implementation of an inverted index: – Use 32-bit integers for document identifiers – Use 16-bit integers for term frequencies
+• Then, the posting list for term “keep” will be stored on disk like this:
+Index Representations (2)
+46Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List
+… 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) …
+1 3 3 1 4 1 5 3 6 1
+32 bit 16 bit
+• A typical inverted index: – Some document IDs occur very frequently in the whole index – Most document IDs occur very rarely • Here, fixed-width integers are not space-efficient • Furthermore, fixed-width integers limit the number of documents that can be stored… • Variable-length codes solve both problems – They can encode arbitrary large numbers – They can be constructed to store small values with little storage cost, at the expense of large values – This perfectly fits our needs if document with many index entries get small IDs
+Index Representations (3)
+47Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The simplest variable-bit infinite code is unary – Represent the integer x > 0 as x - 1 “1” bits followed by a terminating “0” bit – Example: Encode 12 by the bit sequence 111111111110
+• Another variable-bit code is Elias’ gamma code: – To store the integer x > 0, it is factored into 2a + b, where a = ?log2(x)? and 0 = b < 2a – The codeword is formed as the concatenation of a + 1 represented in unary and b represented in fixed-width binary of width a – Example: Encode 12 = 23 + 4 as 1110100
+Variable-Length Codes
+48Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Some more examples:
+Variable-Length Codes (2)
+49Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Value Unary Gamma 1 0 0 2 10 100 3 110 101 4 1110 11000 5 11110 11001 6 111110 11010 10 1111111110 1110010 100 … 1111110100100 1000 … 1111111110111101000
+• The efficiency of each code depends on the distribution of input numbers to be encoded • The unary code allows optimal space efficiency if the input distribution is given by Pr(x) = 2-x – Half of all values are the number 1 – A quarter are 2 – …
+• The gamma code is optimal for Pr(x) ˜ 1 / (2x2)
+• Of course, there are many other codes available…
+Variable-Length Codes (3)
+50Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Using gamma coding, our example posting list becomes:
+• 28 bit (compared to 240 using a fixed-length encoding)
+Variable-Length Codes (4)
+51Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List
+… 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) …
+1 3 3 1 4 1 5 3 6 1
+1 bit 3 bit 3 bit 1 bit 5 bit 1 bit 5 bit 3 bit 5 bit 1 bit
+• To allow even better compression ratios, we can store gaps instead of document IDs:
+• Gaps usually are much smaller than document IDs…
+Storing Gaps
+52Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List
+… 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) …
+Term Posting List (with Gaps) … 5: keep (1, 3),  (2, 1),  (1, 1),  (1, 3),  (1, 1) …
++2 +1 +1 +1
+• What do we get?
+• 16 bit (compared to 28 and 240, respectively)
+• Using gap storage, even large posting lists can be stored efficiently, which enables us to abstain from stop words
+Storing Gaps (2)
+53Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List (with Gaps) … 5: keep (1, 3),  (2, 1),  (1, 1),  (1, 3),  (1, 1) …
+1 3 2 1 1 1 1 3 1 1
+1 bit 3 bit 3 bit 1 bit 1 bit 1 bit 1 bit 3 bit 1 bit 1 bit
+• We already have seen that compression can help us a lot • Now: How to reduce the number of disk accesses?
+• As we have seen in Boolean retrieval, an important operation is intersecting posting lists – Inverted index: • step: {Document1, Document2} • mankind: {Document1} • China: {Document2} – Query: • “mankind AND step” • How to speed up this operation?
+Skip Lists
+54Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Another example: When trying to answer the query “keep AND light,” we have to scan through the two posting lists shown above – Problem: We have to scan the whole posting list of “keep” to finally reach document 6; we know that we can ignore every document having a smaller ID than 6 – Is there any way to skip some of these postings?
+Skip Lists (2)
+55Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List (no Gaps) … 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) 6: light (6, 1) …
+• Idea: Skip Lists – Evenly spaced, add some skip pointers to the list – Every skip pointer consists of a number of bits that can be skipped to reach a different entry – This skipped entries do not have to be accessed from disk • Our gamma-coded posting list (no gaps) with skip pointers that allow skipping every other entry:
+Note that in addition to this we need some coding mechanism to indicate whether an entry contains a skip pointer or not…
+Skip Lists (3)
+56
+1 3 3 1 4 1 5 3 6 1
+1 bit 3 bit 3 bit 1 bit 5 bit 1 bit 5 bit 3 bit 5 bit 1 bit
+10 14
+10 bit 14 bit
+Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Skip lists can speed up intersection operations massively if the posting lists are sorted by document ID
+• Where to place skip pointers? – A heuristic says that they should be placed every sqrt(k) postings if k is the number of list entries…
+Skip Lists (4)
+57Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+1 3 3 1 4 1 5 3 6 1
+1 bit 3 bit 3 bit 1 bit 5 bit 1 bit 5 bit 3 bit 5 bit 1 bit
+10 14
+10 bit 14 bit
+• How to handle changes to document collection? – New documents – Updated documents – Deleted documents • Simple (but inefficient) solution: Rebuild the index from scratch • Better solution: Keep an auxiliary in-memory index that keeps track of all changes – If the auxiliary index gets too large, it is merged with the main index
+Dynamic Indexing
+58Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Lecture 4: Indexing
+1. Document Preparation 2. Index Construction 3. Query Evaluation
+59Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Some slides have been adapted from (Zobel and Moffat, 2006)
+• Boolean retrieval: Process queries as we already have discussed it
+• Vector space retrieval: Answer the query “dark, keep, night” by scanning through the postings lists for “dark,” “night,” and “keep,” while accumulating scores for each document – Let’s have a look at an example…
+Query Processing
+60Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Query = “dark keep night” • Vector representation: Simple term frequencies – Query vector = (0, 1, 0, 0, 1, 0, 1, 0, 0, 0) • Similarity measure: Simple scalar product
+• Process query by scanning though the three lists and add up term frequencies for each occurring document • This gives the following final scores:
+Vector Space Retrieval
+61Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+Term Posting List 2: dark (6, 1) 5: keep (1, 3),  (3, 1),  (4, 1),  (5, 3),  (6, 1) 7: night (1,1),  (4, 1),  (5, 2)
+Doc 1 Doc 2 Doc 3 Doc 4 Doc 5 Doc 6 3 + 1 = 4 0 1 1 + 1 = 2 3 + 2 = 5 1 + 1 = 2
+• Due to the nature of the scalar product, we only need to add up scores for any non-zero query component • To support more advanced vector representations, simply add some more information to the posting lists – For example, to support TF–IDF, store each term’s IDF at the beginning of its corresponding posting list • Furthermore, we can avoid reading all affected posting lists completely, by sorting the postings by their TF – This yields a significant speed-up of query processing • Similar approaches can be used to process queries for other retrieval models…
+Vector Space Retrieval (2)
+62Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+The complete retrieval process: Query Processing
+63Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• A special type of queries are phrase queries • Example: “King of Finland”
+• Three strategies to process phrase queries: – Postprocessing: Initially, ignore the word order and do Boolean retrieval; In a second step, search through the documents found and return only the ones containing the phrase – Store word positions: Add word positions to each posting so that the locations of terms in documents can be checked during query evaluation – Partial phrase indexes: Create a (partial) index containing phrases
+Phrase Queries
+64Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• The three strategies complement each other and usually are applied in combination – Create a phrase index for phrases containing frequent words (phrases containing rare words can be found easily by using the other two approaches) – Store word positions for every word and phrase (can be done efficiently using compression) – If for some reason there are postings without word positions, postprocess all document founds by doing a phrase search
+Phrase Queries (2)
+65Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig
+• Latent Semantic Indexing
+Next Lecture
+66Information Retrieval and Web Search Engines — Wolf-Tilo Balke  — Technische Universität Braunschweig

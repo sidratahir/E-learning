@@ -1,0 +1,375 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 18: Latent Semantic Indexing
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2013-07-10
+
+1 / 43
+
+Overview
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+2 / 43
+
+Outline
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+3 / 43
+
+Indexing anchor text
+
+Anchor text is often a better description of a page?s content than the page itself. Anchor text can be weighted more highly than the text on the page. A Google bomb is a search with ?bad? results due to maliciously manipulated anchor text.
+[dangerous cult] on Google, Bing, Yahoo
+
+4 / 43
+
+PageRank
+
+Model: a web surfer doing a random walk on the web Formalization: Markov chain PageRank is the long-term visit rate of the random surfer or the steady-state distribution. Need teleportation to ensure well-de?ned PageRank Power method to compute PageRank
+PageRank is the principal left eigenvector of the transition probability matrix.
+
+5 / 43
+
+Computing PageRank: Power method
+x1 Pt (d1 ) x2 Pt (d2 ) P12 = 0.9 P22 = 0.7 0.7 0.76 0.748 0.7504 ... 0.25 0.75 = (?1 , ?2 ) = (0.25, 0.75) P11 = 0.1 P21 = 0.3 0.3 0.24 0.252 0.2496
+
+t0 t1 t2 t3
+
+0 0.3 0.24 0.252
+
+1 0.7 0.76 0.748
+
+= = = =
+
+xP xP 2 xP 3 xP 4
+
+0.75 t? 0.25 PageRank vector = ?
+
+= xP ?
+
+Pt (d1 ) = Pt?1 (d1 ) ? P11 + Pt?1 (d2 ) ? P21 Pt (d2 ) = Pt?1 (d1 ) ? P12 + Pt?1 (d2 ) ? P22
+6 / 43
+
+HITS: Hubs and authorities
+hubs www.bestfares.com www.aa.com www.airlinesquality.com www.delta.com blogs.usatoday.com/sky www.united.com aviationblog.dallasnews.com authorities
+
+7 / 43
+
+HITS update rules
+
+A: link matrix h: vector of hub scores a: vector of authority scores HITS algorithm:
+Compute h = Aa Compute a = AT h Iterate until convergence Output (i) list of hubs ranked according to hub score and (ii) list of authorities ranked according to authority score
+
+8 / 43
+
+Take-away today
+
+Latent Semantic Indexing (LSI) / Singular Value Decomposition: The math SVD used for dimensionality reduction LSI: SVD in information retrieval LSI as clustering
+
+9 / 43
+
+Outline
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+10 / 43
+
+Recall: Term-document matrix
+Anthony and Cleopatra 5.25 1.21 8.59 0.0 2.85 1.51 1.37 Julius Caesar 3.18 6.10 2.54 1.54 0.0 0.0 0.0 The Tempest 0.0 0.0 0.0 0.0 0.0 1.90 0.11 Hamlet Othello Macbeth
+
+anthony brutus caesar calpurnia cleopatra mercy worser ... This matrix is the basis
+
+0.0 1.0 1.51 0.0 0.0 0.12 4.15
+
+0.0 0.0 0.25 0.0 0.0 5.25 0.25
+
+0.35 0.0 0.0 0.0 0.0 0.88 1.95
+
+for computing the similarity between
+
+documents and queries. Today: Can we transform this matrix, so that we get a better measure of similarity between documents and queries?
+11 / 43
+
+Latent semantic indexing: Overview
+
+We will decompose the term-document matrix into a product of matrices. The particular decomposition we?ll use: singular value decomposition (SVD). SVD: C = U?V T (where C = term-document matrix) We will then use the SVD to compute a new, improved term-document matrix C ? . We?ll get better similarity values out of C ? (compared to C ). Using SVD for this purpose is called latent semantic indexing or LSI.
+
+12 / 43
+
+Example of C = U?V T : The matrix C
+
+C ship boat ocean wood tree
+
+d1 1 0 1 1 0
+
+d2 0 1 1 0 0
+
+d3 1 0 0 0 0
+
+d4 0 0 0 1 1
+
+d5 0 0 0 1 0
+
+d6 0 0 This is a standard 0 0 1
+
+term-document matrix. Actually, we use a non-weighted matrix here to simplify the example.
+
+13 / 43
+
+Example of C = U?V T : The matrix U
+U ship boat ocean wood tree 1 ?0.44 ?0.13 ?0.48 ?0.70 ?0.26 2 ?0.30 ?0.33 ?0.51 0.35 0.65 3 0.57 ?0.59 ?0.37 0.15 ?0.41 4 0.58 0.00 0.00 ?0.58 0.58 5 0.25 0.73 One row per ?0.61 0.16 ?0.09
+
+term, one column per min(M, N) where M is the number of terms and N is the number of documents. This is an orthonormal matrix: (i) Row vectors have unit length. (ii) Any two distinct row vectors are orthogonal to each other. Think of the dimensions as ?semantic? dimensions that capture distinct topics like politics, sports, economics. 2 = land/water Each number uij in the matrix indicates how strongly related term i is to the topic represented by semantic dimension j.
+14 / 43
+
+Example of C = U?V T : The matrix ?
+? 1 2 3 4 5 1 2.16 0.00 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 3 0.00 0.00 1.28 0.00 0.00 4 0.00 0.00 0.00 1.00 0.00 5 0.00 0.00 This is a square, diagonal 0.00 0.00 0.39
+
+matrix of dimensionality min(M, N) ? min(M, N). The diagonal consists of the singular values of C . The magnitude of the singular value measures the importance of the corresponding semantic dimension. We?ll make use of this by omitting unimportant dimensions.
+
+15 / 43
+
+Example of C = U?V T : The matrix V T
+VT 1 2 3 4 5 d1 ?0.75 ?0.29 0.28 0.00 ?0.53 d2 ?0.28 ?0.53 ?0.75 0.00 0.29 d3 ?0.20 ?0.19 0.45 0.58 0.63 d4 ?0.45 0.63 ?0.20 0.00 0.19 d5 ?0.33 0.22 0.12 ?0.58 0.41 d6 ?0.12 0.41 One ?0.33 0.58 ?0.22
+
+column per document, one row per min(M, N) where M is the number of terms and N is the number of documents. Again: This is an orthonormal matrix: (i) Column vectors have unit length. (ii) Any two distinct column vectors are orthogonal to each other. These are again the semantic dimensions from matrices U and ? that capture distinct topics like politics, sports, economics. Each number vij in the matrix indicates how strongly related document i is to the topic represented by semantic dimension j.
+16 / 43
+
+Example of C = U?V T : All four matrices
+d1 d2 d3 d4 d5 d6 C ship 1 0 1 0 0 0 boat 0 1 0 0 0 0 = 1 0 0 0 0 ocean 1 0 0 1 1 0 wood 1 tree 0 0 0 1 0 1 U 1 2 3 4 5 ship ?0.44 ?0.30 0.57 0.58 0.25 ?0.13 ?0.33 ?0.59 0.00 0.73 boat ? ocean ?0.48 ?0.51 ?0.37 0.00 ?0.61 0.35 0.15 ?0.58 0.16 wood ?0.70 ?0.26 0.65 ?0.41 0.58 ?0.09 tree ?1 2 3 4 5 1 2.16 0.00 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 ? 3 0.00 0.00 1.28 0.00 0.00 4 0.00 0.00 0.00 1.00 0.00 5 0.00 0.00 0.00 0.00 0.39 VT d1 d2 d3 d4 d5 d6 1 ?0.75 ?0.28 ?0.20 ?0.45 ?0.33 ?0.12 ?0.29 ?0.53 ?0.19 0.63 0.22 0.41 2 LSI is 3 0.28 ?0.75 0.45 ?0.20 0.12 ?0.33 4 0.00 0.00 0.58 0.00 ?0.58 0.58 5 ?0.53 0.29 0.63 0.19 0.41 ?0.22 decomposition of C into a representation of the terms, a representation of the documents and a representation of the importance of the ?semantic? dimensions.
+17 / 43
+
+LSI: Summary
+
+We?ve decomposed the term-document matrix C into a product of three matrices: U?V T . The term matrix U ? consists of one (row) vector for each term The document matrix V T ? consists of one (column) vector for each document The singular value matrix ? ? diagonal matrix with singular values, re?ecting importance of each dimension Next: Why are we doing this?
+
+18 / 43
+
+Exercise
+
+VT 1 2 3 4 5
+
+d1 ?0.75 ?0.29 0.28 0.00 ?0.53
+
+d2 ?0.28 ?0.53 ?0.75 0.00 0.29
+
+d3 ?0.20 ?0.19 0.45 0.58 0.63
+
+d4 ?0.45 0.63 ?0.20 0.00 0.19
+
+d5 ?0.33 0.22 0.12 ?0.58 0.41
+
+d6 ?0.12 0.41 Verify ?0.33 0.58 ?0.22
+
+that the ?rst document has unit length. Verify that the ?rst two documents are orthogonal. 0.752 + 0.292 + 0.282 + 0.002 + 0.532 = 1.0059 ?0.75 ? ?0.28 + ?0.29 ? ?0.53 + 0.28 ? ?0.75 + 0.00 ? 0.00 + ?0.53 ? 0.29 = 0
+
+19 / 43
+
+Outline
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+20 / 43
+
+How we use the SVD in LSI
+Key property: Each singular value tells us how important its dimension is. By setting less important dimensions to zero, we keep the important information, but get rid of the ?details?. These details may
+be noise ? in that case, reduced LSI is a better representation because it is less noisy. make things dissimilar that should be similar ? again, the reduced LSI representation is a better representation because it represents similarity better.
+
+Analogy for ?fewer details is better?
+Image of a blue ?ower Image of a yellow ?ower Omitting color makes is easier to see the similarity
+
+21 / 43
+
+Reducing the dimensionality to 2
+1 2 3 U ship ?0.44 ?0.30 0.00 ?0.13 ?0.33 0.00 boat ocean ?0.48 ?0.51 0.00 0.35 0.00 wood ?0.70 tree ?0.26 0.65 0.00 ?2 1 2 3 4 1 2.16 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 0.00 0.00 0.00 3 0.00 0.00 0.00 0.00 4 5 0.00 0.00 0.00 0.00 VT d1 d2 d3 1 ?0.75 ?0.28 ?0.20 2 ?0.29 ?0.53 ?0.19 3 0.00 0.00 0.00 4 0.00 0.00 0.00 5 0.00 0.00 0.00 4 0.00 0.00 0.00 0.00 0.00 5 0.00 0.00 0.00 0.00 0.00 d4 ?0.45 0.63 0.00 0.00 0.00 5 0.00 0.00 0.00 0.00 0.00
+
+d5 ?0.33 0.22 0.00 0.00 0.00
+
+d6 ?0.12 0.41 0.00 0.00 0.00
+
+Actually, we only zero out singular values in ?. This has the e?ect of setting the corresponding dimensions in U and V T to zero when computing the product C = U?V T .
+
+22 / 43
+
+Reducing the dimensionality to 2
+d1 d2 d3 d4 d5 d6 C2 ship 0.85 0.52 0.28 0.13 0.21 ?0.08 0.36 0.36 0.16 ?0.20 ?0.02 ?0.18 boat = 0.72 0.36 ?0.04 0.16 ?0.21 ocean 1.01 0.12 0.20 1.03 0.62 0.41 wood 0.97 tree 0.12 ?0.39 ?0.08 0.90 0.41 0.49 1 2 3 4 5 U ship ?0.44 ?0.30 0.57 0.58 0.25 boat ?0.13 ?0.33 ?0.59 0.00 0.73 ? 0.00 ?0.61 ocean ?0.48 ?0.51 ?0.37 0.35 0.15 ?0.58 0.16 wood ?0.70 ?0.26 0.65 ?0.41 0.58 ?0.09 tree 2 3 4 5 ?2 1 1 2.16 0.00 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 ? 3 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 4 5 0.00 0.00 0.00 0.00 0.00 VT d1 d2 d3 d4 d5 d6 1 ?0.75 ?0.28 ?0.20 ?0.45 ?0.33 ?0.12 2 ?0.29 ?0.53 ?0.19 0.63 0.22 0.41 0.28 ?0.75 0.45 ?0.20 0.12 ?0.33 3 4 0.00 0.00 0.58 0.00 ?0.58 0.58 ?0.53 0.29 0.63 0.19 0.41 ?0.22 5
+23 / 43
+
+Example of C = U?V T : All four matrices
+d1 d2 d3 d4 d5 d6 C ship 1 0 1 0 0 0 boat 0 1 0 0 0 0 = 1 0 0 0 0 ocean 1 0 0 1 1 0 wood 1 tree 0 0 0 1 0 1 U 1 2 3 4 5 ship ?0.44 ?0.30 0.57 0.58 0.25 ?0.13 ?0.33 ?0.59 0.00 0.73 boat ? ocean ?0.48 ?0.51 ?0.37 0.00 ?0.61 0.35 0.15 ?0.58 0.16 wood ?0.70 ?0.26 0.65 ?0.41 0.58 ?0.09 tree ?1 2 3 4 5 1 2.16 0.00 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 ? 3 0.00 0.00 1.28 0.00 0.00 4 0.00 0.00 0.00 1.00 0.00 5 0.00 0.00 0.00 0.00 0.39 VT d1 d2 d3 d4 d5 d6 1 ?0.75 ?0.28 ?0.20 ?0.45 ?0.33 ?0.12 ?0.29 ?0.53 ?0.19 0.63 0.22 0.41 2 LSI is 3 0.28 ?0.75 0.45 ?0.20 0.12 ?0.33 4 0.00 0.00 0.58 0.00 ?0.58 0.58 5 ?0.53 0.29 0.63 0.19 0.41 ?0.22 decomposition of C into a representation of the terms, a representation of the documents and a representation of the importance of the ?semantic? dimensions.
+24 / 43
+
+Original matrix C vs. reduced C2 = U?2V T
+C ship boat ocean wood tree C2 ship boat ocean wood tree d1 d2 d3 1 0 1 0 1 0 1 1 0 1 0 0 0 0 0 d1 d2 0.85 0.52 0.36 0.36 1.01 0.72 0.97 0.12 0.12 ?0.39 d4 0 0 0 1 1 d5 0 0 0 1 0 d3 0.28 0.16 0.36 0.20 ?0.08 d6 0 0 0 0 1 d4 0.13 ?0.20 ?0.04 1.03 0.90 d5 0.21 ?0.02 0.16 0.62 0.41 d6 ?0.08 ?0.18 ?0.21 0.41 0.49
+
+We can view C2 as a twodimensional representation of the matrix C . We have performed a dimensionality reduction to two dimensions.
+
+25 / 43
+
+Exercise
+C ship boat ocean wood tree C2 ship boat ocean wood tree d1 d2 d3 1 0 1 0 1 0 1 1 0 1 0 0 0 0 0 d1 d2 0.85 0.52 0.36 0.36 1.01 0.72 0.97 0.12 0.12 ?0.39 d4 0 0 0 1 1 d5 0 0 0 1 0 d3 0.28 0.16 0.36 0.20 ?0.08 d6 0 0 0 0 1 d4 0.13 ?0.20 ?0.04 1.03 0.90 d5 0.21 ?0.02 0.16 0.62 0.41 d6 ?0.08 ?0.18 ?0.21 0.41 0.49 Compute the similarity between d2 and d3 for the original matrix and for the reduced matrix.
+
+26 / 43
+
+Why the reduced matrix C2 is better than C
+C ship boat ocean wood tree C2 ship boat ocean wood tree d1 d2 d3 1 0 1 0 1 0 1 1 0 1 0 0 0 0 0 d1 d2 0.85 0.52 0.36 0.36 1.01 0.72 0.97 0.12 0.12 ?0.39 d4 0 0 0 1 1 d5 0 0 0 1 0 d3 0.28 0.16 0.36 0.20 ?0.08 d6 0 0 0 0 1 d4 0.13 ?0.20 ?0.04 1.03 0.90 d5 0.21 ?0.02 0.16 0.62 0.41 d6 ?0.08 ?0.18 ?0.21 0.41 0.49
+
+Similarity of d2 and d3 in the original space: 0. Similarity of d2 and d3 in the reduced space: 0.52 ? 0.28 + 0.36 ? 0.16 + 0.72 ? 0.36 + 0.12 ? 0.20 + ?0.39 ? ?0.08 ? 0.52 ?boat? and ?ship? are semantically similar. The ?reduced? similarity measure 27 / 43
+
+Exercise: Compute matrix product
+d1 d2 d3 d4 d5 d6 C2 ship 0.09 0.16 0.06 -0.19 -0.07 -0.12 0.10 0.17 0.06 -0.21 -0.07 -0.14 boat ???????= ocean 0.15 0.27 0.10 -0.32 -0.11 -0.21 wood -0.10 -0.19 -0.07 0.22 0.08 0.14 -0.19 -0.34 -0.12 0.41 0.14 0.27 tree U 1 2 3 4 5 ship ?0.44 ?0.30 0.57 0.58 0.25 ?0.13 ?0.33 ?0.59 0.00 0.73 boat ? 0.00 ?0.61 ocean ?0.48 ?0.51 ?0.37 0.35 0.15 ?0.58 0.16 wood ?0.70 ?0.26 0.65 ?0.41 0.58 ?0.09 tree ?2 1 2 3 4 5 1 0.00 0.00 0.00 0.00 0.00 0.00 1.59 0.00 0.00 0.00 2 ? 3 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 4 0.00 0.00 0.00 0.00 0.00 5 VT d1 d2 d3 d4 d5 d6 1 ?0.75 ?0.28 ?0.20 ?0.45 ?0.33 ?0.12 2 ?0.29 ?0.53 ?0.19 0.63 0.22 0.41 3 0.28 ?0.75 0.45 ?0.20 0.12 ?0.33 4 0.00 0.00 0.58 0.00 ?0.58 0.58 ?0.53 0.29 0.63 0.19 0.41 ?0.22 5
+
+28 / 43
+
+Outline
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+29 / 43
+
+Why we use LSI in information retrieval
+LSI takes documents that are semantically similar (= talk about the same topics), . . . . . . but are not similar in the vector space (because they use di?erent words) . . . . . . and re-represents them in a reduced vector space . . . . . . in which they have higher similarity. Thus, LSI addresses the problems of synonymy and semantic relatedness. Standard vector space: Synonyms contribute nothing to document similarity. Desired e?ect of LSI: Synonyms contribute strongly to document similarity.
+
+30 / 43
+
+How LSI addresses synonymy and semantic relatedness
+
+The dimensionality reduction forces us to omit a lot of ?detail?. We have to map di?erents words (= di?erent dimensions of the full space) to the same dimension in the reduced space. The ?cost? of mapping synonyms to the same dimension is much less than the cost of collapsing unrelated words. SVD selects the ?least costly? mapping (see below). Thus, it will map synonyms to the same dimension. But it will avoid doing that for unrelated words.
+
+31 / 43
+
+LSI: Comparison to other approaches
+
+Recap: Relevance feedback and query expansion are used to increase recall in information retrieval ? if query and documents have no terms in common.
+(or, more commonly, too few terms in common for a high similarity score)
+
+LSI increases recall and hurts precision. Thus, it addresses the same problems as (pseudo) relevance feedback and query expansion . . . . . . and it has the same problems.
+
+32 / 43
+
+Implementation
+
+Compute SVD of term-document matrix Reduce the space and compute reduced document representations
+T Map the query into the reduced space qk = ??1 Uk q. k T T This follows from: Ck = Uk ?k Vk ? ??1 U T C = Vk k
+
+Compute similarity of qk with all reduced documents in Vk . Output ranked list of documents as usual Exercise: What is the fundamental problem with this approach?
+
+33 / 43
+
+Optimality
+SVD is optimal in the following sense. Keeping the k largest singular values and setting all others to zero gives you the optimal approximation of the original matrix C . Eckart-Young theorem Optimal: no other matrix of the same rank (= with the same underlying dimensionality) approximates C better. Measure of approximation is Frobenius norm: 2 ||C ||F = i j cij So LSI uses the ?best possible? matrix. There is only one best possible matrix ? unique solution (modulo signs). Caveat: There is only a tenuous relationship between the Frobenius norm and cosine similarity between documents.
+34 / 43
+
+Data for graphical illustration of LSI
+c1 c2 c3 c4 c5 m1 m2 m3 m4 Human machine interface for lab abc computer applications A survey of user opinion of computer system response time The EPS user interface management system System and human system engineering testing of EPS Relation of user perceived response time to error measurement The generation of random binary unordered trees The intersection graph of paths in trees Graph minors IV Widths of trees and well quasi ordering Graph minors A survey The matrix C c1 c2 c3 c4 c5 m1 m2 m3 m4 human 1 0 0 1 0 0 0 0 0 interface 1 0 1 0 0 0 0 0 0 computer 1 1 0 0 0 0 0 0 0 user 0 1 1 0 1 0 0 0 0 system 0 1 1 2 0 0 0 0 0 response 0 1 0 0 1 0 0 0 0 time 0 1 0 0 1 0 0 0 0 EPS 0 0 1 1 0 0 0 0 0 survey 0 1 0 0 0 0 0 0 1 trees 0 0 0 0 0 1 1 1 0 graph 0 0 0 0 0 0 1 1 1 minors 0 0 0 0 0 0 0 1 1
+35 / 43
+
+Graphical illustration of LSI: Plot of C2
+
+2-dimensional plot of C2 (scaled dimensions). Circles = terms. Open squares = documents (component terms in parentheses). q = query ?human computer interaction?.
+
+The dotted cone represents the region whose points are within a cosine of .9 from q . All documents about human-computer documents (c1-c5) are near q, even c3/c5 although they share no terms. None of the graph theory documents (m1-m4) are near q.
+36 / 43
+
+Exercise
+
+What happens when we rank documents according to cosine similarity in the original vector space? What happens when we rank documents according to cosine similarity in the reduced vector space?
+
+37 / 43
+
+LSI performs better than vector space on MED collection
+
+LSI-100 = LSI reduced to 100 dimensions; SMART = SMART implementation of vector space model
+38 / 43
+
+Outline
+
+1
+
+Recap Latent semantic indexing Dimensionality reduction LSI in information retrieval Clustering
+
+2
+
+3
+
+4
+
+5
+
+39 / 43
+
+Example of C = U?V T : All four matrices
+d1 d2 d3 d4 d5 d6 C ship 1 0 1 0 0 0 boat 0 1 0 0 0 0 = 1 0 0 0 0 ocean 1 0 0 1 1 0 wood 1 tree 0 0 0 1 0 1 U 1 2 3 4 5 ship ?0.44 ?0.30 0.57 0.58 0.25 ?0.13 ?0.33 ?0.59 0.00 0.73 boat ? ocean ?0.48 ?0.51 ?0.37 0.00 ?0.61 0.35 0.15 ?0.58 0.16 wood ?0.70 ?0.26 0.65 ?0.41 0.58 ?0.09 tree ?1 2 3 4 5 1 2.16 0.00 0.00 0.00 0.00 2 0.00 1.59 0.00 0.00 0.00 ? 3 0.00 0.00 1.28 0.00 0.00 4 0.00 0.00 0.00 1.00 0.00 5 0.00 0.00 0.00 0.00 0.39 VT d1 d2 d3 d4 d5 d6 1 ?0.75 ?0.28 ?0.20 ?0.45 ?0.33 ?0.12 ?0.29 ?0.53 ?0.19 0.63 0.22 0.41 2 LSI is 3 0.28 ?0.75 0.45 ?0.20 0.12 ?0.33 4 0.00 0.00 0.58 0.00 ?0.58 0.58 5 ?0.53 0.29 0.63 0.19 0.41 ?0.22 decomposition of C into a representation of the terms, a representation of the documents and a representation of the importance of the ?semantic? dimensions.
+40 / 43
+
+Why LSI can be viewed as soft clustering
+Each of the k dimensions of the reduced space is one cluster. If the value of the LSI representation of document d on dimension k is x, then x is the soft membership of d in topic k. This soft membership can be positive or negative. Example: Dimension 2 in our SVD decomposition This dimension/cluster corresponds to the water/earth dichotomy. ?ship?, ?boat?, ?ocean? have negative values. ?wood?, ?tree? have positive values. d1 , d2 , d3 have negative values (most of their terms are water terms). d4 , d5 , d6 have positive values (all of their terms are earth terms).
+41 / 43
+
+Take-away today
+
+Latent Semantic Indexing (LSI) / Singular Value Decomposition: The math SVD used for dimensionality reduction LSI: SVD in information retrieval LSI as clustering
+
+42 / 43
+
+Resources
+
+Chapter 18 of IIR Resources at http://cislmu.org
+Original paper on latent semantic indexing by Deerwester et al. Paper on probabilistic LSI by Thomas Hofmann Word space: LSI for words
+
+43 / 43
+
+

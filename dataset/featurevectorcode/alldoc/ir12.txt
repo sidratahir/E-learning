@@ -1,0 +1,154 @@
+Introduction to Information Retrieval CS276: Information Retrieval and Web Search Text Classification 1
+Chris Manning and Pandu Nayak
+Introduction to Information Retrieval Standing queries § The path from IR to text classification: § You have an information need to monitor, say: § Unrest in the Niger delta region § You want to rerun an appropriate query periodically to find new news items on this topic § You will be sent new documents that are found § I.e., it’s not rankingbut classification(relevant vs. not relevant) § Such queries are called standing queries § Long used by “information professionals” § A modern mass instantiation is Google Alerts § Standing queries are (hand-written) text classifiers Ch. 13
+Introduction to Information Retrieval
+3
+Introduction to Information Retrieval Spam filtering Another text classification task From: "" <takworlld@hotmail.com> Subject: real estate is the only way... gem  oalvgkay Anyone can buy real estate with no money down Stop paying rent TODAY ! There is no need to spend hundreds or even thousands for similar courses I am 22 years old and I have already purchased 6 properties using the methods outlined in this truly INCREDIBLE ebook. Change your life NOW ! ================================================= Click Below to order: http://www.wholesaledaily.com/sales/nmd.htm ================================================= Ch. 13
+Introduction to Information Retrieval Categorization/Classification § Given: § A representation of a document d § Issue: how to represent text documents. § Usually some type of high-dimensional space –bag of words § A fixed set of classes: C = {c 1 , c 2 ,…, cJ} § Determine: § The category of d: ? (d) ? C , where ? (d) is a classification function § We want to build classification functions (“classifiers”). Sec. 13.1
+Introduction to Information Retrieval
+Multimedia GUIGarb.Coll.SemanticsML Planning planning temporal reasoning plan language... programming semantics language proof... learning intelligence algorithm reinforcement network... garbage collection memory optimization region...
+“planning language proof intelligence”
+Training Data:
+Test Data:
+Classes:
+(AI)
+Document Classification
+(Programming) (HCI)
+... ...
+Sec. 13.1
+Introduction to Information Retrieval Classification Methods (1) § Manual classification § Used by the original Yahoo! Directory § Looksmart, about.com, ODP, PubMed § Accurate when job is done by experts § Consistent when the problem size and team is small § Difficult and expensive to scale § Means we need automatic classification methods for big problems Ch. 13
+Introduction to Information Retrieval Classification Methods (2) § Hand-coded rule-based classifiers § One technique used by news agencies, intelligence agencies, etc. § Widely deployed in government and enterprise § Vendors provide “IDE”for writing such rules Ch. 13
+Introduction to Information Retrieval Classification Methods (2) § Hand-coded rule-based classifiers § Commercial systems have complex query languages § Accuracy can be high if a rule has been carefully refined over time by a subject expert § Building and maintaining these rules is expensive Ch. 13
+Introduction to Information Retrieval A Verity topic A complex classification rule: art § Note: § maintenance issues (author, etc.) § Hand-weighting of terms
+[Verity was bought by Autonomy in 2005, which was bought by HP in 2011 –a mess; I think it no longer exists ...]
+Ch. 13
+11
+Introduction to Information Retrieval Classification Methods (3): Supervised learning § Given: § A document d § A fixed set of classes: C = {c 1 , c 2 ,…, cJ} § A training set D of documents each with a label in C § Determine: § A learning method or algorithm which will enable us to learn a classifier ? § For a test document d , we assign it the class ? (d ) ? C Sec. 13.1
+Introduction to Information Retrieval Classification Methods (3) § Supervised learning § Naive Bayes (simple, common) –see video, cs229 § k-Nearest Neighbors (simple, powerful) § Support-vector machines (newer, generally more powerful) § Decision trees à random forests à gradient-boosted decision trees (e.g., xgboost) § … plus many other methods § No free lunch: need hand-classified training data § But data can be built up by amateurs § Many commercial systems use a mix of methods Ch. 13
+Introduction to Information Retrieval Features § Supervised learning classifiers can use any sort of feature § URL, email address, punctuation, capitalization, dictionaries, network features § In the simplest bag of words view of documents § We use onlyword features § we use allof the words in the text (not a subset)
+Introduction to Information Retrieval The bag of words representation I love this movie! It's sweet, but with satirical humor. The dialogue is great and the adventure scenes are fun…  It manages to be whimsical and romantic while laughing at the conventions of the fairy tale genre. I would recommend it to just about anyone. I've seen it several times, and I'm always happy to see it again whenever I have a friend who hasn't seen it yet. ?( )=c
+Introduction to Information Retrieval The bag of words representation ?( )=c great 2 love 2 recommend 1 laugh 1 happy 1 ... ...
+Introduction to Information Retrieval Feature Selection: Why? § Text collections have a large number of features § 10,000 –1,000,000 unique words … and more § Selection may make a particular classifier feasible § Some classifiers can’t deal with 1,000,000 features § Reduces training time § Training time for some methods is quadratic or worse in the number of features § Makes runtime models smaller and faster § Can improve generalization (performance) § Eliminates noise features § Avoids overfitting Sec.13.5
+Introduction to Information Retrieval Feature Selection: Frequency § The simplest feature selection method: § Just use the commonest terms § No particular foundation § But it make sense why this works §They’re the words that can be well-estimated and are most often available as evidence § In practice, this is often 90% as good as better methods § Smarter feature selection: § chi-squared, etc.
+Introduction	to	Information	Retrieval Naïve	Bayes:	See	IIR	13	or	cs124	lecture	on	Coursera	or	cs229 § Classify	based	on	prior	weight	of	class	and	conditional	parameter	for	what	each	word	says:
+§ Training	is	done	by	counting	and	dividing:
+§ Don’t	forget	to	smooth 19
+€ 
+cNB =argmax cj?C
+logP(cj)+ logP(xi |cj) i?positions ? $ % & & ' ( ) ) 
+€ 
+P(cj)? Ncj N
+€ 
+P(xk |cj)? Tcjxk +
+a [Tcjxi +
+a ]x i ?V?
+Introduction to Information Retrieval SpamAssassin § Naïve Bayes has found a home in spam filtering § Paul Graham’s A Plan for Spam § Widely used in spam filters § But many features beyond words: §black hole lists, etc. §particular hand-crafted text patterns
+Introduction to Information Retrieval SpamAssassin Features: § Basic (Naïve) Bayes spam probability § Mentions: Generic Viagra § Regex: millions of (dollar) ((dollar) NN,NNN,NNN.NN) § Phrase: impress ... girl § Phrase: ‘Prestigious Non-Accredited Universities’ § From: starts with many numbers § Subject is all capitals § HTML has a low ratio of text to image area § Relay in RBL, http://www.mailabuse.com/enduserinfo_rbl.html § RCVD line looks faked § http://spamassassin.apache.org/tests_3_3_x.html
+Introduction to Information Retrieval Naive Bayes is Not So Naive §Very fast learning and testing (basically just count words) §Low storage requirements §Very good in domains with many equally importantfeatures §More robust to irrelevant features than many learning methods Irrelevant features cancel out without affecting results
+Introduction to Information Retrieval Naive Bayes is Not So Naive §More robust to concept drift (changing class definition over time) §Naive Bayes won 1st and 2nd place in KDDCUP 97 competition out of 16 systems Goal: Financial services industry direct mail response prediction: Predict if the recipient of mail will actually respond to the advertisement – 750,000 records. §A good dependable baseline for text classification (but not the best)!
+Introduction to Information Retrieval Evaluating Categorization § Evaluation must be done on test data that are independent of the training data § Sometimes use cross-validation (averaging results over multiple training and test splits of the overall data) § Easy to get good performance on a test set that was available to the learner during training (e.g., just memorize the test set) Sec.13.6
+Introduction to Information Retrieval Evaluating Categorization § Measures: precision, recall, F1, classification accuracy § Classification accuracy: r / n where n is the total number of test docs and r is the number of test docs correctly classified Sec.13.6
+Introduction to Information Retrieval WebKB Experiment (1998) § Classify webpages from CS departments into: § student, faculty, course, project § Train on ~5,000 hand-labeled web pages § Cornell, Washington, U.Texas, Wisconsin § Crawl and classify a new site (CMU) using Naïve Bayes § Results Sec.13.6
+Introduction to Information Retrieval
+Introduction	to	Information	Retrieval
+28
+Remember:	Vector	Space	Representation § Each	document	is	a	vector,	one	component	for	each	term	(=	word). § Normally	normalize	vectors	to	unit	length. § High-dimensional	vector	space: § Terms	are	axes § 10,000+	dimensions,	or	even	100,000+ § Docs	are	vectors	in	this	space
+§ How	can	we	do	classification	in	this	space?
+Sec.14.1
+Introduction to Information Retrieval Classification	Using	Vector	Spaces § In vector space classification, training set corresponds to a labeled set of points (equivalently, vectors) § Premise 1:Documents in the same class form a contiguous region of space § Premise 2:Documents from different classes don’t overlap (much) § Learning a classifier: build surfaces to delineate classes in the space
+30
+Documents	in	a	Vector	Space
+Government
+Science Arts
+Sec.14.1
+31
+Test	Document	of	what	class?
+Government
+Science Arts
+Sec.14.1
+32
+Test	Document	=	Government
+Government
+Science Arts
+Our focus: how to find good separators
+Sec.14.1
+Definition	of	centroid
+§ Where	Dc is	the	set	of	all	documents	that	belong	to	class	c	and	v(d)	is	the	vector	space	representation	of	d.
+§ Note	that	centroid	will	in	general	not	be	a	unit	vector	even	when	the	inputs	are	unit	vectors.
+33
+  
+€ 
+? µ (c)= 1 |Dc |
+? v (d) d?Dc ?
+Sec.14.2
+Rocchio	classification § Rocchio	forms	a	simple	representative	for	each	class:	the	centroid/prototype	§ Classification:	nearest	prototype/centroid § It	does	not	guarantee	that	classifications	are	consistent	with	the	given	training	data
+34
+Sec.14.2
+Why not?
+Introduction	to	Information	Retrieval Two-class	Rocchio	as	a	linear	classifier § Line	or	hyperplane	defined	by:
+§ For	Rocchio,	set:
+35
+€ 
+widi =
+?
+i=1
+M ?
+  
+€ 
+! w = ! µ (c1)- ! µ (c2) ? =0.5×(| ! µ (c1)|2 -| ! µ (c2)|2)
+Sec.14.2
+Introduction	to	Information	Retrieval
+36
+Linear	classifier:	Example
+§ Class:	“interest”	(as	in	interest	rate) § Example	features	of	a	linear	classifier wi ti wi ti
+§ To	classify,	find	dot	product	of	feature	vector	and	weights
+• 0.70 prime • 0.67 rate • 0.63 interest • 0.60 rates • 0.46 discount • 0.43 bundesbank
+• -0.71 dlrs • -0.35 world • -0.33 sees • -0.25 year • -0.24 group • -0.24 dlr
+Sec.14.4
+Rocchio	classification § A	simple	form	of	Fisher’s	linear	discriminant § Little	used	outside	text	classification § It	has	been	used	quite	effectively	for	text	classification § But	in	general	worse	than	Naïve	Bayes § Again,	cheap	to	train	and	test	documents
+37
+Sec.14.2
+Introduction	to	Information	Retrieval kNearest	Neighbor	Classification § kNN	=	kNearest	Neighbor
+§ To	classify	a	document	d: § Define	k-neighborhood	as	the	knearest	neighbors	of	d § Pick	the	majority	class	label	in	the	kneighborhood § For	larger	kcan	roughly	estimate	P(c|d)	as	#(c)/k
+38
+Sec.14.3
+39
+Test	Document	=	Science
+Government
+Science Arts
+Sec.14.1
+Voronoi diagram
+40
+Nearest-Neighbor	Learning § Learning:	just	store	the	labeled	training	examples	D § Testing	instance	x	(under	1NN): § Compute	similarity	between	xand	all	examples	in	D. § Assign	xthe	category	of	the	most	similar	example	in	D. § Does	not	compute	anything	beyond	storing	the	examples § Also	called: § Case-based	learning § Memory-based	learning § Lazy	learning § Rationale	of	kNN:	contiguity	hypothesis
+Sec.14.3
+41
+k	Nearest	Neighbor § Using	only	the	closest	example	(1NN)	is	subject	to	errors	due	to: § A	single	atypical	example.	§ Noise	(i.e.,	an	error)	in	the	category	label	of	a	single	training	example. § More	robust:	find	the	kexamples	and	return	the	majority	category	of	these	k § kis	typically	odd	to	avoid	ties;	3	and	5	are	most	common
+Sec.14.3
+Introduction	to	Information	Retrieval
+42
+Nearest	Neighbor	with	Inverted	Index § Naively	finding	nearest	neighbors	requires	a	linear	search	through	|D|	documents	in	collection § But	determining	knearest	neighbors	is	the	same	as	determining	the	k	best	retrievals	using	the	test	document	as	a	query	to	a	database	of	training	documents. § Use	standard	vector	space	inverted	index	methods	to	find	the	knearest	neighbors. § Testing	Time:	O(B|Vt|)									where	Bis	the	average	number	of	training	documents	in	which	a	test-document	word	appears. § Typically	B	<<	|D|
+Sec.14.3
+Introduction	to	Information	Retrieval kNN:	Discussion § No	feature	selection	necessary § No	training	necessary § Scales	well	with	large	number	of	classes § Don’t	need	to	train	nclassifiers	for	nclasses § Classes	can	influence	each	other § Small	changes	to	one	class	can	have	ripple	effect § Done	naively,	very	expensive	at	test	time § In	most	cases	it’s	more	accurate	than	NB	or	Rocchio § As	the	amount	of	data	goes	to	infinity,	it	has	to	be	a	great	classifier!	–it’s	“Bayes	optimal”
+43
+Sec.14.3
+Let’s test our intuition § Can a bag of words always be viewed as a vector space? § What about a bag of features? § Can we always view a standing query as a contiguous region in a vector space? § Do far away points influence classification in a kNN classifier?  In a Rocchio classifier? § Can a Rocchio classifier handle disjunctive classes? § Why do linear classifiers actually work well for text? 44
+Introduction	to	Information	Retrieval
+45
+Rocchio	Anomaly			§ Prototype	models	have	problems	with	polymorphic	(disjunctive)	categories.
+Sec.14.2
+Introduction	to	Information	Retrieval
+46
+3	Nearest	Neighbor	vs.	Rocchio § Nearest	Neighbor	tends	to	handle	polymorphic	categories	better	than	Rocchio/NB.	
+Introduction	to	Information	Retrieval Bias	vs.	capacity	–notions	and	terminology § Consider	asking	a	botanist:	Is	an	object	a	tree? § Too	much	capacity,	low	bias § Botanist	who	memorizes § Will	always	say	“no”	to	new	object	(e.g.,	different	#	of	leaves) § Not	enough	capacity,	high	bias § Lazy	botanist § Says	“yes”	if	the	object	is	green § You	want	the	middle	ground
+47
+(Example due to C. Burges)
+Sec.14.6
+Introduction	to	Information	Retrieval kNN	vs.	Naive	Bayes § Bias/Variance	tradeoff § Variance	˜	Capacity § kNNhas	high	variance	and	low	bias. § Infinite	memory § Rocchio/NB	has	low	variance	and	high	bias. § Linear	decision	surface	between	classes
+48
+Sec.14.6
+49
+Bias	vs.	variance:	Choosing	the	correct	model	capacity
+Sec.14.6
+Introduction	to	Information	Retrieval Summary:	Representation	of Text	Categorization	Attributes § Representations	of	text	are	usually	very	high	dimensional § “The	curse	of	dimensionality” § High-bias	algorithms	should	generally	work	best	in	high-dimensional	space § They	prevent	overfitting § They	generalize	more § For	most	text	categorization	tasks,	there	are	many	relevant	features	&	many	irrelevant	ones
+50
+Introduction	to	Information	Retrieval Which	classifier	do	I	use	for	a	given	text	classification	problem? § Is	there	a	learning	method	that	is	optimal	for	all	text	classification	problems? § No,	because	there	is	a	tradeoff	between	bias	and	variance. § Factors	to	take	into	account: § How	much	training	data	is	available? § How	simple/complex	is	the	problem?	(linear	vs.	nonlinear	decision	boundary) § How	noisy	is	the	data? § How	stable	is	the	problem	over	time? § For	an	unstable	problem,	it’s	better	to	use	a	simple	and	robust	classifier. 51

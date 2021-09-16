@@ -1,0 +1,1201 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 3: Dictionaries and tolerant retrieval
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-04-10
+
+1 / 114
+
+Overview
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+2 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+3 / 114
+
+Type/token distinction
+
+Token ? an instance of a word or term occurring in a document Type ? an equivalence class of tokens In June, the dog likes to chase the cat in the barn. 12 word tokens, 9 word types
+
+4 / 114
+
+Problems in tokenization
+
+What are the delimiters? Space? Apostrophe? Hyphen? For each of these: sometimes they delimit, sometimes they don?t. No whitespace in many languages! (e.g., Chinese) No whitespace in Dutch, German, Swedish compounds (Lebensversicherungsgesellschaftsangestellter)
+
+5 / 114
+
+Problems with equivalence classing
+
+A term is an equivalence class of tokens. How do we de?ne equivalence classes? Numbers (3/20/91 vs. 20/3/91) Case folding Stemming, Porter stemmer Morphological analysis: in?ectional vs. derivational Equivalence classing problems in other languages
+More complex morphology than in English Finnish: a single verb may have 12,000 di?erent forms Accents, umlauts
+
+6 / 114
+
+Skip pointers
+
+16
+Brutus
+
+28
+
+72
+
+2 4 8 16 19 23 28 43 5 51 98
+
+Caesar
+
+1 2 3 5 8 41 51 60 71
+
+7 / 114
+
+Positional indexes
+Postings lists in a nonpositional index: each posting is just a docID Postings lists in a positional index: each posting is a docID and a list of positions Example query: ?to1 be2 or3 not4 to5 be6 ? to, 993427: 1: 7, 18, 33, 72, 86, 231 ; 2: 1, 17, 74, 222, 255 ; 4: 8, 16, 190, 429, 433 ; 5: 363, 367 ; 7: 13, 23, 191 ; . . . be, 178239: 1: 17, 25 ; 4: 17, 191, 291, 430, 434 ; 5: 14, 19, 101 ; . . . Document 4 is a match!
+
+8 / 114
+
+Positional indexes
+
+With a positional index, we can answer phrase queries. With a positional index, we can answer proximity queries.
+
+9 / 114
+
+Take-away
+
+Tolerant retrieval: What to do if there is no exact match between query term and document term Wildcard queries Spelling correction
+
+10 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+11 / 114
+
+Inverted index
+
+For each term t, we store a list of all documents that contain t. Brutus ?? 1 2 4 11 31 45 173 174 Caesar Calpurnia . . . dictionary postings ?? ?? 1 2 2 31 4 54 5 101 6 16 57 132 ...
+
+12 / 114
+
+Dictionaries
+
+The dictionary is the data structure for storing the term vocabulary. Term vocabulary: the data Dictionary: the data structure for storing the term vocabulary
+
+13 / 114
+
+Dictionary as array of ?xed-width entries
+
+For each term, we need to store a couple of items:
+document frequency pointer to postings list ...
+
+Assume for the time being that we can store this information in a ?xed-length entry. Assume that we store these entries in an array.
+
+14 / 114
+
+Dictionary as array of ?xed-width entries
+
+term a aachen ... zulu 20 bytes
+
+space needed:
+
+document frequency 656,265 65 ... 221 4 bytes
+
+pointer to postings list ?? ?? How do ... ?? 4 bytes
+
+we look up a query term qi in this array at query time? That is: which data structure do we use to locate the entry (row) in the array where qi is stored?
+
+15 / 114
+
+Data structures for looking up term
+
+Two main classes of data structures: hashes and trees Some IR systems use hashes, some use trees. Criteria for when to use hashes vs. trees:
+Is there a ?xed number of terms or will it keep growing? What are the relative frequencies with which various keys will be accessed? How many terms are we likely to have?
+
+16 / 114
+
+Hashes
+
+Each vocabulary term is hashed into an integer, its row number in the array At query time: hash query term, locate entry in ?xed-width array Pros: Lookup in a hash is faster than lookup in a tree.
+Lookup time is constant.
+
+Cons
+no way to ?nd minor variants (resume vs. r?sum?) e e no pre?x search (all terms starting with automat) need to rehash everything periodically if vocabulary keeps growing
+
+17 / 114
+
+Trees
+
+Trees solve the pre?x problem (?nd all terms starting with automat). Simplest tree: binary tree Search is slightly slower than in hashes: O(log M), where M is the size of the vocabulary. O(log M) only holds for balanced trees. Rebalancing binary trees is expensive. B-trees mitigate the rebalancing problem. B-tree de?nition: every internal node has a number of children in the interval [a, b] where a, b are appropriate positive integers, e.g., [2, 4].
+
+18 / 114
+
+Binary tree
+
+19 / 114
+
+B-tree
+
+20 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+21 / 114
+
+Wildcard queries
+
+mon*: ?nd all docs containing any term beginning with mon Easy with B-tree dictionary: retrieve all terms t in the range: mon ? t < moo *mon: ?nd all docs containing any term ending with mon
+Maintain an additional tree for terms backwards Then retrieve all terms t in the range: nom ? t < non
+
+Result: A set of terms that are matches for wildcard query Then retrieve documents that contain any of these terms
+
+22 / 114
+
+How to handle * in the middle of a term
+
+Example: m*nchen We could look up m* and *nchen in the B-tree and intersect the two term sets. Expensive Alternative: permuterm index Basic idea: Rotate every wildcard query, so that the * occurs at the end. Store each of these rotations in the dictionary, say, in a B-tree
+
+23 / 114
+
+Permuterm index
+
+For term hello: add hello$, ello$h, llo$he, lo$hel, o$hell, and $hello to the B-tree where $ is a special symbol
+
+24 / 114
+
+Permuterm ? term mapping
+
+25 / 114
+
+Permuterm index
+
+For hello, we?ve stored: hello$, ello$h, llo$he, lo$hel, o$hell, $hello Queries
+For X, look up X$ For X*, look up $X* For *X, look up X$* For *X*, look up X* For X*Y, look up Y$X* Example: For hel*o, look up o$hel*
+
+Permuterm index would better be called a permuterm tree. But permuterm index is the more common name.
+
+26 / 114
+
+Processing a lookup in the permuterm index
+
+Rotate query wildcard to the right Use B-tree lookup as before Problem: Permuterm more than quadruples the size of the dictionary compared to a regular B-tree. (empirical number)
+
+27 / 114
+
+k-gram indexes
+
+More space-e?cient than permuterm index Enumerate all character k-grams (sequence of k characters) occurring in a term 2-grams are called bigrams. Example: from April is the cruelest month we get the bigrams: $a ap pr ri il l$ $i is s$ $t th he e$ $c cr ru ue el le es st t$ $m mo on nt h$ $ is a special word boundary symbol, as before. Maintain an inverted index from bigrams to the terms that contain the bigram
+
+28 / 114
+
+Postings list in a 3-gram inverted index
+
+etr
+
+? beetroot ? metric
+
+? petrify
+
+? retrieval
+
+29 / 114
+
+k-gram (bigram, trigram, . . . ) indexes
+
+Note that we now have two di?erent types of inverted indexes The term-document inverted index for ?nding documents based on a query consisting of terms The k-gram index for ?nding terms based on a query consisting of k-grams
+
+30 / 114
+
+Processing wildcarded terms in a bigram index
+
+Query mon* can now be run as: $m and mo and on Gets us all terms with the pre?x mon . . . . . . but also many ?false positives? like moon. We must post?lter these terms against query. Surviving terms are then looked up in the term-document inverted index. k-gram index vs. permuterm index
+k-gram index is more space e?cient. Permuterm index doesn?t require post?ltering.
+
+31 / 114
+
+Exercise
+
+Google has very limited support for wildcard queries. For example, this query doesn?t work very well on Google: [gen* universit*]
+Intention: you are looking for the University of Geneva, but don?t know which accents to use for the French words for university and Geneva.
+
+According to Google search basics, 2010-04-29: ?Note that the * operator works only on whole words, not parts of words.? But this is not entirely true. Try [pythag*] and [m*nchen] Exercise: Why doesn?t Google fully support wildcard queries?
+
+32 / 114
+
+Processing wildcard queries in the term-document index
+Problem 1: we must potentially execute a large number of Boolean queries. Most straightforward semantics: Conjunction of disjunctions For [gen* universit*]: genevauniversity orgenevauniversit? e orgen`veuniversity orgen`veuniversit? orgeneraluniversities e e e or . . . Very expensive Problem 2: Users hate to type. If abbreviated queries like [pyth* theo*] for [pythagoras? theorem] are allowed, users will use them a lot. This would signi?cantly increase the cost of answering queries. Somewhat alleviated by Google Suggest
+
+33 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+34 / 114
+
+Edit distance
+
+The edit distance between string s1 and string s2 is the minimum number of basic operations that convert s1 to s2 . Levenshtein distance: The admissible basic operations are insert, delete, and replace Levenshtein distance dog-do: 1 Levenshtein distance cat-cart: 1 Levenshtein distance cat-cut: 1 Levenshtein distance cat-act: 2 Damerau-Levenshtein distance cat-act: 1 Damerau-Levenshtein includes transposition as a fourth possible operation.
+
+35 / 114
+
+Levenshtein distance: Computation
+
+c a t s
+
+0 1 2 3 4
+
+f 1 1 2 3 4
+
+a 2 2 1 2 3
+
+s 3 3 2 2 2
+
+t 4 4 3 2 3
+
+36 / 114
+
+Levenshtein distance: Algorithm
+
+LevenshteinDistance(s1 , s2 ) 1 for i ? 0 to |s1 | 2 do m[i , 0] = i 3 for j ? 0 to |s2 | 4 do m[0, j] = j 5 for i ? 1 to |s1 | 6 do for j ? 1 to |s2 | 7 do if s1 [i ] = s2 [j] 8 then m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]} 9 else m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]+1} 10 return m[|s1 |, |s2 |] Operations: insert (cost 1), delete (cost 1), replace (cost 1), copy (cost 0)
+
+37 / 114
+
+Levenshtein distance: Algorithm
+
+LevenshteinDistance(s1 , s2 ) 1 for i ? 0 to |s1 | 2 do m[i , 0] = i 3 for j ? 0 to |s2 | 4 do m[0, j] = j 5 for i ? 1 to |s1 | 6 do for j ? 1 to |s2 | 7 do if s1 [i ] = s2 [j] 8 then m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]} 9 else m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]+1} 10 return m[|s1 |, |s2 |] Operations: insert (cost 1), delete (cost 1), replace (cost 1), copy (cost 0)
+
+38 / 114
+
+Levenshtein distance: Algorithm
+
+LevenshteinDistance(s1 , s2 ) 1 for i ? 0 to |s1 | 2 do m[i , 0] = i 3 for j ? 0 to |s2 | 4 do m[0, j] = j 5 for i ? 1 to |s1 | 6 do for j ? 1 to |s2 | 7 do if s1 [i ] = s2 [j] 8 then m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]} 9 else m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]+1} 10 return m[|s1 |, |s2 |] Operations: insert (cost 1), delete (cost 1), replace (cost 1), copy (cost 0)
+
+39 / 114
+
+Levenshtein distance: Algorithm
+
+LevenshteinDistance(s1 , s2 ) 1 for i ? 0 to |s1 | 2 do m[i , 0] = i 3 for j ? 0 to |s2 | 4 do m[0, j] = j 5 for i ? 1 to |s1 | 6 do for j ? 1 to |s2 | 7 do if s1 [i ] = s2 [j] 8 then m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]} 9 else m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]+1} 10 return m[|s1 |, |s2 |] Operations: insert (cost 1), delete (cost 1), replace (cost 1), copy (cost 0)
+
+40 / 114
+
+Levenshtein distance: Algorithm
+
+LevenshteinDistance(s1 , s2 ) 1 for i ? 0 to |s1 | 2 do m[i , 0] = i 3 for j ? 0 to |s2 | 4 do m[0, j] = j 5 for i ? 1 to |s1 | 6 do for j ? 1 to |s2 | 7 do if s1 [i ] = s2 [j] 8 then m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]} 9 else m[i , j] = min{m[i -1, j]+1, m[i , j-1]+1, m[i -1, j-1]+1} 10 return m[|s1 |, |s2 |] Operations: insert (cost 1), delete (cost 1), replace (cost 1), copy (cost 0)
+
+41 / 114
+
+Levenshtein distance: Example
+
+f 0 1 1 2 2 3 3 4 4 1 1 2 2 3 3 4 4 5 1 2 1 2 2 3 3 4 4 2 2 2 1 3 3 4 4 5
+
+a 2 3 2 3 1 2 2 3 3 3 3 3 3 2 2 3 2 4
+
+s 3 4 3 4 2 3 2 3 2 4 4 4 4 3 2 3 3 3
+
+t 4 5 4 5 3 4 2 3 3
+
+c a t s
+
+42 / 114
+
+Each cell of Levenshtein matrix
+
+cost of getting here from my upper left neighbor (copy or replace) cost of getting here from my left neighbor (insert)
+
+cost of getting here from my upper neighbor (delete) the minimum of the three possible ?movements?; the cheapest way of getting here
+
+43 / 114
+
+Levenshtein distance: Example
+
+f 0 1 1 2 2 3 3 4 4 1 1 2 2 3 3 4 4 5 1 2 1 2 2 3 3 4 4 2 2 2 1 3 3 4 4 5
+
+a 2 3 2 3 1 2 2 3 3 3 3 3 3 2 2 3 2 4
+
+s 3 4 3 4 2 3 2 3 2 4 4 4 4 3 2 3 3 3
+
+t 4 5 4 5 3 4 2 3 3
+
+c a t s
+
+44 / 114
+
+Dynamic programming (Cormen et al.)
+
+Optimal substructure: The optimal solution to the problem contains within it subsolutions, i.e., optimal solutions to subproblems. Overlapping subsolutions: The subsolutions overlap. These subsolutions are computed over and over again when computing the global optimal solution in a brute-force algorithm. Subproblem in the case of edit distance: what is the edit distance of two pre?xes Overlapping subsolutions: We need most distances of pre?xes 3 times ? this corresponds to moving right, diagonally, down.
+
+45 / 114
+
+Weighted edit distance
+
+As above, but weight of an operation depends on the characters involved. Meant to capture keyboard errors, e.g., m more likely to be mistyped as n than as q. Therefore, replacing m by n is a smaller edit distance than by q. We now require a weight matrix as input. Modify dynamic programming to handle weights
+
+46 / 114
+
+Using edit distance for spelling correction
+
+Given query, ?rst enumerate all character sequences within a preset (possibly weighted) edit distance Intersect this set with our list of ?correct? words Then suggest terms in the intersection to the user. ? exercise in a few slides
+
+47 / 114
+
+Exercise
+
+1 2
+
+Compute Levenshtein distance matrix for oslo ? snow What are the Levenshtein editing operations that transform cat into catcat?
+
+48 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2
+
+n 2 3
+
+o 3 4
+
+w 4
+
+o s l o
+
+49 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 ? 2
+
+n 2 3
+
+o 3 4
+
+w 4
+
+o s l o
+
+50 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2
+
+n 2 3
+
+o 3 4
+
+w 4
+
+o s l o
+
+51 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 ? 3
+
+o 3 4
+
+w 4
+
+o s l o
+
+52 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 2 3
+
+o 3 4
+
+w 4
+
+o s l o
+
+53 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 ? 4
+
+w 4
+
+o s l o
+
+54 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 2 4
+
+w 4
+
+o s l o
+
+55 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 ?
+
+o s l o
+
+56 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 2 1 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 3
+
+o s l o
+
+57 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 ? 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 3
+
+o s l o
+
+58 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2
+
+n 2 3 2 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 3
+
+o s l o
+
+59 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 ? 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 3
+
+o s l o
+
+60 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3
+
+o 3 4 2 4 4 3
+
+w 4 5 3
+
+o s l o
+
+61 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 ? 4 4 3
+
+w 4 5 3
+
+o s l o
+
+62 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3
+
+w 4 5 3
+
+o s l o
+
+63 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 ?
+
+o s l o
+
+64 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 1 2 1 2 1 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+65 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 ? 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+66 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2
+
+n 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+67 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 ? 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+68 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3
+
+o 3 4 2 3 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+69 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 ? 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+70 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4
+
+w 4 5 3 4 3
+
+o s l o
+
+71 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 ?
+
+o s l o
+
+72 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 1 2 1 2 1 2 2 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+73 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 ? 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+74 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3
+
+n 2 3 2 3 2 3 2 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+75 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 ? 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+76 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3
+
+o 3 4 2 3 3 4 3 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+77 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 ? 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+78 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2 4 4 3 3 4 4 4
+
+w 4 5 3 4 3 4 4
+
+o s l o
+
+79 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2 4 4 3 3 4 4 4 4 3
+
+w 4 5 3 4 3 4 4 5 ?
+
+o s l o
+
+80 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2 4 4 3 3 4 4 4 4 3
+
+w 4 5 3 4 3 4 4 5 3
+
+o s l o
+
+81 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2
+
+w 44 45 33 34 43 44 44 45 3
+
+o s l o
+
+3
+
+82 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2 4 4 3 3 4 4 4 4 3
+
+w 4 5 3 4 3 4 4 5 3
+
+o s l o
+
+How do
+
+I read out the editing operations that transform oslo into snow?
+
+83 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 input * 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3 3 2 3 3 3 3 3 2 4
+
+o 3 4 2 3 3 4 3 4 2
+
+w 44 45 33 34 43 44 44 45 33
+
+o s l o cost 1
+
+operation insert
+
+output w
+
+84 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 input o * 2 2 2 2 2 2 3 3 4
+
+n 2 3 2 3 2 3 2 3 3
+
+o 33 24 32 33 33 34 33 24 42
+
+w 44 45 33 34 43 44 44 45 33
+
+o s l o cost 0 1
+
+operation (copy) insert
+
+output o w
+
+85 / 114
+
+s 0 1 1 2 2 3 3 4 4 1 1 2 1 3 3 4 4 5 1 2 1 2 1 2 2 3 3 input l o *
+
+n 22 23 22 23 22 23 32 33 43 output n o w
+
+o 33 24 32 33 33 34 33 24 42
+
+w 44 45 33 34 43 44 44 45 33
+
+o s l o cost 1 0 1
+
+operation replace (copy) insert
+
+86 / 114
+
+s 0 1 1 2 2 3 3 4 4 11 12 21 12 31 32 42 43 53 input s l o *
+
+n 22 23 22 23 22 23 32 33 43 output s n o w
+
+o 33 24 32 33 33 34 33 24 42
+
+w 44 45 33 34 43 44 44 45 33
+
+o s l o cost 0 1 0 1
+
+operation (copy) replace (copy) insert
+
+87 / 114
+
+s 0 1 1 2 2 3 3 4 4 operation delete (copy) replace (copy) insert 11 12 21 12 31 32 42 43 53 input o s l o *
+
+n 22 23 22 23 22 23 32 33 43 output * s n o w
+
+o 33 24 32 33 33 34 33 24 42
+
+w 44 45 33 34 43 44 44 45 33
+
+o s l o cost 1 0 1 0 1
+
+88 / 114
+
+c 0 1 1 2 2 3 3 1 0 2 2 3 3 4 1 2 0 1 1 2 2 2 2 1 0 2 2 3
+
+a 2 3 1 2 0 1 1 3 3 2 2 1 0 2
+
+t 3 4 2 3 1 2 0 4 3 3 3 2 2 1
+
+c 4 5 3 4 2 3 1 5 5 4 3 3 3 2
+
+a 5 6 4 5 3 4 2 6 6 5 5 4 3 3
+
+t 6 7 5 6 4 5 3
+
+c a t
+
+89 / 114
+
+c 0 1 1 2 2 3 3 11 02 20 21 31 32 42 input * * * c a t
+
+a 22 23 11 02 20 21 31 output c a t c a t
+
+t 33 34 22 23 11 02 20
+
+c 44 35 33 34 22 23 11
+
+a 55 56 44 35 33 34 22
+
+t 66 67 55 56 44 35 33
+
+c a t cost 1 1 1 0 0 0
+
+operation insert insert insert (copy) (copy) (copy)
+
+90 / 114
+
+c 0 1 1 2 2 3 3 11 02 20 21 31 32 42 input c * * * a t
+
+a 22 23 11 02 20 21 31 output c a t c a t
+
+t 33 34 22 23 11 02 20
+
+c 44 35 33 34 22 23 11
+
+a 55 56 44 35 33 34 22
+
+t 66 67 55 56 44 35 33
+
+c a t cost 0 1 1 1 0 0
+
+operation (copy) insert insert insert (copy) (copy)
+
+91 / 114
+
+c 0 1 1 2 2 3 3 11 02 20 21 31 32 42 input c a * * * t
+
+a 22 23 11 02 20 21 31 output c a t c a t
+
+t 33 34 22 23 11 02 20
+
+c 44 35 33 34 22 23 11
+
+a 55 56 44 35 33 34 22
+
+t 66 67 55 56 44 35 33
+
+c a t cost 0 0 1 1 1 0
+
+operation (copy) (copy) insert insert insert (copy)
+
+92 / 114
+
+c 0 1 1 2 2 3 3 11 02 20 21 31 32 42 input c a t * * *
+
+a 22 23 11 02 20 21 31 output c a t c a t
+
+t 33 34 22 23 11 02 20
+
+c 44 35 33 34 22 23 11
+
+a 55 56 44 35 33 34 22
+
+t 66 67 55 56 44 35 33
+
+c a t cost 0 0 0 1 1 1
+
+operation (copy) (copy) (copy) insert insert insert
+
+93 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+94 / 114
+
+Spelling correction
+
+Two principal uses
+Correcting documents being indexed Correcting user queries
+
+Two di?erent methods for spelling correction Isolated word spelling correction
+Check each word on its own for misspelling Will not catch typos resulting in correctly spelled words, e.g., an asteroid that fell form the sky
+
+Context-sensitive spelling correction
+Look at surrounding words Can correct form/from error above
+
+95 / 114
+
+Correcting documents
+
+We?re not interested in interactive spelling correction of documents (e.g., MS Word) in this class. In IR, we use document correction primarily for OCR?ed documents. (OCR = optical character recognition) The general philosophy in IR is: don?t change the documents.
+
+96 / 114
+
+Correcting queries
+
+First: isolated word spelling correction Premise 1: There is a list of ?correct words? from which the correct spellings come. Premise 2: We have a way of computing the distance between a misspelled word and a correct word. Simple spelling correction algorithm: return the ?correct? word that has the smallest distance to the misspelled word. Example: informaton ? information For the list of correct words, we can use the vocabulary of all words that occur in our collection. Why is this problematic?
+
+97 / 114
+
+Alternatives to using the term vocabulary
+
+A standard dictionary (Webster?s, OED etc.) An industry-speci?c dictionary (for specialized IR systems) The term vocabulary of the collection, appropriately weighted
+
+98 / 114
+
+Distance between misspelled word and ?correct? word
+
+Several alternatives Edit distance and Levenshtein distance Weighted edit distance k-gram overlap
+
+99 / 114
+
+Spelling correction
+
+Now that we can compute edit distance: how to use it for isolated word spelling correction ? this is the last slide in this section. k-gram indexes for isolated word spelling correction. Context-sensitive spelling correction General issues
+
+100 / 114
+
+k-gram indexes for spelling correction
+
+Enumerate all k-grams in the query term Example: bigram index, misspelled word bordroom Bigrams: bo, or, rd, dr, ro, oo, om Use the k-gram index to retrieve ?correct? words that match query term k-grams Threshold by number of matching k-grams E.g., only vocabulary terms that di?er by at most 3 k-grams
+
+101 / 114
+
+k-gram indexes for spelling correction: bordroom
+
+bo
+
+? aboard
+
+? about
+
+? boardroom ? border
+
+or
+
+? border
+
+?
+
+lord
+
+? morbid
+
+? sordid
+
+rd
+
+? aboard
+
+? ardent
+
+? boardroom ? border
+
+102 / 114
+
+Context-sensitive spelling correction
+Our example was: an asteroid that fell form the sky How can we correct form here? One idea: hit-based spelling correction
+Retrieve ?correct? terms close to each query term for ?ew form munich: ?ea for ?ew, from for form, munch for munich Now try all possible resulting phrases as queries with one word ??xed? at a time Try query ??ea form munich? Try query ??ew from munich? Try query ??ew form munch? The correct query ??ew from munich? has the most hits.
+
+Suppose we have 7 alternatives for ?ew, 20 for form and 3 for munich, how many ?corrected? phrases will we enumerate?
+
+103 / 114
+
+Context-sensitive spelling correction
+
+The ?hit-based? algorithm we just outlined is not very e?cient. More e?cient alternative: look at ?collection? of queries, not documents
+
+104 / 114
+
+General issues in spelling correction
+
+User interface
+automatic vs. suggested correction Did you mean only works for one suggestion. What about multiple possible corrections? Tradeo?: simple vs. powerful UI
+
+Cost
+Spelling correction is potentially expensive. Avoid running on every query? Maybe just on queries that match few documents. Guess: Spelling correction of major search engines is e?cient enough to be run on every query.
+
+105 / 114
+
+Exercise: Understand Peter Norvig?s spelling corrector
+import re, collections def words(text): return re.findall(?[a-z]+?, text.lower()) def train(features): model = collections.defaultdict(lambda: 1) for f in features: model[f] += 1 return model NWORDS = train(words(file(?big.txt?).read())) alphabet = ?abcdefghijklmnopqrstuvwxyz? def edits1(word): splits = [(word[:i], word[i:]) for i in range(len(word) + 1)] deletes = [a + b[1:] for a, b in splits if b] transposes = [a + b[1] + b[0] + b[2:] for a, b in splits if len(b) gt 1] replaces = [a + c + b[1:] for a, b in splits for c in alphabet if b] inserts = [a + c + b for a, b in splits for c in alphabet] return set(deletes + transposes + replaces + inserts) def known_edits2(word): return set(e2 for e1 in edits1(word) for e2 in edits1(e1) if e2 in NWORDS) def known(words): return set(w for w in words if w in NWORDS) def correct(word): candidates = known([word]) or known(edits1(word)) or known_edits2(word) or [word] return max(candidates, key=NWORDS.get)
+106 / 114
+
+Outline
+
+1
+
+Recap Dictionaries Wildcard queries Edit distance Spelling correction Soundex
+
+2
+
+3
+
+4
+
+5
+
+6
+
+107 / 114
+
+Soundex
+
+Soundex is the basis for ?nding phonetic (as opposed to orthographic) alternatives. Example: chebyshev / tchebysche? Algorithm:
+Turn every token to be indexed into a 4-character reduced form Do the same with query terms Build and search an index on the reduced forms
+
+108 / 114
+
+Soundex algorithm
+1 2
+
+3
+
+Retain the ?rst letter of the term. Change all occurrences of the following letters to ?0? (zero): A, E, I, O, U, H, W, Y Change letters to digits as follows:
+B, F, P, V to 1 C, G, J, K, Q, S, X, Z to 2 D,T to 3 L to 4 M, N to 5 R to 6
+
+4 5
+
+Repeatedly remove one out of each pair of consecutive identical digits Remove all zeros from the resulting string; pad the resulting string with trailing zeros and return the ?rst four positions, which will consist of a letter followed by three digits
+
+109 / 114
+
+Example: Soundex of HERMAN
+
+Retain H ERMAN ? 0RM0N 0RM0N ? 06505 06505 ? 06505 06505 ? 655 Return H655 Note: HERMANN will generate the same code
+
+110 / 114
+
+How useful is Soundex?
+
+Not very ? for information retrieval Ok for ?high recall? tasks in other applications (e.g., Interpol) Zobel and Dart (1996) suggest better alternatives for phonetic matching in IR.
+
+111 / 114
+
+Exercise
+
+Compute Soundex code of your last name
+
+112 / 114
+
+Take-away
+
+Tolerant retrieval: What to do if there is no exact match between query term and document term Wildcard queries Spelling correction
+
+113 / 114
+
+Resources
+
+Chapter 3 of IIR Resources at http://cislmu.org
+trie vs hash vs ternary tree Soundex demo Edit distance demo Peter Norvig?s spelling corrector Google: wild card search, spelling correction gone wrong, a misspelling that is more frequent that the correct spelling
+
+114 / 114
+
+

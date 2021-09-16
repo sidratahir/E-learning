@@ -1,0 +1,880 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 19: Web Search
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-07-02
+
+1 / 123
+
+Overview
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+2 / 123
+
+7
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+3 / 123
+
+7
+
+Indexing anchor text
+
+Anchor text is often a better description of a page?s content than the page itself. Anchor text can be weighted more highly than the text on the page. A Google bomb is a search with ?bad? results due to maliciously manipulated anchor text.
+[dangerous cult] on Google, Bing, Yahoo
+
+4 / 123
+
+PageRank
+
+Model: a web surfer doing a random walk on the web Formalization: Markov chain PageRank is the long-term visit rate of the random surfer or the steady-state distribution. Need teleportation to ensure well-de?ned PageRank Power method to compute PageRank
+PageRank is the principal left eigenvector of the transition probability matrix.
+
+5 / 123
+
+Computing PageRank: Power method
+x1 Pt (d1 ) x2 Pt (d2 ) P12 = 0.9 P22 = 0.7 0.7 0.76 0.748 0.7504 ... 0.25 0.75 = (?1 , ?2 ) = (0.25, 0.75) P11 = 0.1 P21 = 0.3 0.3 0.24 0.252 0.2496
+
+t0 t1 t2 t3
+
+0 0.3 0.24 0.252
+
+1 0.7 0.76 0.748
+
+= = = =
+
+xP xP 2 xP 3 xP 4
+
+0.75 t? 0.25 PageRank vector = ?
+
+= xP ?
+
+Pt (d1 ) = Pt?1 (d1 ) ? P11 + Pt?1 (d2 ) ? P21 Pt (d2 ) = Pt?1 (d1 ) ? P12 + Pt?1 (d2 ) ? P22
+6 / 123
+
+HITS: Hubs and authorities
+hubs www.bestfares.com www.aa.com www.airlinesquality.com www.delta.com blogs.usatoday.com/sky www.united.com aviationblog.dallasnews.com authorities
+
+7 / 123
+
+HITS update rules
+
+A: link matrix h: vector of hub scores a: vector of authority scores HITS algorithm:
+Compute h = Aa Compute a = AT h Iterate until convergence Output (i) list of hubs ranked according to hub score and (ii) list of authorities ranked according to authority score
+
+8 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+9 / 123
+
+7
+
+Web search overview
+
+10 / 123
+
+Search is a top activity on the web
+
+11 / 123
+
+Without search engines, the web wouldn?t work
+
+Without search, content is hard to ?nd. ? Without search, there is no incentive to create content.
+Why publish something if nobody will read it? Why publish something if I don?t get ad revenue from it?
+
+Somebody needs to pay for the web.
+Servers, web infrastructure, content creation A large part today is paid by search ads. Search pays for the web.
+
+12 / 123
+
+Interest aggregation
+
+Unique feature of the web: A small number of geographically dispersed people with similar interests can ?nd each other.
+Elementary school kids with hemophilia People interested in translating R5R5 Scheme into relatively portable C (open source project) Search engines are a key enabler for interest aggregation.
+
+13 / 123
+
+IR on the web vs. IR in general
+
+On the web, search is not just a nice feature.
+Search is a key enabler of the web: . . . . . . ?nancing, content creation, interest aggregation etc.
+
+? look at search ads The web is a chaotic und uncoordinated collection. ? lots of duplicates ? need to detect duplicates No control / restrictions on who can author content ? lots of spam ? need to detect spam The web is very large. ? need to know how big it is
+
+14 / 123
+
+Take-away today
+
+Big picture Ads ? they pay for the web Duplicate detection ? addresses one aspect of chaotic content creation Spam detection ? addresses one aspect of lack of central access control Probably won?t get to today
+Web information retrieval Size of the web
+
+15 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+16 / 123
+
+7
+
+First generation of search ads: Goto (1996)
+
+17 / 123
+
+First generation of search ads: Goto (1996)
+
+Buddy Blake bid the maximum ($0.38) for this search. He paid $0.38 to Goto every time somebody clicked on the link. Pages were simply ranked according to bid ? revenue maximization for Goto. No separation of ads/docs. Only one result list! Upfront and honest. No relevance ranking, . . . . . . but Goto did not pretend there was any.
+18 / 123
+
+Second generation of search ads: Google (2000/2001)
+
+Strict separation of search results and search ads
+
+19 / 123
+
+Two ranked lists: web pages (left) and ads (right)
+
+SogoTrade appears in search results. SogoTrade pears in ads. ap-
+
+Do search engines rank advertisers higher than non-advertisers? All major search engines claim no.
+
+20 / 123
+
+Do ads in?uence editorial content?
+
+Similar problem at newspapers / TV channels A newspaper is reluctant to publish harsh criticism of its major advertisers. The line often gets blurred at newspapers / on TV. No known case of this happening with search engines yet?
+
+21 / 123
+
+How are the ads on the right ranked?
+
+22 / 123
+
+How are ads ranked?
+
+Advertisers bid for keywords ? sale by auction. Open system: Anybody can participate and bid on keywords. Advertisers are only charged when somebody clicks on your ad. How does the auction determine an ad?s rank and the price paid for the ad? Basis is a second price auction, but with twists For the bottom line, this is perhaps the most important research area for search engines ? computational advertising.
+Squeezing an additional fraction of a cent from each ad means billions of additional revenue for the search engine.
+
+23 / 123
+
+How are ads ranked?
+First cut: according to bid price ` la Goto a
+Bad idea: open to abuse Example: query [treatment for cancer?] ? how to write your last will We don?t want to show nonrelevant or o?ensive ads.
+
+Instead: rank based on bid price and relevance Key measure of ad relevance: clickthrough rate
+clickthrough rate = CTR = clicks per impressions
+
+Result: A nonrelevant ad will be ranked low.
+Even if this decreases search engine revenue short-term Hope: Overall acceptance of the system and overall revenue is maximized if users get useful information.
+
+Other ranking factors: location, time of day, quality and loading speed of landing page The main ranking factor: the query
+24 / 123
+
+Google AdWords demo
+
+25 / 123
+
+Google?s second price auction
+advertiser A B C D bid $4.00 $3.00 $2.00 $1.00 CTR 0.01 0.03 0.06 0.08 ad rank 0.04 0.09 0.12 0.08 rank 4 2 1 3 paid (minimum) $2.68 $1.51 $0.51
+
+bid: maximum bid for a click by advertiser CTR: click-through rate: when an ad is displayed, what percentage of time do users click on it? CTR is a measure of relevance. ad rank: bid ? CTR: this trades o? (i) how much money the advertiser is willing to pay against (ii) how relevant the ad is rank: rank in auction paid: second price auction price paid by advertiser Second price auction: The advertiser pays the minimum amount necessary to maintain their position in the auction (plus 1 cent).
+
+26 / 123
+
+Keywords with high bids
+According to http://www.cwire.org/highest-paying-search-terms/ $69.1 mesothelioma treatment options $65.9 personal injury lawyer michigan $62.6 student loans consolidation $61.4 car accident attorney los angeles $59.4 online car insurance quotes $59.4 arizona dui lawyer $46.4 asbestos cancer $40.1 home equity line of credit $39.8 life insurance quotes $39.2 re?nancing $38.7 equity line of credit $38.0 lasik eye surgery new york city $37.0 2nd mortgage $35.9 free car insurance quote
+27 / 123
+
+Search ads: A win-win-win?
+
+The search engine company gets revenue every time somebody clicks on an ad. The user only clicks on an ad if they are interested in the ad.
+Search engines punish misleading and nonrelevant ads. As a result, users are often satis?ed with what they ?nd after clicking on an ad.
+
+The advertiser ?nds new customers in a cost-e?ective way.
+
+28 / 123
+
+Exercise
+
+Why is web search potentially more attractive for advertisers than TV spots, newspaper ads or radio spots? The advertiser pays for all this. How can the advertiser be cheated? Any way this could be bad for the user? Any way this could be bad for the search engine?
+
+29 / 123
+
+Not a win-win-win: Keyword arbitrage
+
+Buy a keyword on Google Then redirect tra?c to a third party that is paying much more than you are paying Google.
+E.g., redirect to a page full of ads
+
+This rarely makes sense for the user. Ad spammers keep inventing new tricks. The search engines need time to catch up with them.
+
+30 / 123
+
+Not a win-win-win: Violation of trademarks
+
+Example: geico During part of 2005: The search term ?geico? on Google was bought by competitors. Geico lost this case in the United States. Louis Vuitton lost similar case in Europe. See http://google.com/tm complaint.html It?s potentially misleading to users to trigger an ad o? of a trademark if the user can?t buy the product on the site.
+
+31 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+32 / 123
+
+7
+
+Duplicate detection
+The web is full of duplicated content. More so than many other collections Exact duplicates
+Easy to eliminate E.g., use hash/?ngerprint
+
+Near-duplicates
+Abundant on the web Di?cult to eliminate
+
+For the user, it?s annoying to get a search result with near-identical documents. Marginal relevance is zero: even a highly relevant document becomes nonrelevant if it appears below a (near-)duplicate. We need to eliminate near-duplicates.
+33 / 123
+
+Near-duplicates: Example
+
+34 / 123
+
+Exercise
+
+How would you eliminate near-duplicates on the web?
+
+35 / 123
+
+Detecting near-duplicates
+
+Compute similarity with an edit-distance measure We want ?syntactic? (as opposed to semantic) similarity.
+True semantic similarity (similarity in content) is too di?cult to compute.
+
+We do not consider documents near-duplicates if they have the same content, but express it with di?erent words. Use similarity threshold ? to make the call ?is/isn?t a near-duplicate?. E.g., two documents are near-duplicates if similarity > ? = 80%.
+
+36 / 123
+
+Represent each document as set of shingles
+
+A shingle is simply a word n-gram. Shingles are used as features to measure syntactic similarity of documents. For example, for n = 3, ?a rose is a rose is a rose? would be represented as this set of shingles:
+{ a-rose-is, rose-is-a, is-a-rose }
+
+We can map shingles to 1..2m (e.g., m = 64) by ?ngerprinting. From now on: sk refers to the shingle?s ?ngerprint in 1..2m . We de?ne the similarity of two documents as the Jaccard coe?cient of their shingle sets.
+
+37 / 123
+
+Recall: Jaccard coe?cient
+
+A commonly used measure of overlap of two sets Let A and B be two sets Jaccard coe?cient: jaccard(A, B) = (A = ? or B = ?) jaccard(A, A) = 1 jaccard(A, B) = 0 if A ? B = 0 A and B don?t have to be the same size. Always assigns a number between 0 and 1. |A ? B| |A ? B|
+
+38 / 123
+
+Jaccard coe?cient: Example
+
+Three documents: d1 : ?Jack London traveled to Oakland? d2 : ?Jack London traveled to the city of Oakland? d3 : ?Jack traveled from Oakland to London? Based on shingles of size 2 (2-grams or bigrams), what are the Jaccard coe?cients J(d1 , d2 ) and J(d1 , d3 )? J(d1 , d2 ) = 3/8 = 0.375 J(d1 , d3 ) = 0 Note: very sensitive to dissimilarity
+
+39 / 123
+
+Represent each document as a sketch
+
+The number of shingles per document is large. To increase e?ciency, we will use a sketch, a cleverly chosen subset of the shingles of a document. The size of a sketch is, say, n = 200 . . . . . . and is de?ned by a set of permutations ?1 . . . ?200 . Each ?i is a random permutation on 1..2m The sketch of d is de?ned as: < mins?d ?1 (s), mins?d ?2 (s), . . . , mins?d ?200 (s) > (a vector of 200 numbers).
+
+40 / 123
+
+Permutation and minimum: Example
+document 1: {sk } 1
+ss s1 s2 ss s3 s4 ? 2m
+
+document 2: {sk } 1
+s s1 s ss s5 s3 s4 ? 2m
+
+xk = ?(sk ) 1x 3
+? s s? ? s s? x1 x4 x2 ? 2m
+
+xk = ?(sk ) 1x 3
+? s ? s? s s x1 x4 ?? m 2 x5
+
+xk 1
+? x3 ?? x1 x4 ? x2 ?
+
+xk 2m 1
+? x3 ?? x1 x5 ?? m 2 x2
+
+minsk ?(sk ) 1
+? x3 ? 2m
+
+minsk ?(sk )
+
+? 2m 1 x? 3 We use mins?d1 ?(s) = mins?d2 ?(s) as a test for: are d1 and d2
+
+near-duplicates? In this case: permutation ? says: d1 ? d2
+41 / 123
+
+Computing Jaccard for sketches
+
+Sketches: Each document is now a vector of n = 200 numbers. Much easier to deal with than the very high-dimensional space of shingles But how do we compute Jaccard?
+
+42 / 123
+
+Computing Jaccard for sketches (2)
+How do we compute Jaccard? Let U be the union of the set of shingles of d1 and d2 and I the intersection. There are |U|! permutations on U. For s ? ? I , for how many permutations ? do we have arg mins?d1 ?(s) = s ? = arg mins?d2 ?(s)? Answer: (|U| ? 1)! There is a set of (|U| ? 1)! di?erent permutations for each s in I . ? |I |(|U| ? 1)! permutations make arg mins?d1 ?(s) = arg mins?d2 ?(s) true Thus, the proportion of permutations that make mins?d1 ?(s) = mins?d2 ?(s) true is: |I |(|U| ? 1)! |I | = = J(d1 , d2 ) |U|! |U|
+43 / 123
+
+Estimating Jaccard
+
+Thus, the proportion of successful permutations is the Jaccard coe?cient.
+Permutation ? is successful i? mins?d1 ?(s) = mins?d2 ?(s)
+
+Picking a permutation at random and outputting 1 (successful) or 0 (unsuccessful) is a Bernoulli trial. Estimator of probability of success: proportion of successes in n Bernoulli trials. (n = 200) Our sketch is based on a random selection of permutations. Thus, to compute Jaccard, count the number k of successful permutations for < d1 , d2 > and divide by n = 200. k/n = k/200 estimates J(d1 , d2 ).
+
+44 / 123
+
+Implementation
+
+We use hash functions as an e?cient type of permutation: hi : {1..2m } ? {1..2m } Scan all shingles sk in union of two sets in arbitrary order For each hash function hi and documents d1 , d2 , . . .: keep slot for minimum value found so far If hi (sk ) is lower than minimum found so far: update slot
+
+45 / 123
+
+Example
+d1 d2 s1 1 0 s2 0 1 s3 1 1 s4 1 0 s5 0 1 h(x) = x mod 5 g (x) = (2x + 1) mod 5
+min(h(d1 )) = 1 = 0 = min(h(d2 )) min(g (d1 )) = 2 = 0 = min(g (d2 ))
+
+h g h(1) = 1 g (1) = 3 h(2) = 2 g (2) = 0 h(3) = 3 g (3) = 2 h(4) = 4 g (4) = 4 h(5) = 0 g (5) = 1
+
+d1 slot ? ? 11 33 ?1 ?3 31 22 41 42 ?1 ?2
+
+d2 slot ? ? ?? ?? 22 00 32 20 ?2 ?0 00 10
+
+? J(d1 , d2 ) =
+
+0+0 2
+
+=0 ?nal sketches
+46 / 123
+
+Exercise
+
+s1 s2 s3 s4
+
+d1 0 1 0 1
+
+d2 1 0 1 0
+
+d3 1 ? 1 h(x) = 5x + 5 mod 4 Estimate J(d1 , d2 ), 0 g (x) = (3x + 1) mod 4 0
+
+? ? J(d1 , d3 ), J(d2 , d3 )
+
+47 / 123
+
+Solution (1)
+d1 slot ? ? ?? ?? 33 33 ?3 ?3 11 11 d2 slot ? ? 22 00 ?2 ?0 00 20 ?0 ?0 d3 slot ? ? 22 00 32 30 ?2 ?0 ?2 ?0
+
+s1 s2 s3 s4
+
+d1 0 1 0 1
+
+d2 1 0 1 0
+
+d3 1 1 0 0
+
+h(x) = 5x + 5 mod 4 g (x) = (3x + 1) mod 4
+
+h(1) = 2 g (1) = 0 h(2) = 3 g (2) = 3 h(3) = 0 g (3) = 2 h(4) = 1 g (4) = 1
+
+?nal sketches
+
+48 / 123
+
+Solution (2)
+
+? J(d1 , d2 ) = ? J(d1 , d3 ) = ? J(d2 , d3 ) =
+
+0+0 =0 2 0+0 =0 2 0+1 = 1/2 2
+
+49 / 123
+
+Shingling: Summary
+
+Input: N documents Choose n-gram size for shingling, e.g., n = 5 Pick 200 random permutations, represented as hash functions Compute N sketches: 200 ? N matrix shown on previous slide, one row per permutation, one column per document Compute
+N?(N?1) 2
+
+pairwise similarities
+
+Transitive closure of documents with similarity > ? Index only one document from each equivalence class
+
+50 / 123
+
+E?cient near-duplicate detection
+
+Now we have an extremely e?cient method for estimating a Jaccard coe?cient for a single pair of two documents. But we still have to estimate O(N 2 ) coe?cients where N is the number of web pages. Still intractable One solution: locality sensitive hashing (LSH) Another solution: sorting (Henzinger 2006)
+
+51 / 123
+
+Take-away today
+
+Big picture Ads ? they pay for the web Duplicate detection ? addresses one aspect of chaotic content creation Spam detection ? addresses one aspect of lack of central access control Probably won?t get to today
+Web information retrieval Size of the web
+
+52 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+53 / 123
+
+7
+
+The goal of spamming on the web
+
+You have a page that will generate lots of revenue for you if people visit it. Therefore, you would like to direct visitors to this page. One way of doing this: get your page ranked highly in search results. Exercise: How can I get my page ranked highly?
+
+54 / 123
+
+Spam technique: Keyword stu?ng / Hidden text
+
+Misleading meta-tags, excessive repetition Hidden text with colors, style sheet tricks etc. Used to be very e?ective, most search engines now catch these
+
+55 / 123
+
+Keyword stu?ng
+
+56 / 123
+
+Spam technique: Doorway and lander pages
+
+Doorway page: optimized for a single keyword, redirects to the real target page Lander page: optimized for a single keyword or a misspelled domain name, designed to attract surfers who will then click on ads
+
+57 / 123
+
+Lander page
+
+Number one hit on Google for the search ?composita? The only purpose of this page: get people to click on the ads and make money for the page owner
+58 / 123
+
+Spam technique: Duplication
+
+Get good content from somewhere (steal it or produce it yourself) Publish a large number of slight variations of it For example, publish the answer to a tax question with the spelling variations of ?tax deferred? on the previous slide
+
+59 / 123
+
+Spam technique: Cloaking
+
+Serve fake content to search engine spider So do we just penalize this always? No: legitimate uses (e.g., di?erent content to US vs. European users)
+
+60 / 123
+
+Spam technique: Link spam
+
+Create lots of links pointing to the page you want to promote Put these links on pages with high (or at least non-zero) PageRank
+Newly registered domains (domain ?ooding) A set of pages that all point to each other to boost each other?s PageRank (mutual admiration society) Pay somebody to put your link on their highly ranked page (?schuetze horoskop? example) Leave comments that include the link on blogs
+
+61 / 123
+
+SEO: Search engine optimization
+
+Promoting a page in the search rankings is not necessarily spam. It can also be a legitimate business ? which is called SEO. You can hire an SEO ?rm to get your page highly ranked. There are many legitimate reasons for doing this.
+For example, Google bombs like Who is a failure?
+
+And there are many legitimate ways of achieving this:
+Restructure your content in a way that makes it easy to index Talk with in?uential bloggers and have them link to your site Add more interesting and original content
+
+62 / 123
+
+The war against spam
+
+Quality indicators
+Links, statistically analyzed (PageRank etc) Usage (users visiting a page) No adult content (e.g., no pictures with ?esh-tone) Distribution and structure of text (e.g., no keyword stu?ng)
+
+Combine all of these indicators and use machine learning Editorial intervention
+Blacklists Top queries audited Complaints addressed Suspect patterns detected
+
+63 / 123
+
+Webmaster guidelines
+
+Major search engines have guidelines for webmasters. These guidelines tell you what is legitimate SEO and what is spamming. Ignore these guidelines at your own risk Once a search engine identi?es you as a spammer, all pages on your site may get low ranks (or disappear from the index entirely). There is often a ?ne line between spam and legitimate SEO. Scienti?c study of ?ghting spam on the web: adversarial information retrieval
+
+64 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+65 / 123
+
+7
+
+Web IR: Di?erences from traditional IR
+
+Links: The web is a hyperlinked document collection. Queries: Web queries are di?erent, more varied and there are a lot of them. How many? ? 109 Users: Users are di?erent, more varied and there are a lot of them. How many? ? 109 Documents: Documents are di?erent, more varied and there are a lot of them. How many? ? 1011 Context: Context is more important on the web than in many other IR applications. Ads and spam
+
+66 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+67 / 123
+
+7
+
+Query distribution (1)
+Most frequent queries on a large search engine on 2002.10.26. 1 sex 16 crack 31 juegos 46 2 (artifact) 17 games 32 nude 47 3 (artifact) 18 pussy 33 music 48 4 porno 19 cracks 34 musica 49 5 mp3 20 lolita 35 anal 50 6 Halloween 21 britney spears 36 free6 51 7 sexo 22 ebay 37 avril lavigne 52 8 chat 23 sexe 38 hotmail.com 53 9 porn 24 Pamela Anderson 39 winzip 54 10 yahoo 25 warez 40 fuck 55 11 KaZaA 26 divx 41 wallpaper 56 12 xxx 27 gay 42 hotmail.com 57 13 Hentai 28 harry potter 43 postales 58 14 lyrics 29 playboy 44 shakira 59 15 hotmail 30 lolitas 45 traductor 60 More than 1/3 of these are queries for adult content. Exercise: Does this mean that most people are looking for adult content? Caramail msn jennifer lopez tits free porn cheats yahoo.com eminem
+Christina Aguilera
+
+incest
+letras de canciones
+
+hardcore weather wallpapers lingerie
+
+68 / 123
+
+Query distribution (2)
+
+Queries have a power law distribution. Recall Zipf?s law: a few very frequent words, a large number of very rare words Same here: a few very frequent queries, a large number of very rare queries Examples of rare queries: search for names, towns, books etc The proportion of adult queries is much lower than 1/3
+
+69 / 123
+
+Types of queries / user needs in web search
+Informational user needs: I need information on something. ?low hemoglobin? We called this ?information need? earlier in the class. On the web, information needs proper are only a subclass of user needs. Other user needs: Navigational and transactional Navigational user needs: I want to go to this web site. ?hotmail?, ?myspace?, ?United Airlines? Transactional user needs: I want to make a transaction.
+Buy something: ?MacBook Air? Download something: ?Acrobat Reader? Chat with someone: ?live soccer chat?
+
+Di?cult problem: How can the search engine tell what the user need or intent for a particular query is?
+70 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+71 / 123
+
+7
+
+Search in a hyperlinked collection
+
+Web search in most cases is interleaved with navigation . . . . . . i.e., with following links. Di?erent from most other IR collections
+
+72 / 123
+
+Bowtie structure of the web
+
+Strongly connected component (SCC) in the center Lots of pages that get linked to, but don?t link (OUT) Lots of pages that link to other pages, but don?t get linked to (IN) Tendrils, tubes, islands
+
+74 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+75 / 123
+
+7
+
+User intent: Answering the need behind the query
+
+What can we do to guess user intent? Guess user intent independent of context:
+Spell correction Precomputed ?typing? of queries (next slide)
+
+Better: Guess user intent based on context:
+Geographic context (slide after next) Context of user in this session (e.g., previous query) Context provided by personal pro?le (Yahoo/MSN do this, Google claims it doesn?t)
+
+76 / 123
+
+Guessing of user intent by ?typing? queries
+
+Calculation: 5+4 Unit conversion: 1 kg in pounds Currency conversion: 1 euro in kronor Tracking number: 8167 2278 6764 Flight info: LH 454 Area code: 650 Map: columbus oh Stock price: msft Albums/movies etc: coldplay
+
+77 / 123
+
+The spatial context: Geo-search
+Three relevant locations
+Server (nytimes.com ? New York) Web page (nytimes.com article about Albania) User (located in Palo Alto)
+
+Locating the user
+IP address Information provided by user (e.g., in user pro?le) Mobile phone
+
+Geo-tagging: Parse text and identify the coordinates of the geographic entities
+Example: East Palo Alto CA ? Latitude: 37.47 N, Longitude: 122.14 W Important NLP problem
+
+78 / 123
+
+How do we use context to modify query results?
+
+Result restriction: Don?t consider inappropriate results
+For user on google.fr . . . . . . only show .fr results
+
+Ranking modulation: use a rough generic ranking, rerank based on personal context Contextualization / personalization is an area of search with a lot of potential for improvement.
+
+79 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+80 / 123
+
+7
+
+Users of web search
+
+Use short queries (average < 3) Rarely use operators Don?t want to spend a lot of time on composing a query Only look at the ?rst couple of results Want a simple UI, not a search engine start page overloaded with graphics Extreme variability in terms of user needs, user expectations, experience, knowledge, . . .
+Industrial/developing world, English/Estonian, old/young, rich/poor, di?erences in culture and class
+
+One interface for hugely divergent needs
+
+81 / 123
+
+How do users evaluate search engines?
+
+Classic IR relevance (as measured by F ) can also be used for web IR. Equally important: Trust, duplicate elimination, readability, loads fast, no pop-ups On the web, precision is more important than recall.
+Precision at 1, precision at 10, precision on the ?rst 2-3 pages But there is a subset of queries where recall matters.
+
+82 / 123
+
+Web information needs that require high recall
+
+Has this idea been patented? Searching for info on a prospective ?nancial advisor Searching for info on a prospective employee Searching for info on a date
+
+83 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+84 / 123
+
+7
+
+Web documents: di?erent from other IR collections
+
+Distributed content creation: no design, no coordination
+?Democratization of publishing? Result: extreme heterogeneity of documents on the web
+
+Unstructured (text, html), semistructured (html, xml), structured/relational (databases) Dynamically generated content
+
+85 / 123
+
+Dynamic content
+
+Dynamic pages are generated from scratch when the user requests them ? usually from underlying data in a database. Example: current status of ?ight LH 454
+
+86 / 123
+
+Dynamic content (2)
+
+Most (truly) dynamic content is ignored by web spiders.
+It?s too much to index it all.
+
+Actually, a lot of ?static? content is also assembled on the ?y (asp, php etc.: headers, date, ads etc)
+
+87 / 123
+
+Web pages change frequently (Fetterly 1997)
+
+88 / 123
+
+Multilinguality
+
+Documents in a large number of languages Queries in a large number of languages First cut: Don?t return English results for a Japanese query However: Frequent mismatches query/document languages Many people can understand, but not query in a language Translation is important. Google example: ?Beaujolais Nouveau -wine?
+
+89 / 123
+
+Duplicate documents
+
+Signi?cant duplication ? 30%?40% duplicates in some studies Duplicates in the search results were common in the early days of the web. Today?s search engines eliminate duplicates very e?ectively. Key for high user satisfaction
+
+90 / 123
+
+Trust
+
+For many collections, it is easy to assess the trustworthiness of a document.
+A collection of Reuters newswire articles A collection of TASS (Telegraph Agency of the Soviet Union) newswire articles from the 1980s Your Outlook email from the last three years
+
+Web documents are di?erent: In many cases, we don?t know how to evaluate the information. Hoaxes abound.
+
+91 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+92 / 123
+
+7
+
+Growth of the web
+
+The web keeps growing. But growth is no longer exponential?
+
+93 / 123
+
+Size of the web: Issues
+
+What is size? Number of web servers? Number of pages? Terabytes of data available? Some servers are seldom connected.
+Example: Your laptop running a web server Is it part of the web?
+
+The ?dynamic? web is in?nite.
+Any sum of two numbers is its own dynamic page on Google. (Example: ?2+4?)
+
+94 / 123
+
+?Search engine index contains N pages?: Issues
+
+Can I claim a page is in the index if I only index the ?rst 4000 bytes? Can I claim a page is in the index if I only index anchor text pointing to the page?
+There used to be (and still are?) billions of pages that are only indexed by anchor text.
+
+95 / 123
+
+Simple method for determining a lower bound
+
+OR-query of frequent words in a number of languages http://ifnlp.org/ir/sizeoftheweb.html According to this query: Size of web ? 21,450,000,000 on 2007.07.07 and ? 25,350,000,000 on 2008.07.03 But page counts of google search results are only rough estimates.
+
+96 / 123
+
+Outline
+1 2 3 4 5 6
+
+Recap Big picture Ads Duplicate detection Spam Web IR Queries Links Context Users Documents Size Size of the web
+97 / 123
+
+7
+
+Size of the web: Who cares?
+
+Media Users
+They may switch to the search engine that has the best coverage of the web. Users (sometimes) care about recall. If we underestimate the size of the web, search engine results may have low recall.
+
+Search engine designers (how many pages do I need to be able to handle?) Crawler designers (which policy will crawl close to N pages?)
+
+98 / 123
+
+What is the size of the web? Any guesses?
+
+99 / 123
+
+Simple method for determining a lower bound
+
+OR-query of frequent words in a number of languages http://ifnlp.org/lehre/teaching/2007-SS/ir/sizeoftheweb.html According to this query: Size of web ? 21,450,000,000 on 2007.07.07 Big if: Page counts of google search results are correct. (Generally, they are just rough estimates.) But this is just a lower bound, based on one search engine. How can we do better?
+
+100 / 123
+
+Size of the web: Issues
+
+The ?dynamic? web is in?nite.
+Any sum of two numbers is its own dynamic page on Google. (Example: ?2+4?) Many other dynamic sites generating in?nite number of pages
+
+The static web contains duplicates ? each ?equivalence class? should only be counted once. Some servers are seldom connected.
+Example: Your laptop Is it part of the web?
+
+101 / 123
+
+?Search engine index contains N pages?: Issues
+
+Can I claim a page is in the index if I only index the ?rst 4000 bytes? Can I claim a page is in the index if I only index anchor text pointing to the page?
+There used to be (and still are?) billions of pages that are only indexed by anchor text.
+
+102 / 123
+
+How can we estimate the size of the web?
+
+103 / 123
+
+Sampling methods
+
+Random queries Random searches Random IP addresses Random walks
+
+104 / 123
+
+Variant: Estimate relative sizes of indexes
+
+There are signi?cant di?erences between indexes of di?erent search engines. Di?erent engines have di?erent preferences.
+max url depth, max count/host, anti-spam rules, priority rules etc.
+
+Di?erent engines index di?erent things under the same URL.
+anchor text, frames, meta-keywords, size of pre?x etc.
+
+105 / 123
+
+Sampling URLs
+
+Ideal strategy: Generate a random URL Problem: Random URLs are hard to ?nd (and sampling distribution should re?ect ?user interest?) Approach 1: Random walks / IP addresses
+In theory: might give us a true estimate of the size of the web (as opposed to just relative sizes of indexex)
+
+Approach 2: Generate a random URL contained in a given engine
+Su?ces for accurate estimation of relative size
+
+107 / 123
+
+Random URLs from random queries
+
+Idea: Use vocabulary of the web for query generation Vocabulary can be generated from web crawl Use conjunctive queries w1 AND w2
+Example: vocalists AND rsi
+
+Get result set of one hundred URLs from the source engine Choose a random URL from the result set This sampling method induces a weight W (p) for each page p. Method was used by Bharat and Broder (1998).
+
+108 / 123
+
+Checking if a page is in the index
+
+Either: Search for URL if the engine supports this Or: Create a query that will ?nd doc d with high probability
+Download doc, extract words Use 8 low frequency word as AND query Call this a strong query for d Run query Check if d is in result set
+
+Problems
+Near duplicates Redirects Engine time-outs
+
+109 / 123
+
+Random searches
+
+Choose random searches extracted from a search engine log (Lawrence & Giles 97) Use only queries with small result sets For each random query: compute ratio size(r1 )/size(r2 ) of the two result sets Average over random searches
+
+112 / 123
+
+Advantages & disadvantages
+
+Advantage
+Might be a better re?ection of the human perception of coverage
+
+Issues
+Samples are correlated with source of log (unfair advantage for originating search engine) Duplicates Technical statistical problems (must have non-zero results, ratio average not statistically sound)
+
+113 / 123
+
+Random IP addresses [ONei97,Lawr99]
+
+[Lawr99] exhaustively crawled 2500 servers and extrapolated Estimated size of the web to be 800 million
+
+117 / 123
+
+Advantages and disadvantages
+
+Advantages
+Can, in theory, estimate the size of the accessible web (as opposed to the (relative) size of an index) Clean statistics Independent of crawling strategies
+
+Disadvantages
+Many hosts share one IP (? oversampling) Hosts with large web sites don?t get more weight than hosts with small web sites (? possible undersampling) Sensitive to spam (multiple IPs for same spam server) Again, duplicates
+
+118 / 123
+
+Conclusion
+
+Many di?erent approaches to web size estimation. None is perfect. The problem has gotten much harder. There hasn?t been a good study for a couple of years. Great topic for a thesis!
+
+122 / 123
+
+Resources
+
+Chapter 19 of IIR Resources at http://cislmu.org
+Hal Varian explains Google second price auction: http://www.youtube.com/watch?v=K7l0a2PVhPQ Size of the web queries Trademark issues (Geico and Vuitton cases) How ads are priced Henzinger, Finding near-duplicate web pages: A large-scale evaluation of algorithms, ACM SIGIR 2006.
+
+123 / 123
+
+

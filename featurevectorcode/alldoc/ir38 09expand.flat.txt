@@ -1,0 +1,522 @@
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 9: Relevance Feedback & Query Expansion
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-05-14
+
+1 / 63
+
+Overview
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+2 / 63
+
+Outline
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+3 / 63
+
+Relevance
+
+We will evaluate the quality of an information retrieval system and, in particular, its ranking algorithm with respect to relevance. A document is relevant if it gives the user the information she was looking for. To evaluate relevance, we need an evaluation benchmark with three elements:
+A benchmark document collection A benchmark suite of queries An assessment of the relevance of each query-document pair
+
+4 / 63
+
+Relevance: query vs. information need
+The notion of ?relevance to the query? is very problematic. Information need i : You are looking for information on whether drinking red wine is more e?ective at reducing your risk of heart attacks than white wine. Query q: wine and red and white and heart and attack Consider document d ? : He then launched into the heart of his speech and attacked the wine industry lobby for downplaying the role of red and white wine in drunk driving. d ? is relevant to the query q, but d ? is not relevant to the information need i . User happiness/satisfaction (i.e., how well our ranking algorithm works) can only be measured by relevance to information needs, not by relevance to queries.
+5 / 63
+
+Precision and recall
+
+Precision (P) is the fraction of retrieved documents that are relevant Precision = #(relevant items retrieved) = P(relevant|retrieved) #(retrieved items)
+
+Recall (R) is the fraction of relevant documents that are retrieved Recall = #(relevant items retrieved) = P(retrieved|relevant) #(relevant items)
+
+6 / 63
+
+A combined measure: F
+
+F allows us to trade o? precision against recall. Balanced F : 2PR P +R This is a kind of soft minimum of precision and recall. F1 =
+
+7 / 63
+
+Averaged 11-point precision/recall graph
+1 0.8 Precision
+
+0.6
+
+0.4
+
+0.2
+
+0 0 0.2 0.4 Recall 0.6 0.8 1
+
+This curve is typical of performance levels for the TREC benchmark. 70% chance of getting the ?rst document right (roughly) When we want to look at at least 50% of all relevant documents, then for each relevant document we ?nd, we will have to look at about two nonrelevant documents. That?s not very good. High-recall retrieval is an unsolved problem.
+
+8 / 63
+
+Google dynamic summaries for [vegetarian diet running]
+
+9 / 63
+
+Take-away today
+
+Interactive relevance feedback: improve initial retrieval results by telling the IR system which docs are relevant / nonrelevant Best known relevance feedback method: Rocchio feedback Query expansion: improve retrieval results by adding synonyms / related terms to the query
+Sources for related terms: Manual thesauri, automatic thesauri, query logs
+
+10 / 63
+
+Overview
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+11 / 63
+
+Outline
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+12 / 63
+
+How can we improve recall in search?
+
+Main topic today: two ways of improving recall: relevance feedback and query expansion As an example consider query q: [aircraft] . . . . . . and document d containing ?plane?, but not containing ?aircraft? A simple IR system will not return d for q. Even if d is the most relevant document for q! We want to change this:
+Return relevant documents even if there is no term match with the (original) query
+
+13 / 63
+
+Recall
+
+Loose de?nition of recall in this lecture: ?increasing the number of relevant documents returned to user? This may actually decrease recall on some measures, e.g., when expanding ?jaguar? to ?jaguar AND panthera?
+. . . which eliminates some relevant documents, but increases relevant documents returned on top pages
+
+14 / 63
+
+Options for improving recall
+
+Local: Do a ?local?, on-demand analysis for a user query
+Main local method: relevance feedback Part 1
+
+Global: Do a global analysis once (e.g., of collection) to produce thesaurus
+Use thesaurus for query expansion Part 2
+
+15 / 63
+
+Google used to expose query expansion in UI
+
+??ights -?ight ?dogs -dog
+
+no longer available: http://searchenginewatch.com/article/2277383/Google-Kil
+
+16 / 63
+
+Outline
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+17 / 63
+
+Relevance feedback: Basic idea
+
+The user issues a (short, simple) query. The search engine returns a set of documents. User marks some docs as relevant, some as nonrelevant. Search engine computes a new representation of the information need. Hope: better than the initial query. Search engine runs new query and returns new results. New results have (hopefully) better recall. We will use the term ad hoc retrieval to refer to regular retrieval without relevance feedback.
+
+18 / 63
+
+Relevance feedback: Examples
+
+We will now look at three di?erent examples of relevance feedback that highlight di?erent aspects of the process.
+
+19 / 63
+
+Relevance Feedback: Example 1
+
+20 / 63
+
+Results for initial query
+
+21 / 63
+
+User feedback: Select what is relevant
+
+22 / 63
+
+Results after relevance feedback
+
+23 / 63
+
+Vector space example: query ?canine? (1)
+source: Fernando D? ?az
+
+24 / 63
+
+Similarity of docs to query ?canine?
+
+source: Fernando D? ?az
+
+25 / 63
+
+User feedback: Select relevant documents
+
+source: Fernando D? ?az
+
+26 / 63
+
+Results after relevance feedback
+source: Fernando D? ?az
+
+27 / 63
+
+Example 3: A real (non-image) example
+Initial query: [new space satellite applications] Results for initial query: (r = rank) + + r 1 2 3 4 5 6 7 + 8 0.539 0.533 0.528 0.526 0.525 0.524 0.516 0.509 NASA Hasn?t Scrapped Imaging Spectrometer NASA Scratches Environment Gear From Satellite Plan Science Panel Backs NASA Satellite Plan, But Urges Launches of Smaller Probes A NASA Satellite Project Accomplishes Incredible Feat: Staying Within Budget Scientist Who Exposed Global Warming Proposes Satellites for Climate Research Report Provides Support for the Critics Of Using Big Satellites to Study Climate Arianespace Receives Satellite Launch Pact From Telesat Canada Telecommunications Tale of Two Companies
+
+User then marks relevant documents with ?+?.
+28 / 63
+
+Expanded query after relevance feedback
+
+2.074 30.816 5.991 4.196 3.516 3.004 2.790 2.003 0.836
+
+new satellite nasa launch instrument bundespost rocket broadcast oil
+
+15.106 5.660 5.196 3.972 3.446 2.806 2.053 1.172 0.646
+
+space application eos aster arianespace Compare to original ss scientist earth measure
+
+query: [new space satellite applications]
+
+29 / 63
+
+Results for expanded query (old ranks in parens)
+r 1 (2) 2 (1) 3 4 * 5 (8) 6 7 8
+
+* *
+
+0.513 0.500 0.493 0.493 0.492 0.491 0.490 0.490
+
+NASA Scratches Environment Gear From Satellite Plan NASA Hasn?t Scrapped Imaging Spectrometer When the Pentagon Launches a Secret Satellite, Space Sleuths Do Some Spy Work of Their Own NASA Uses ?Warm? Superconductors For Fast Circuit Telecommunications Tale of Two Companies Soviets May Adapt Parts of SS-20 Missile For Commercial Use Gaping Gap: Pentagon Lags in Race To Match the Soviets In Rocket Launchers Rescue of Satellite By Space Agency To Cost $90 Million
+30 / 63
+
+Outline
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+31 / 63
+
+Key concept for relevance feedback: Centroid
+
+The centroid is the center of mass of a set of points. Recall that we represent documents as points in a high-dimensional space. Thus: we can compute centroids of documents. De?nition: ?(D) = 1 |D| v(d)
+d?D
+
+where D is a set of documents and v (d) = d is the vector we use to represent document d.
+
+32 / 63
+
+Centroid: Examples
+? ? ? ? ? ?
+
+x x
+
+x x
+
+33 / 63
+
+Rocchio algorithm
+The Rocchio algorithm implements relevance feedback in the vector space model. Rocchio chooses the query qopt that maximizes qopt = arg max[sim(q, ?(Dr )) ? sim(q, ?(Dnr ))]
+q
+
+Dr : set of relevant docs; Dnr : set of nonrelevant docs Intent: qopt is the vector that separates relevant and nonrelevant docs maximally. Making some additional assumptions, we can rewrite qopt as: qopt = ?(Dr ) + [?(Dr ) ? ?(Dnr )]
+
+34 / 63
+
+Rocchio algorithm
+
+The optimal query vector is: qopt = ?(Dr ) + [?(Dr ) ? ?(Dnr )] 1 1 1 = dj + [ dj ? |Dr | |Dr | |Dnr |
+dj ?Dr dj ?Dr
+
+dj ]
+dj ?Dnr
+
+We move the centroid of the relevant documents by the di?erence between the two centroids.
+
+35 / 63
+
+Exercise: Compute Rocchio vector
+
+x x x x x x
+
+circles: relevant documents, Xs: nonrelevant documents compute: qopt = ?(Dr ) + [?(Dr ) ? ?(Dnr )]
+
+36 / 63
+
+Rocchio illustrated
+
+qopt ?R ?NR
+
+?R ? ?NR x
+
+x x x x
+
+x
+
+circles: relevant documents, Xs: nonrelevant documents ?R : centroid of relevant documents ?R does not separate relevant/nonrelevant. ?NR : centroid of nonrelevant documents ?R ? ?NR : di?erence vector Add di?erence vector to ?R . . . . . . to get qopt qopt separates relevant/nonrelevant perfectly.
+37 / 63
+
+Terminology
+
+So far, we have used the name Rocchio for the theoretically better motivated original version of Rocchio. The implementation that is actually used in most cases is the SMART implementation ? this SMART version of Rocchio is what we will refer to from now on.
+
+38 / 63
+
+Rocchio 1971 algorithm (SMART)
+Used in practice: qm = ?q0 + ??(Dr ) ? ??(Dnr ) 1 1 dj ? ? = ?q0 + ? |Dr | |Dnr |
+dj ?Dr
+
+dj
+dj ?Dnr
+
+qm : modi?ed query vector; q0 : original query vector; Dr and Dnr : sets of known relevant and nonrelevant documents respectively; ?, ?, and ?: weights New query moves towards relevant documents and away from nonrelevant documents. Tradeo? ? vs. ?/?: If we have a lot of judged documents, we want a higher ?/?. Set negative term weights to 0. ?Negative weight? for a term doesn?t make sense in the vector space model.
+39 / 63
+
+Positive vs. negative relevance feedback
+
+Positive feedback is more valuable than negative feedback. For example, set ? = 0.75, ? = 0.25 to give higher weight to positive feedback. Many systems only allow positive feedback.
+
+40 / 63
+
+Relevance feedback: Assumptions
+
+When can relevance feedback enhance recall? Assumption A1: The user knows the terms in the collection well enough for an initial query. Assumption A2: Relevant documents contain similar terms (so I can ?hop? from one relevant document to a di?erent one when giving relevance feedback).
+
+41 / 63
+
+Violation of A1
+
+Assumption A1: The user knows the terms in the collection well enough for an initial query. Violation: Mismatch of searcher?s vocabulary and collection vocabulary Example: cosmonaut / astronaut
+
+42 / 63
+
+Violation of A2
+
+Assumption A2: Relevant documents are similar. Example for violation: [contradictory government policies] Several unrelated ?prototypes?
+Subsidies for tobacco farmers vs. anti-smoking campaigns Aid for developing countries vs. high tari?s on imports from developing countries
+
+Relevance feedback on tobacco docs will not help with ?nding docs on developing countries.
+
+43 / 63
+
+Relevance feedback: Assumptions
+
+When can relevance feedback enhance recall? Assumption A1: The user knows the terms in the collection well enough for an initial query. Assumption A2: Relevant documents contain similar terms (so I can ?hop? from one relevant document to a di?erent one when giving relevance feedback).
+
+44 / 63
+
+Relevance feedback: Evaluation
+
+Pick an evaluation measure, e.g., precision in top 10: P@10 Compute P@10 for original query q0 Compute P@10 for modi?ed relevance feedback query q1 In most cases: q1 is spectacularly better than q0 ! Is this a fair evaluation?
+
+45 / 63
+
+Relevance feedback: Evaluation
+
+Fair evaluation must be on ?residual? collection: docs not yet judged by user. Studies have shown that relevance feedback is successful when evaluated this way. Empirically, one round of relevance feedback is often very useful. Two rounds are marginally useful.
+
+46 / 63
+
+Evaluation: Caveat
+
+True evaluation of usefulness must compare to other methods taking the same amount of time. Alternative to relevance feedback: User revises and resubmits query. Users may prefer revision/resubmission to having to judge relevance of documents. There is no clear evidence that relevance feedback is the ?best use? of the user?s time.
+
+47 / 63
+
+Exercise
+
+Do search engines use relevance feedback? Why?
+
+48 / 63
+
+Relevance feedback: Problems
+
+Relevance feedback is expensive.
+Relevance feedback creates long modi?ed queries. Long queries are expensive to process.
+
+Users are reluctant to provide explicit feedback. It?s often hard to understand why a particular document was retrieved after applying relevance feedback. The search engine Excite had full relevance feedback at one point, but abandoned it later.
+
+49 / 63
+
+Pseudo-relevance feedback
+
+Pseudo-relevance feedback automates the ?manual? part of true relevance feedback. Pseudo-relevance feedback algorithm:
+Retrieve a ranked list of hits for the user?s query Assume that the top k documents are relevant. Do relevance feedback (e.g., Rocchio)
+
+Works very well on average But can go horribly wrong for some queries.
+Because of query drift If you do several iterations of pseudo-relevance feedback, then you will get query drift for a large proportion of queries.
+
+50 / 63
+
+Pseudo-relevance feedback at TREC4
+Cornell SMART system Results show number of relevant documents out of top 100 for 50 queries (so total number of documents is 5000): method lnc.ltc lnc.ltc-PsRF Lnu.ltu Lnu.ltu-PsRF number of relevant documents 3210 3634 3709 4350
+
+Results contrast two length normalization schemes (L vs. l) and pseudo-relevance feedback (PsRF). The pseudo-relevance feedback method used added only 20 terms to the query. (Rocchio will add many more.) This demonstrates that pseudo-relevance feedback is e?ective on average.
+51 / 63
+
+Outline
+
+1
+
+Recap Motivation Relevance feedback: Basics Relevance feedback: Details Query expansion
+
+2
+
+3
+
+4
+
+5
+
+52 / 63
+
+Query expansion: Example
+
+53 / 63
+
+Types of user feedback
+
+User gives feedback on documents.
+More common in relevance feedback
+
+User gives feedback on words or phrases.
+More common in query expansion
+
+54 / 63
+
+Query expansion
+
+Query expansion is another method for increasing recall. We use ?global query expansion? to refer to ?global methods for query reformulation?. In global query expansion, the query is modi?ed based on some global resource, i.e. a resource that is not query-dependent. Main information we use: (near-)synonymy
+
+55 / 63
+
+?Global? resources used for query expansion
+
+A publication or database that collects (near-)synonyms is called a thesaurus. Manual thesaurus (maintained by editors, e.g., PubMed) Automatically derived thesaurus (e.g., based on co-occurrence statistics) Query-equivalence based on query log mining (common on the web as in the ?palm? example)
+
+56 / 63
+
+Thesaurus-based query expansion
+
+For each term t in the query, expand the query with words the thesaurus lists as semantically related with t. Example from earlier: hospital ? medical Generally increases recall May signi?cantly decrease precision, particularly with ambiguous terms
+interest rate ? interest rate fascinate
+
+Widely used in specialized search engines for science and engineering It?s very expensive to create a manual thesaurus and to maintain it over time.
+
+57 / 63
+
+Example for manual thesaurus: PubMed
+
+58 / 63
+
+Automatic thesaurus generation
+Attempt to generate a thesaurus automatically by analyzing the distribution of words in documents Fundamental notion: similarity between two words De?nition 1: Two words are similar if they co-occur with similar words.
+?car? ? ?motorcycle? because both occur with ?road?, ?gas? and ?license?, so they must be similar.
+
+De?nition 2: Two words are similar if they occur in a given grammatical relation with the same words.
+You can harvest, peel, eat, prepare, etc. apples and pears, so apples and pears must be similar.
+
+Co-occurrence is more robust, grammatical relations are more accurate.
+
+59 / 63
+
+Co-occurence-based thesaurus: Examples
+
+Word Nearest neighbors absolutely absurd whatsoever totally exactly nothing bottomed dip copper drops topped slide trimmed captivating shimmer stunningly superbly plucky witty doghouse dog porch crawling beside downstairs makeup repellent lotion glossy sunscreen skin gel mediating reconciliation negotiate case conciliation keeping hoping bring wiping could some would lithographs drawings Picasso Dali sculptures Gauguin pathogens toxins bacteria organisms bacterial parasite senses grasp psyche truly clumsy naive innate WordSpace demo on web
+
+60 / 63
+
+Query expansion at search engines
+
+Main source of query expansion at search engines: query logs Example 1: After issuing the query [herbs], users frequently search for [herbal remedies].
+? ?herbal remedies? is potential expansion of ?herb?.
+
+Example 2: Users searching for [?ower pix] frequently click on the URL photobucket.com/?ower. Users searching for [?ower clipart] frequently click on the same URL.
+? ??ower clipart? and ??ower pix? are potential expansions of each other.
+
+61 / 63
+
+Take-away today
+
+Interactive relevance feedback: improve initial retrieval results by telling the IR system which docs are relevant / nonrelevant Best known relevance feedback method: Rocchio feedback Query expansion: improve retrieval results by adding synonyms / related terms to the query
+Sources for related terms: Manual thesauri, automatic thesauri, query logs
+
+62 / 63
+
+Resources
+
+Chapter 9 of IIR Resources at http://cislmu.org
+Salton and Buckley 1990 (original relevance feedback paper) Spink, Jansen, Ozmultu 2000: Relevance feedback at Excite Justin Bieber: related searches fail Word Space Sch?tze 1998: Automatic word sense discrimination (describes u a simple method for automatic thesaurus generation)
+
+63 / 63
+
+

@@ -1,0 +1,3179 @@
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 15-1: Support Vector Machines
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-06-04
+
+Sch?tze: Support vector machines u
+
+1 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Overview
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+2 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Outline
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+3 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Rocchio, a simple vector space classi?er
+
+TrainRocchio(C, D) 1 for each cj ? C 2 do Dj ? {d : d, cj ? D} 1 3 ?j ? |Dj | d?Dj v (d) 4 return {?1 , . . . , ?J } ApplyRocchio({?1 , . . . , ?J }, d) 1 return arg minj |?j ? v(d)|
+
+Sch?tze: Support vector machines u
+
+4 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 1D
+
+A linear classi?er in 1D is a point described by the equation w1 d1 = ? The point at ?/w1 Points (d1 ) with w1 d1 ? ? are in the class c. Points (d1 ) with w1 d1 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+5 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 1D
+
+A linear classi?er in 1D is a point described by the equation w1 d1 = ? The point at ?/w1 Points (d1 ) with w1 d1 ? ? are in the class c. Points (d1 ) with w1 d1 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+5 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 1D
+
+A linear classi?er in 1D is a point described by the equation w1 d1 = ? The point at ?/w1 Points (d1 ) with w1 d1 ? ? are in the class c. Points (d1 ) with w1 d1 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+5 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 1D
+
+A linear classi?er in 1D is a point described by the equation w1 d1 = ? The point at ?/w1 Points (d1 ) with w1 d1 ? ? are in the class c. Points (d1 ) with w1 d1 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+5 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 2D
+
+A linear classi?er in 2D is a line described by the equation w1 d1 + w2 d2 = ? Example for a 2D linear classi?er Points (d1 d2 ) with w1 d1 + w2 d2 ? ? are in the class c. Points (d1 d2 ) with w1 d1 + w2 d2 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+6 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 2D
+
+A linear classi?er in 2D is a line described by the equation w1 d1 + w2 d2 = ? Example for a 2D linear classi?er Points (d1 d2 ) with w1 d1 + w2 d2 ? ? are in the class c. Points (d1 d2 ) with w1 d1 + w2 d2 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+6 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 2D
+
+A linear classi?er in 2D is a line described by the equation w1 d1 + w2 d2 = ? Example for a 2D linear classi?er Points (d1 d2 ) with w1 d1 + w2 d2 ? ? are in the class c. Points (d1 d2 ) with w1 d1 + w2 d2 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+6 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 2D
+
+A linear classi?er in 2D is a line described by the equation w1 d1 + w2 d2 = ? Example for a 2D linear classi?er Points (d1 d2 ) with w1 d1 + w2 d2 ? ? are in the class c. Points (d1 d2 ) with w1 d1 + w2 d2 < ? are in the complement class c.
+
+Sch?tze: Support vector machines u
+
+6 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 3D
+A linear classi?er in 3D is a plane described by the equation w1 d1 + w2 d2 + w3 d3 = ? Example for a 3D linear classi?er Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 ? ? are in the class c. Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 < ? are in the complement class c.
+Sch?tze: Support vector machines u 7 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 3D
+A linear classi?er in 3D is a plane described by the equation w1 d1 + w2 d2 + w3 d3 = ? Example for a 3D linear classi?er Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 ? ? are in the class c. Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 < ? are in the complement class c.
+Sch?tze: Support vector machines u 7 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 3D
+A linear classi?er in 3D is a plane described by the equation w1 d1 + w2 d2 + w3 d3 = ? Example for a 3D linear classi?er Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 ? ? are in the class c. Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 < ? are in the complement class c.
+Sch?tze: Support vector machines u 7 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A linear classi?er in 3D
+A linear classi?er in 3D is a plane described by the equation w1 d1 + w2 d2 + w3 d3 = ? Example for a 3D linear classi?er Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 ? ? are in the class c. Points (d1 d2 d3 ) with w1 d1 + w2 d2 + w3 d3 < ? are in the complement class c.
+Sch?tze: Support vector machines u 7 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Learning algorithms for vector space classi?cation
+In terms of actual computation, there are two types of learning algorithms. (i) Simple learning algorithms that estimate the parameters of the classi?er directly from the training data, often in one linear pass.
+Naive Bayes, Rocchio, kNN are all examples of this.
+
+(ii) Iterative algorithms
+Support vector machines Perceptron (example available as PDF on website: http://cislmu.org)
+
+The best performing learning algorithms usually require iterative learning.
+Sch?tze: Support vector machines u 8 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Linear classi?ers: Discussion
+
+Many common text classi?ers are linear classi?ers: Naive Bayes, Rocchio, logistic regression, linear support vector machines etc. Each method has a di?erent way of selecting the separating hyperplane
+Huge di?erences in performance on test documents
+
+Can we get better performance with more powerful nonlinear classi?ers? Not in general: A given amount of training data may su?ce for estimating a linear boundary, but not for estimating a more complex nonlinear boundary.
+
+Sch?tze: Support vector machines u
+
+9 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear)
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear) Introduction to SVMs
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear) Introduction to SVMs Formalization
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear) Introduction to SVMs Formalization Soft margin case for nonseparable problems
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear) Introduction to SVMs Formalization Soft margin case for nonseparable problems Discussion: Which classi?er should I use for my problem?
+
+Sch?tze: Support vector machines u
+
+10 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Overview
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+11 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Outline
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+12 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Support vector machines
+
+Sch?tze: Support vector machines u
+
+13 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Support vector machines
+
+Machine-learning research in the last two decades has improved classi?er e?ectiveness.
+
+Sch?tze: Support vector machines u
+
+13 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Support vector machines
+
+Machine-learning research in the last two decades has improved classi?er e?ectiveness. New generation of state-of-the-art classi?ers: support vector machines (SVMs), boosted decision trees, regularized logistic regression, maximum entropy, neural networks, and random forests
+
+Sch?tze: Support vector machines u
+
+13 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Support vector machines
+
+Machine-learning research in the last two decades has improved classi?er e?ectiveness. New generation of state-of-the-art classi?ers: support vector machines (SVMs), boosted decision trees, regularized logistic regression, maximum entropy, neural networks, and random forests As we saw in IIR: Applications to IR problems, particularly text classi?cation
+
+Sch?tze: Support vector machines u
+
+13 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+What is a support vector machine ? ?rst take
+
+Sch?tze: Support vector machines u
+
+14 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+What is a support vector machine ? ?rst take
+
+Vector space classi?cation (similar to Rocchio, kNN, linear classi?ers)
+
+Sch?tze: Support vector machines u
+
+14 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+What is a support vector machine ? ?rst take
+
+Vector space classi?cation (similar to Rocchio, kNN, linear classi?ers) Di?erence from previous methods: large margin classi?er
+
+Sch?tze: Support vector machines u
+
+14 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+What is a support vector machine ? ?rst take
+
+Vector space classi?cation (similar to Rocchio, kNN, linear classi?ers) Di?erence from previous methods: large margin classi?er We aim to ?nd a separating hyperplane (decision boundary) that is maximally far from any point in the training data
+
+Sch?tze: Support vector machines u
+
+14 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+What is a support vector machine ? ?rst take
+
+Vector space classi?cation (similar to Rocchio, kNN, linear classi?ers) Di?erence from previous methods: large margin classi?er We aim to ?nd a separating hyperplane (decision boundary) that is maximally far from any point in the training data In case of non-linear-separability: We may have to discount some points as outliers or noise.
+
+Sch?tze: Support vector machines u
+
+14 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Which hyperplane?
+
+Sch?tze: Support vector machines u
+
+15 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem
+
+Sch?tze: Support vector machines u
+
+16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem Decision boundary is linear separator.
+
+Sch?tze: Support vector machines u
+
+16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem Decision boundary is linear separator. criterion: being maximally far away from any data point ? determines classi?er margin
+
+Margin is maximized
+Sch?tze: Support vector machines u 16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem Decision boundary is linear separator. criterion: being maximally far away from any data point ? determines classi?er margin
+
+Maximum margin decision hyperplane
+
+Margin is maximized
+Sch?tze: Support vector machines u 16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem Decision boundary is linear separator. criterion: being maximally far away from any data point ? determines classi?er margin Vectors on margin lines are called support vectors
+
+Maximum margin decision hyperplane
+
+Support vectors
+
+Margin is maximized
+Sch?tze: Support vector machines u 16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+(Linear) Support Vector Machines
+binary classi?cation problem Decision boundary is linear separator. criterion: being maximally far away from any data point ? determines classi?er margin Vectors on margin lines are called support vectors Set of support vectors are a complete speci?cation of classi?er
+Sch?tze: Support vector machines u
+
+Maximum margin decision hyperplane
+
+Support vectors
+
+Margin is maximized
+16 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+Points near the decision surface are uncertain classi?cation decisions.
+
+Maximum margin decision hyperplane
+
+Support vectors
+
+Margin is maximized
+Sch?tze: Support vector machines u 17 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+Points near the decision surface are uncertain classi?cation decisions. A classi?er with a large margin makes no low certainty classi?cation decisions (on the training set).
+
+Maximum margin decision hyperplane
+
+Support vectors
+
+Margin is maximized
+Sch?tze: Support vector machines u 17 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+Points near the decision surface are uncertain classi?cation decisions. A classi?er with a large margin makes no low certainty classi?cation decisions (on the training set). Gives classi?cation safety margin with respect to errors and random variation
+
+Maximum margin decision hyperplane
+
+Support vectors
+
+Margin is maximized
+Sch?tze: Support vector machines u 17 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+
+SVM classi?cation = large margin around decision boundary
+
+Sch?tze: Support vector machines u
+
+18 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+
+SVM classi?cation = large margin around decision boundary We can think of the margin as a ?fat separator? ? a fatter version of our regular decision hyperplane.
+
+Sch?tze: Support vector machines u
+
+18 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+
+SVM classi?cation = large margin around decision boundary We can think of the margin as a ?fat separator? ? a fatter version of our regular decision hyperplane. unique solution
+
+Sch?tze: Support vector machines u
+
+18 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Why maximize the margin?
+
+SVM classi?cation = large margin around decision boundary We can think of the margin as a ?fat separator? ? a fatter version of our regular decision hyperplane. unique solution increased ability to correctly generalize to test data
+
+Sch?tze: Support vector machines u
+
+18 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Separating hyperplane: Recap
+Hyperplane
+An n-dimensional generalization of a plane (point in 1-D space, line in 2-D space, ordinary plane in 3-D space).
+
+Decision hyperplane
+Can be de?ned by: intercept term b (we were calling this ? before) normal vector w (weight vector) which is perpendicular to the hyperplane All points x on the hyperplane satisfy: w Tx + b = 0
+
+Sch?tze: Support vector machines u
+
+19 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+Used in SVM literature
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+Used in SVM literature
+
+w Tx
+
+=0
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+Used in SVM literature
+
+w Tx
+
+=0
+Often used in perceptron literature, folds threshold into vector by adding a constant dimension (set to 1 or -1 for all vectors)
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+Used in SVM literature
+
+w Tx
+
+=0
+Often used in perceptron literature, folds threshold into vector by adding a constant dimension (set to 1 or -1 for all vectors)
+
+M i =1 wi di
+
+=?
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Notation: Di?erent conventions for linear separator
+
+w Tx + b = 0
+Used in SVM literature
+
+w Tx
+
+=0
+Often used in perceptron literature, folds threshold into vector by adding a constant dimension (set to 1 or -1 for all vectors)
+
+M i =1 wi di
+
+=?
+
+?Spelled out? version we used in the last chapter for linear separators
+
+Sch?tze: Support vector machines u
+
+20 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Draw the maximum margin separator. Which vectors are the support vectors? Coordinates of dots: (3,3), (-1,1). Coordinates of triangle: (3,0)
+Sch?tze: Support vector machines u 21 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Draw the maximum margin separator. Which vectors are the support vectors? Coordinates of dots: (3,3), (-1,1). Coordinates of triangle: (3,0)
+Sch?tze: Support vector machines u 21 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Draw the maximum margin separator. Which vectors are the support vectors? Coordinates of dots: (3,3), (-1,1). Coordinates of triangle: (3,0)
+Sch?tze: Support vector machines u 21 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Draw the maximum margin separator. Which vectors are the support vectors? Coordinates of dots: (3,3), (-1,1). Coordinates of triangle: (3,0)
+Sch?tze: Support vector machines u 21 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Draw the maximum margin separator. Which vectors are the support vectors? Coordinates of dots: (3,3), (-1,1). Coordinates of triangle: (3,0)
+Sch?tze: Support vector machines u 21 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Outline
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+22 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Formalization of SVMs
+Training set
+Consider a binary classi?cation problem: xi are the input vectors yi are the labels
+
+Sch?tze: Support vector machines u
+
+23 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Formalization of SVMs
+Training set
+Consider a binary classi?cation problem: xi are the input vectors yi are the labels For SVMs, the two classes are yi = +1 and yi = ?1.
+
+Sch?tze: Support vector machines u
+
+23 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Formalization of SVMs
+Training set
+Consider a binary classi?cation problem: xi are the input vectors yi are the labels For SVMs, the two classes are yi = +1 and yi = ?1.
+
+The linear classi?er is then:
+f (x) = sign(w T x + b)
+
+Sch?tze: Support vector machines u
+
+23 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Formalization of SVMs
+Training set
+Consider a binary classi?cation problem: xi are the input vectors yi are the labels For SVMs, the two classes are yi = +1 and yi = ?1.
+
+The linear classi?er is then:
+f (x) = sign(w T x + b) A value of ?1 indicates one class, and a value of +1 the other class.
+
+Sch?tze: Support vector machines u
+
+23 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b.
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Functional margin
+The functional margin of the vector xi w.r.t the hyperplane w , b is: yi (w T xi + b)
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Functional margin
+The functional margin of the vector xi w.r.t the hyperplane w , b is: yi (w T xi + b) The functional margin of a data set w.r.t a decision surface is twice the functional margin of any of the points in the data set with minimal functional margin
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Functional margin
+The functional margin of the vector xi w.r.t the hyperplane w , b is: yi (w T xi + b) The functional margin of a data set w.r.t a decision surface is twice the functional margin of any of the points in the data set with minimal functional margin Factor 2 comes from measuring across the whole width of the margin.
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Functional margin
+The functional margin of the vector xi w.r.t the hyperplane w , b is: yi (w T xi + b) The functional margin of a data set w.r.t a decision surface is twice the functional margin of any of the points in the data set with minimal functional margin Factor 2 comes from measuring across the whole width of the margin. Problem: We can increase functional margin by scaling w and b.
+
+Sch?tze: Support vector machines u
+
+24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Functional margin of a point
+SVM makes its decision based on the score w T x + b. Clearly, the larger |w T x + b| is, the more con?dence we can have that the decision is correct.
+
+Functional margin
+The functional margin of the vector xi w.r.t the hyperplane w , b is: yi (w T xi + b) The functional margin of a data set w.r.t a decision surface is twice the functional margin of any of the points in the data set with minimal functional margin Factor 2 comes from measuring across the whole width of the margin. Problem: We can increase functional margin by scaling w and b. ? We need to place some constraint on the size of w .
+Sch?tze: Support vector machines u 24 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes.
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes. To compute the geometric margin, we need to compute the distance of a vector x from the hyperplane:
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes. To compute the geometric margin, we need to compute the distance of a vector x from the hyperplane: r =y w Tx + b |w |
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes. To compute the geometric margin, we need to compute the distance of a vector x from the hyperplane: r =y w Tx + b |w |
+
+(why? we will see that this is so graphically in a few moments)
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes. To compute the geometric margin, we need to compute the distance of a vector x from the hyperplane: r =y w Tx + b |w |
+
+(why? we will see that this is so graphically in a few moments) Distance is of course invariant to scaling:
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Geometric margin
+Geometric margin of the classi?er: maximum width of the band that can be drawn separating the support vectors of the two classes. To compute the geometric margin, we need to compute the distance of a vector x from the hyperplane: r =y w Tx + b |w |
+
+(why? we will see that this is so graphically in a few moments) Distance is of course invariant to scaling: if we replace w by 5w and b by 5b, then the distance is the same because it is normalized by the length of w .
+
+Sch?tze: Support vector machines u
+
+25 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then:
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1 Since each example?s distance from the hyperplane is ri = yi (w T xi + b)/|w |, the margin is ? = 2/|w |.
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1 Since each example?s distance from the hyperplane is ri = yi (w T xi + b)/|w |, the margin is ? = 2/|w |. We want to maximize this margin.
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1 Since each example?s distance from the hyperplane is ri = yi (w T xi + b)/|w |, the margin is ? = 2/|w |. We want to maximize this margin. That is, we want to ?nd w and b such that:
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1 Since each example?s distance from the hyperplane is ri = yi (w T xi + b)/|w |, the margin is ? = 2/|w |. We want to maximize this margin. That is, we want to ?nd w and b such that: For all (xi , yi ) ? D, yi (w T xi + b) ? 1
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs
+Assume canonical ?functional margin? distance Assume that every data point has at least distance 1 from the hyperplane, then: yi (w T xi + b) ? 1 Since each example?s distance from the hyperplane is ri = yi (w T xi + b)/|w |, the margin is ? = 2/|w |. We want to maximize this margin. That is, we want to ?nd w and b such that: For all (xi , yi ) ? D, yi (w T xi + b) ? 1 ? = 2/|w | is maximized
+
+Sch?tze: Support vector machines u
+
+26 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+margin is maximized
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+weight vector w
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+wTx + b = 1 wTx + b = 0 weight vector w w T x + b = ?1
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+0.5x + 0.5y ? 2 = 1 0.5x + 0.5y ? 2 = 0 support vector x 0.5x + 0.5y ? 2 = ?1
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+projection of x onto w
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+distance of support vector from separator
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+support vectors in red maximum margin decision hyperplane
+
+Sch?tze: Support vector machines u
+
+27 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+w Tw ? + b = 0 b w Tw ? =? |w | |w | Distance of support vector from separator = (length of projection of x onto w ) minus (length of w ? ) w Tw ? w Tx ? |w | |w | = w Tx b + |w | |w | w Tx + b |w |
+28 / 49
+
+b = ?w T w ?
+
+=
+Sch?tze: Support vector machines u
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Distance of support vector from separator = (length of projection of x = (1 5)T onto w ) minus (length of w ? ) w Tx w Tw ? ? |w | |w | ? ? (0.5 ? 1 + 0.5 ? 5)/(1/ 2) ? (0.5 ? 2 + 0.5 ? 2)/(1/ 2) ? ? 3/(1/ 2) ? 2/(1/ 2) b w Tx + |w | |w | ? ? 3/(1/ 2) + (?2)/(1/ 2) 3?2 ? 1/ 2 ? 2
+Sch?tze: Support vector machines u 29 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2.
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2. This gives the ?nal standard formulation of an SVM as a minimization problem:
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2. This gives the ?nal standard formulation of an SVM as a minimization problem:
+
+Optimization problem solved by SVMs
+Find w and b such that:
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2. This gives the ?nal standard formulation of an SVM as a minimization problem:
+
+Optimization problem solved by SVMs
+Find w and b such that:
+1T 2w w
+
+is minimized (because |w | =
+
+?
+
+w T w ), and
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2. This gives the ?nal standard formulation of an SVM as a minimization problem:
+
+Optimization problem solved by SVMs
+Find w and b such that:
+1T 2w w
+
+for all {(xi , yi )}, yi (w T xi + b) ? 1
+
+is minimized (because |w | =
+
+?
+
+w T w ), and
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Optimization problem solved by SVMs (2)
+Maximizing 2/|w | is the same as minimizing |w |/2. This gives the ?nal standard formulation of an SVM as a minimization problem:
+
+Optimization problem solved by SVMs
+Find w and b such that:
+1T 2w w
+
+for all {(xi , yi )}, yi (w T xi + b) ? 1
+
+is minimized (because |w | =
+
+?
+
+w T w ), and
+
+We are now optimizing a quadratic function subject to linear constraints. Quadratic optimization problems are standard mathematical optimization problems, and many algorithms exist for solving them (e.g. Quadratic Programming libraries).
+
+Sch?tze: Support vector machines u
+
+30 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set.
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable).
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable). We use quadratic optimization to ?nd this plane.
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable). We use quadratic optimization to ?nd this plane. Given a new point x to classify, the classi?cation function f (x) computes the functional margin of the point (= normalized distance).
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable). We use quadratic optimization to ?nd this plane. Given a new point x to classify, the classi?cation function f (x) computes the functional margin of the point (= normalized distance). The sign of this function determines the class to assign to the point.
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable). We use quadratic optimization to ?nd this plane. Given a new point x to classify, the classi?cation function f (x) computes the functional margin of the point (= normalized distance). The sign of this function determines the class to assign to the point. If the point is within the margin of the classi?er, the classi?er can return ?don?t know? rather than one of the two classes.
+
+Sch?tze: Support vector machines u
+
+31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+We start with a training set. The data set de?nes the maximum-margin separating hyperplane (if it is separable). We use quadratic optimization to ?nd this plane. Given a new point x to classify, the classi?cation function f (x) computes the functional margin of the point (= normalized distance). The sign of this function determines the class to assign to the point. If the point is within the margin of the classi?er, the classi?er can return ?don?t know? rather than one of the two classes. The value of f (x) may also be transformed into a probability of classi?cation
+Sch?tze: Support vector machines u 31 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+3 2 1 0 0 1 2 3
+
+Which vectors are the support vectors? Draw the maximum margin separator. What values of w1 , w2 and b (for w1 x + w2 y + b = 0) describe this separator? Recall that we must have w1 x + w2 y + b ? {1, ?1} for the support vectors.
+Sch?tze: Support vector machines u 32 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working geometrically:
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+33 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working geometrically: The maximum margin weight vector will be parallel to the shortest line connecting points of the two classes, that is, the line between (1, 1) and (2, 3), giving a weight vector of (1, 2).
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+33 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working geometrically: The maximum margin weight vector will be parallel to the shortest line connecting points of the two classes, that is, the line between (1, 1) and (2, 3), giving a weight vector of (1, 2). The optimal decision surface is orthogonal to that line and intersects it at the halfway point. Therefore, it passes through (1.5, 2).
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+33 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working geometrically: The maximum margin weight vector will be parallel to the shortest line connecting points of the two classes, that is, the line between (1, 1) and (2, 3), giving a weight vector of (1, 2). The optimal decision surface is orthogonal to that line and intersects it at the halfway point. Therefore, it passes through (1.5, 2). The SVM decision boundary is: 4 11 2 b?b = (1?x+2?y )?(1?1.5+2?2) ? 0 = x+ y ? 5 5 5
+Sch?tze: Support vector machines u 33 / 49
+
+3 2 1 0 0 1 2 3
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working algebraically:
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+34 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working algebraically: With the constraint sign(yi (w T xi + b)) ? 1, we seek to minimize |w |.
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+34 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working algebraically: With the constraint sign(yi (w T xi + b)) ? 1, we seek to minimize |w |. We know that the solution is w = (a, 2a) for some a. So: a + 2a + b = ?1, 2a + 6a + b = 1
+3 2 1 0 0 1 2 3
+
+Sch?tze: Support vector machines u
+
+34 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working algebraically: With the constraint sign(yi (w T xi + b)) ? 1, we seek to minimize |w |. We know that the solution is w = (a, 2a) for some a. So: a + 2a + b = ?1, 2a + 6a + b = 1
+3 2 1 0 0 1 2 3
+
+Hence, a = 2/5 and b = ?11/5. So the optimal hyperplane is given by w = (2/5, 4/5) and b = ?11/5.
+
+Sch?tze: Support vector machines u
+
+34 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Walkthrough example
+Working algebraically: With the constraint sign(yi (w T xi + b)) ? 1, we seek to minimize |w |. We know that the solution is w = (a, 2a) for some a. So: a + 2a + b = ?1, 2a + 6a + b = 1
+3 2 1 0 0 1 2 3
+
+Hence, a = 2/5 and b = ?11/5. So the optimal hyperplane is given by w = (2/5, 4/5) and b = ?11/5. The margin ? is 2/|w | = ? 2/ 4/25 + 16/25 = 2/(2 5/5) = ? 5 = (1 ? 2)2 + (1 ? 3)2 .
+
+Sch?tze: Support vector machines u
+
+34 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable?
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+some points, outliers, noisy examples are inside or on the wrong side of the margin
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+some points, outliers, noisy examples are inside or on the wrong side of the margin
+
+Pay cost for each misclassi?ed example, depending on how far it is from meeting the margin requirement
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+some points, outliers, noisy examples are inside or on the wrong side of the margin
+
+Pay cost for each misclassi?ed example, depending on how far it is from meeting the margin requirement Slack variable ?i : A non-zero value for ?i allows xi to not meet the margin requirement at a cost proportional to the value of ?i .
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+some points, outliers, noisy examples are inside or on the wrong side of the margin
+
+Pay cost for each misclassi?ed example, depending on how far it is from meeting the margin requirement Slack variable ?i : A non-zero value for ?i allows xi to not meet the margin requirement at a cost proportional to the value of ?i . Optimization problem: trading o? how fat it can make the margin vs. how many points have to be moved around to allow this margin.
+
+Sch?tze: Support vector machines u
+
+35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Soft margin classi?cation
+What happens if data is not linearly separable? Standard approach: allow the fat decision margin to make a few mistakes
+some points, outliers, noisy examples are inside or on the wrong side of the margin
+
+Pay cost for each misclassi?ed example, depending on how far it is from meeting the margin requirement Slack variable ?i : A non-zero value for ?i allows xi to not meet the margin requirement at a cost proportional to the value of ?i . Optimization problem: trading o? how fat it can make the margin vs. how many points have to be moved around to allow this margin. The sum of the ?i gives an upper bound on the number of training errors. Soft-margin SVMs minimize training error traded o? against margin.
+Sch?tze: Support vector machines u 35 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Using SVM for one-of classi?cation
+
+Sch?tze: Support vector machines u
+
+36 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Using SVM for one-of classi?cation
+Recall how to use binary linear classi?ers (k classes) for one-of: train and run k classi?ers and then select the class with the highest con?dence
+
+Sch?tze: Support vector machines u
+
+36 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Using SVM for one-of classi?cation
+Recall how to use binary linear classi?ers (k classes) for one-of: train and run k classi?ers and then select the class with the highest con?dence Another strategy used with SVMs: build k(k ? 1)/2 one-versus-one classi?ers, and choose the class that is selected by the most classi?ers. While this involves building a very large number of classi?ers, the time for training classi?ers may actually decrease, since the training data set for each classi?er is much smaller.
+
+Sch?tze: Support vector machines u
+
+36 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Using SVM for one-of classi?cation
+Recall how to use binary linear classi?ers (k classes) for one-of: train and run k classi?ers and then select the class with the highest con?dence Another strategy used with SVMs: build k(k ? 1)/2 one-versus-one classi?ers, and choose the class that is selected by the most classi?ers. While this involves building a very large number of classi?ers, the time for training classi?ers may actually decrease, since the training data set for each classi?er is much smaller. Yet another possibility: structured prediction. Generalization of classi?cation where the classes are not just a set of independent, categorical labels, but may be arbitrary structured objects with relationships de?ned between them
+Sch?tze: Support vector machines u 36 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Outline
+
+1
+
+Recap SVM intro SVM details Classi?cation in the real world
+
+2
+
+3
+
+4
+
+Sch?tze: Support vector machines u
+
+37 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Text classi?cation
+
+Sch?tze: Support vector machines u
+
+38 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Text classi?cation
+
+Many commercial applications
+
+Sch?tze: Support vector machines u
+
+38 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Text classi?cation
+
+Many commercial applications There are many applications of text classi?cation for corporate Intranets, government departments, and Internet publishers.
+
+Sch?tze: Support vector machines u
+
+38 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Text classi?cation
+
+Many commercial applications There are many applications of text classi?cation for corporate Intranets, government departments, and Internet publishers. Often greater performance gains from exploiting domain-speci?c text features than from changing from one machine learning method to another.
+
+Sch?tze: Support vector machines u
+
+38 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Text classi?cation
+
+Many commercial applications There are many applications of text classi?cation for corporate Intranets, government departments, and Internet publishers. Often greater performance gains from exploiting domain-speci?c text features than from changing from one machine learning method to another. Understanding the data is one of the keys to successful categorization, yet this is an area in which many categorization tool vendors are weak.
+
+Sch?tze: Support vector machines u
+
+38 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Choosing what kind of classi?er to use
+
+Sch?tze: Support vector machines u
+
+39 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Choosing what kind of classi?er to use
+When building a text classi?er, ?rst question: how much training data is there currently available?
+
+Sch?tze: Support vector machines u
+
+39 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Choosing what kind of classi?er to use
+When building a text classi?er, ?rst question: how much training data is there currently available?
+
+Practical challenge: creating or obtaining enough training data
+Hundreds or thousands of examples from each class are required to produce a high performance classi?er and many real world contexts involve large sets of categories.
+
+Sch?tze: Support vector machines u
+
+39 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Choosing what kind of classi?er to use
+When building a text classi?er, ?rst question: how much training data is there currently available?
+
+Practical challenge: creating or obtaining enough training data
+Hundreds or thousands of examples from each class are required to produce a high performance classi?er and many real world contexts involve large sets of categories. None? Very little? Quite a lot? A huge amount, growing every day?
+
+Sch?tze: Support vector machines u
+
+39 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+
+Sch?tze: Support vector machines u
+
+40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+Use hand-written rules!
+
+Sch?tze: Support vector machines u
+
+40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+Use hand-written rules!
+
+Example
+IF (wheat OR grain) AND NOT (whole OR bread) THEN c = grain
+
+Sch?tze: Support vector machines u
+
+40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+Use hand-written rules!
+
+Example
+IF (wheat OR grain) AND NOT (whole OR bread) THEN c = grain In practice, rules get a lot bigger than this, and can be phrased using more sophisticated query languages than just Boolean expressions, including the use of numeric scores.
+
+Sch?tze: Support vector machines u
+
+40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+Use hand-written rules!
+
+Example
+IF (wheat OR grain) AND NOT (whole OR bread) THEN c = grain In practice, rules get a lot bigger than this, and can be phrased using more sophisticated query languages than just Boolean expressions, including the use of numeric scores. With careful crafting, the accuracy of such rules can become very high (high 90% precision, high 80% recall).
+
+Sch?tze: Support vector machines u
+
+40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have no labeled training data
+Use hand-written rules!
+
+Example
+IF (wheat OR grain) AND NOT (whole OR bread) THEN c = grain In practice, rules get a lot bigger than this, and can be phrased using more sophisticated query languages than just Boolean expressions, including the use of numeric scores. With careful crafting, the accuracy of such rules can become very high (high 90% precision, high 80% recall). Nevertheless the amount of work to create such well-tuned rules is very large. A reasonable estimate is 2 days per class, and extra time has to go into maintenance of rules, as the content of documents in classes drifts over time.
+Sch?tze: Support vector machines u 40 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+A Verity topic (a complex classi?cation rule)
+
+Sch?tze: Support vector machines u
+
+41 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Westlaw: Example queries
+Information need: Information on the legal theories involved in preventing the disclosure of trade secrets by employees formerly employed by a competing company Query: ?trade secret? /s disclos! /s prevent /s employe! Information need: Requirements for disabled people to be able to access a workplace Query: disab! /p access! /s work-site work-place (employment /3 place) Information need: Cases about a host?s responsibility for drunk guests Query: host! /p (responsib! liab!) /p (intoxicat! drunk!) /p guest
+
+Sch?tze: Support vector machines u
+
+42 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+
+Sch?tze: Support vector machines u
+
+43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+Work out how to get more labeled data as quickly as you can.
+
+Sch?tze: Support vector machines u
+
+43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+Work out how to get more labeled data as quickly as you can. Best way: insert yourself into a process where humans will be willing to label data for you as part of their natural tasks.
+
+Sch?tze: Support vector machines u
+
+43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+Work out how to get more labeled data as quickly as you can. Best way: insert yourself into a process where humans will be willing to label data for you as part of their natural tasks.
+
+Example
+Often humans will sort or route email for their own purposes, and these actions give information about classes.
+
+Sch?tze: Support vector machines u
+
+43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+Work out how to get more labeled data as quickly as you can. Best way: insert yourself into a process where humans will be willing to label data for you as part of their natural tasks.
+
+Example
+Often humans will sort or route email for their own purposes, and these actions give information about classes.
+
+Active Learning
+A system is built which decides which documents a human should label.
+
+Sch?tze: Support vector machines u
+
+43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have fairly little data and you are going to train a supervised classi?er
+Work out how to get more labeled data as quickly as you can. Best way: insert yourself into a process where humans will be willing to label data for you as part of their natural tasks.
+
+Example
+Often humans will sort or route email for their own purposes, and these actions give information about classes.
+
+Active Learning
+A system is built which decides which documents a human should label. Usually these are the ones on which a classi?er is uncertain of the correct classi?cation.
+Sch?tze: Support vector machines u 43 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Good amount of labeled data, but not huge
+Use everything that we have presented about text classi?cation.
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Good amount of labeled data, but not huge
+Use everything that we have presented about text classi?cation. Consider hybrid approach (overlay Boolean classi?er)
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Good amount of labeled data, but not huge
+Use everything that we have presented about text classi?cation. Consider hybrid approach (overlay Boolean classi?er)
+
+Huge amount of labeled data
+Choice of classi?er probably has little e?ect on your results.
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Good amount of labeled data, but not huge
+Use everything that we have presented about text classi?cation. Consider hybrid approach (overlay Boolean classi?er)
+
+Huge amount of labeled data
+Choice of classi?er probably has little e?ect on your results. Choose classi?er based on the scalability of training or runtime e?ciency.
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+If you have labeled data
+
+Good amount of labeled data, but not huge
+Use everything that we have presented about text classi?cation. Consider hybrid approach (overlay Boolean classi?er)
+
+Huge amount of labeled data
+Choice of classi?er probably has little e?ect on your results. Choose classi?er based on the scalability of training or runtime e?ciency. Rule of thumb: each doubling of the training data size produces a linear increase in classi?er performance, but with very large amounts of data, the improvement becomes sub-linear.
+
+Sch?tze: Support vector machines u
+
+44 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Large and di?cult category taxonomies
+
+Sch?tze: Support vector machines u
+
+45 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Large and di?cult category taxonomies
+
+If you have a small number of well-separated categories, then many classi?cation algorithms are likely to work well. But often: very large number of very similar categories.
+
+Sch?tze: Support vector machines u
+
+45 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Large and di?cult category taxonomies
+
+If you have a small number of well-separated categories, then many classi?cation algorithms are likely to work well. But often: very large number of very similar categories.
+
+Example
+Web directories (e.g. the Yahoo! Directory consists of over 200,000 categories or the Open Directory Project), library classi?cation schemes (Dewey Decimal or Library of Congress), the classi?cation schemes used in legal or medical applications.
+
+Sch?tze: Support vector machines u
+
+45 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Large and di?cult category taxonomies
+
+If you have a small number of well-separated categories, then many classi?cation algorithms are likely to work well. But often: very large number of very similar categories.
+
+Example
+Web directories (e.g. the Yahoo! Directory consists of over 200,000 categories or the Open Directory Project), library classi?cation schemes (Dewey Decimal or Library of Congress), the classi?cation schemes used in legal or medical applications. Accurate classi?cation over large sets of closely related classes is inherently di?cult. ? No general high-accuracy solution.
+
+Sch?tze: Support vector machines u
+
+45 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems?
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance.
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available?
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available? How simple/complex is the problem? (linear vs. nonlinear decision boundary)
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available? How simple/complex is the problem? (linear vs. nonlinear decision boundary) How noisy is the problem?
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available? How simple/complex is the problem? (linear vs. nonlinear decision boundary) How noisy is the problem? How stable is the problem over time?
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Recap
+
+Is there a learning method that is optimal for all text classi?cation problems? No, because there is a tradeo? between bias and variance. Factors to take into account:
+How much training data is available? How simple/complex is the problem? (linear vs. nonlinear decision boundary) How noisy is the problem? How stable is the problem over time?
+For an unstable problem, it?s better to use a simple and robust classi?er.
+
+Sch?tze: Support vector machines u
+
+46 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Exercise
+
+You are tasked with building a system that monitors the sentiment expressed by tweeters about a company. Functionality: the user enters a set of #hashtags, @usernames and keyword queries that are related to the company of interest. The system then computes the proportion of positive and negative sentiment in the messages containing these #hashtags, @usernames and queries. A key part of this system is a classi?er that takes a tweet and classi?es it as having positive or negative polarity. How would you build this classi?er? You can use a rule-based or a statistical or a hybrid approach.
+
+Sch?tze: Support vector machines u
+
+47 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Take-away today
+
+Support vector machines: State-of-the-art text classi?cation methods (linear and nonlinear) Introduction to SVMs Formalization Soft margin case for nonseparable problems Discussion: Which classi?er should I use for my problem?
+
+Sch?tze: Support vector machines u
+
+48 / 49
+
+Recap
+
+SVM intro
+
+SVM details
+
+Classi?cation in the real world
+
+Resources
+
+Chapter 14 of IIR (basic vector space classi?cation) Chapter 15 of IIR (SVMs) Discussion of ?how to select the right classi?er for my problem? in Russell and Norvig Resources at http://cislmu.org
+
+Sch?tze: Support vector machines u
+
+49 / 49
+
+

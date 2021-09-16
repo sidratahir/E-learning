@@ -1,0 +1,5763 @@
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Introduction to Information Retrieval
+http://informationretrieval.org IIR 16: Flat Clustering
+Hinrich Sch?tze u
+Center for Information and Language Processing, University of Munich
+
+2014-06-11
+
+Sch?tze: Flat clustering u
+
+1 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Overview
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+2 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+3 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Learning to rank for zone scoring
+Given query q and document d, weighted zone scoring assigns to the pair (q, d) a score in the interval [0,1] by computing a linear combination of document zone scores, where each zone contributes a value. Consider a set of documents, which have l zones Let g1 , ..., gl ? [0, 1], such that li =1 gi = 1 For 1 ? i ? l , let si be the Boolean score denoting a match (or non-match) between q and the i th zone
+si = 1 if a query term occurs in zone i, 0 otherwise
+
+Weighted zone scoring aka ranked Boolean retrieval
+Rank documents according to
+l i =1 gi si
+
+Learning to rank approach: learn the weights gi from training data
+Sch?tze: Flat clustering u 4 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Training set for learning to rank
+?j ?1 ?2 ?3 ?4 ?5 ?6 ?7 dj 37 37 238 238 1741 2094 3194 qj linux penguin system penguin kernel driver driver sT 1 0 0 0 1 0 1 sB 1 1 1 0 1 1 0 r (dj , qj ) Relevant Nonrelevant Relevant Nonrelevant Relevant Relevant Nonrelevant
+
+Sch?tze: Flat clustering u
+
+5 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Summary of learning to rank approach
+
+The problem of making a binary relevant/nonrelevant judgment is cast as a classi?cation or regression problem, based on a training set of query-document pairs and associated relevance judgments. In principle, any method learning a classi?er (including least squares regression) can be used to ?nd this line. Big advantage of learning to rank: we can avoid hand-tuning scoring functions and simply learn them from training data. Bottleneck of learning to rank: the cost of maintaining a representative set of training examples whose relevance assessments must be made by humans.
+
+Sch?tze: Flat clustering u
+
+6 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+LTR features used by Microsoft Research (1)
+
+Zones: body, anchor, title, url, whole document Features derived from standard IR models: query term number, query term ratio, length, idf, sum of term frequency, min of term frequency, max of term frequency, mean of term frequency, variance of term frequency, sum of length normalized term frequency, min of length normalized term frequency, max of length normalized term frequency, mean of length normalized term frequency, variance of length normalized term frequency, sum of tf-idf, min of tf-idf, max of tf-idf, mean of tf-idf, variance of tf-idf, boolean model, BM25
+
+Sch?tze: Flat clustering u
+
+7 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+LTR features used by Microsoft Research (2)
+
+Language model features: LMIR.ABS, LMIR.DIR, LMIR.JM Web-speci?c features: number of slashes in url, length of url, inlink number, outlink number, PageRank, SiteRank Spam features: QualityScore Usage-based features: query-url click count, url click count, url dwell time
+
+Sch?tze: Flat clustering u
+
+8 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Ranking SVMs
+Vector of feature di?erences: ?(di , dj , q) = ?(di , q) ? ?(dj , q) By hypothesis, one of di and dj has been judged more relevant. Notation: We write di ? dj for ?di precedes dj in the results ordering?. If di is judged more relevant than dj , then we will assign the vector ?(di , dj , q) the class yijq = +1; otherwise ?1. This gives us a training set of pairs of vectors and ?precedence indicators?. Each of the vectors is computed as the di?erence of two document-query vectors. We can then train an SVM on this training set with the goal of obtaining a classi?er that returns w T ?(di , dj , q) > 0 i?
+Sch?tze: Flat clustering u
+
+di ? dj
+9 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering?
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering? Applications of clustering in information retrieval
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering? Applications of clustering in information retrieval K -means algorithm
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering? Applications of clustering in information retrieval K -means algorithm Evaluation of clustering
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering? Applications of clustering in information retrieval K -means algorithm Evaluation of clustering How many clusters?
+
+Sch?tze: Flat clustering u
+
+10 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+11 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+(Document) clustering is the process of grouping a set of documents into clusters of similar documents.
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+(Document) clustering is the process of grouping a set of documents into clusters of similar documents. Documents within a cluster should be similar.
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+(Document) clustering is the process of grouping a set of documents into clusters of similar documents. Documents within a cluster should be similar. Documents from di?erent clusters should be dissimilar.
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+(Document) clustering is the process of grouping a set of documents into clusters of similar documents. Documents within a cluster should be similar. Documents from di?erent clusters should be dissimilar. Clustering is the most common form of unsupervised learning.
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering: De?nition
+
+(Document) clustering is the process of grouping a set of documents into clusters of similar documents. Documents within a cluster should be similar. Documents from di?erent clusters should be dissimilar. Clustering is the most common form of unsupervised learning. Unsupervised = there are no labeled or annotated data.
+
+Sch?tze: Flat clustering u
+
+12 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Data set with clear cluster structure
+
+0.0 0.0
+
+0.5
+
+1.0
+
+1.5
+
+2.0
+
+2.5
+
+0.5
+
+1.0
+
+1.5
+
+2.0
+
+Sch?tze: Flat clustering u
+
+13 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Classi?cation: supervised learning
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Classi?cation: supervised learning Clustering: unsupervised learning
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Classi?cation: supervised learning Clustering: unsupervised learning Classi?cation: Classes are human-de?ned and part of the input to the learning algorithm.
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Classi?cation: supervised learning Clustering: unsupervised learning Classi?cation: Classes are human-de?ned and part of the input to the learning algorithm. Clustering: Clusters are inferred from the data without human input.
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Classi?cation vs. Clustering
+
+Classi?cation: supervised learning Clustering: unsupervised learning Classi?cation: Classes are human-de?ned and part of the input to the learning algorithm. Clustering: Clusters are inferred from the data without human input.
+However, there are many ways of in?uencing the outcome of clustering: number of clusters, similarity measure, representation of documents, . . .
+
+Sch?tze: Flat clustering u
+
+14 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+15 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+The cluster hypothesis
+
+Sch?tze: Flat clustering u
+
+16 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+The cluster hypothesis
+
+Cluster hypothesis. Documents in the same cluster behave similarly with respect to relevance to information needs.
+
+Sch?tze: Flat clustering u
+
+16 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+The cluster hypothesis
+
+Cluster hypothesis. Documents in the same cluster behave similarly with respect to relevance to information needs. All applications of clustering in IR are based (directly or indirectly) on the cluster hypothesis.
+
+Sch?tze: Flat clustering u
+
+16 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+The cluster hypothesis
+
+Cluster hypothesis. Documents in the same cluster behave similarly with respect to relevance to information needs. All applications of clustering in IR are based (directly or indirectly) on the cluster hypothesis. Van Rijsbergen?s original wording (1979): ?closely associated documents tend to be relevant to the same requests?.
+
+Sch?tze: Flat clustering u
+
+16 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Applications of clustering in IR
+
+Sch?tze: Flat clustering u
+
+17 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Applications of clustering in IR
+application search result clustering what is clustered? search results (subsets of) collection collection bene?t more e?ective information presentation to user alternative user interface: ?search without typing? e?ective information presentation for exploratory browsing higher e?ciency: faster search
+17 / 86
+
+Scatter-Gather
+
+collection clustering
+
+cluster-based retrieval
+
+collection
+
+Sch?tze: Flat clustering u
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Search result clustering for better navigation
+
+Sch?tze: Flat clustering u
+
+18 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Search result clustering for better navigation
+
+Sch?tze: Flat clustering u
+
+18 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Scatter-Gather
+
+Sch?tze: Flat clustering u
+
+19 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Scatter-Gather
+
+Sch?tze: Flat clustering u
+
+19 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: Yahoo
+
+Sch?tze: Flat clustering u
+
+20 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: Yahoo
+
+Sch?tze: Flat clustering u
+
+20 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: MESH (upper level)
+
+Sch?tze: Flat clustering u
+
+21 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: MESH (upper level)
+
+Sch?tze: Flat clustering u
+
+21 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: MESH (lower level)
+
+Sch?tze: Flat clustering u
+
+22 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation: MESH (lower level)
+
+Sch?tze: Flat clustering u
+
+22 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering.
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering. But they are well known examples for using a global hierarchy for navigation.
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering. But they are well known examples for using a global hierarchy for navigation. Some examples for global navigation/exploration based on clustering:
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering. But they are well known examples for using a global hierarchy for navigation. Some examples for global navigation/exploration based on clustering:
+Cartia
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering. But they are well known examples for using a global hierarchy for navigation. Some examples for global navigation/exploration based on clustering:
+Cartia Themescapes
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Navigational hierarchies: Manual vs. automatic creation
+
+Note: Yahoo/MESH are not examples of clustering. But they are well known examples for using a global hierarchy for navigation. Some examples for global navigation/exploration based on clustering:
+Cartia Themescapes Google News
+
+Sch?tze: Flat clustering u
+
+23 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation combined with visualization (1)
+
+Sch?tze: Flat clustering u
+
+24 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation combined with visualization (1)
+
+Sch?tze: Flat clustering u
+
+24 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation combined with visualization (2)
+
+Sch?tze: Flat clustering u
+
+25 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global navigation combined with visualization (2)
+
+Sch?tze: Flat clustering u
+
+25 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global clustering for navigation: Google News
+
+Sch?tze: Flat clustering u
+
+26 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Global clustering for navigation: Google News
+
+http://news.google.com
+
+Sch?tze: Flat clustering u
+
+26 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+Cluster docs in collection a priori
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+Cluster docs in collection a priori When a query matches a doc d, also return other docs in the cluster containing d
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+Cluster docs in collection a priori When a query matches a doc d, also return other docs in the cluster containing d
+
+Hope: if we do this: the query ?car? will also return docs containing ?automobile?
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+Cluster docs in collection a priori When a query matches a doc d, also return other docs in the cluster containing d
+
+Hope: if we do this: the query ?car? will also return docs containing ?automobile?
+Because the clustering algorithm groups together docs containing ?car? with those containing ?automobile?.
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Clustering for improving recall
+
+To improve search recall:
+Cluster docs in collection a priori When a query matches a doc d, also return other docs in the cluster containing d
+
+Hope: if we do this: the query ?car? will also return docs containing ?automobile?
+Because the clustering algorithm groups together docs containing ?car? with those containing ?automobile?. Both types of documents contain words like ?parts?, ?dealer?, ?mercedes?, ?road trip?.
+
+Sch?tze: Flat clustering u
+
+27 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise: Data set with clear cluster structure
+Propose algorithm for ?nding the cluster structure in this example
+
+0.0 0.0
+
+0.5
+
+1.0
+
+1.5
+
+2.0
+
+2.5
+
+0.5
+
+1.0
+
+1.5
+
+2.0
+
+Sch?tze: Flat clustering u
+
+28 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given.
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given. Later: Semiautomatic methods for determining K
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given. Later: Semiautomatic methods for determining K
+
+Secondary goals in clustering
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given. Later: Semiautomatic methods for determining K
+
+Secondary goals in clustering
+Avoid very small and very large clusters
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given. Later: Semiautomatic methods for determining K
+
+Secondary goals in clustering
+Avoid very small and very large clusters De?ne clusters that are easy to explain to the user
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Desiderata for clustering
+
+General goal: put related docs in the same cluster, put unrelated docs in di?erent clusters.
+We?ll see di?erent ways of formalizing this.
+
+The number of clusters should be appropriate for the data set we are clustering.
+Initially, we will assume the number of clusters K is given. Later: Semiautomatic methods for determining K
+
+Secondary goals in clustering
+Avoid very small and very large clusters De?ne clusters that are easy to explain to the user Many others . . .
+
+Sch?tze: Flat clustering u
+
+29 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively Main algorithm: K -means
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively Main algorithm: K -means
+
+Hierarchical algorithms
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively Main algorithm: K -means
+
+Hierarchical algorithms
+Create a hierarchy
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively Main algorithm: K -means
+
+Hierarchical algorithms
+Create a hierarchy Bottom-up, agglomerative
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat vs. Hierarchical clustering
+
+Flat algorithms
+Usually start with a random (partial) partitioning of docs into groups Re?ne iteratively Main algorithm: K -means
+
+Hierarchical algorithms
+Create a hierarchy Bottom-up, agglomerative Top-down, divisive
+
+Sch?tze: Flat clustering u
+
+30 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel shoes
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel shoes
+
+You can only do that with a soft clustering approach.
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel shoes
+
+You can only do that with a soft clustering approach.
+
+This class: ?at, hard clustering
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel shoes
+
+You can only do that with a soft clustering approach.
+
+This class: ?at, hard clustering Next time: hierarchical, hard clustering
+
+Sch?tze: Flat clustering u
+
+31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Hard vs. Soft clustering
+Hard clustering: Each document belongs to exactly one cluster.
+More common and easier to do
+
+Soft clustering: A document can belong to more than one cluster.
+Makes more sense for applications like creating browsable hierarchies You may want to put sneakers in two clusters:
+sports apparel shoes
+
+You can only do that with a soft clustering approach.
+
+This class: ?at, hard clustering Next time: hierarchical, hard clustering Next week: latent semantic indexing, a form of soft clustering
+Sch?tze: Flat clustering u 31 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters.
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters. Given: a set of documents and the number K
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters. Given: a set of documents and the number K Find: a partition into K clusters that optimizes the chosen partitioning criterion
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters. Given: a set of documents and the number K Find: a partition into K clusters that optimizes the chosen partitioning criterion Global optimization: exhaustively enumerate partitions, pick optimal one
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters. Given: a set of documents and the number K Find: a partition into K clusters that optimizes the chosen partitioning criterion Global optimization: exhaustively enumerate partitions, pick optimal one
+Not tractable
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Flat algorithms
+
+Flat algorithms compute a partition of N documents into a set of K clusters. Given: a set of documents and the number K Find: a partition into K clusters that optimizes the chosen partitioning criterion Global optimization: exhaustively enumerate partitions, pick optimal one
+Not tractable
+
+E?ective heuristic method: K -means algorithm
+
+Sch?tze: Flat clustering u
+
+32 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+33 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means
+
+Sch?tze: Flat clustering u
+
+34 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means
+
+Perhaps the best known clustering algorithm
+
+Sch?tze: Flat clustering u
+
+34 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means
+
+Perhaps the best known clustering algorithm Simple, works well in many cases
+
+Sch?tze: Flat clustering u
+
+34 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means
+
+Perhaps the best known clustering algorithm Simple, works well in many cases Use as default / baseline for clustering documents
+
+Sch?tze: Flat clustering u
+
+34 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Document representations in clustering
+
+Sch?tze: Flat clustering u
+
+35 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Document representations in clustering
+
+Vector space model
+
+Sch?tze: Flat clustering u
+
+35 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Document representations in clustering
+
+Vector space model As in vector space classi?cation, we measure relatedness between vectors by Euclidean distance . . .
+
+Sch?tze: Flat clustering u
+
+35 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Document representations in clustering
+
+Vector space model As in vector space classi?cation, we measure relatedness between vectors by Euclidean distance . . . . . . which is almost equivalent to cosine similarity.
+
+Sch?tze: Flat clustering u
+
+35 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Document representations in clustering
+
+Vector space model As in vector space classi?cation, we measure relatedness between vectors by Euclidean distance . . . . . . which is almost equivalent to cosine similarity. Almost: centroids are not length-normalized.
+
+Sch?tze: Flat clustering u
+
+35 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid.
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid. Objective/partitioning criterion: minimize the average squared di?erence from the centroid
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid. Objective/partitioning criterion: minimize the average squared di?erence from the centroid Recall de?nition of centroid: ?(?) = 1 |?| x
+x??
+
+where we use ? to denote a cluster.
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid. Objective/partitioning criterion: minimize the average squared di?erence from the centroid Recall de?nition of centroid: ?(?) = 1 |?| x
+x??
+
+where we use ? to denote a cluster. We try to ?nd the minimum average squared di?erence by iterating two steps:
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid. Objective/partitioning criterion: minimize the average squared di?erence from the centroid Recall de?nition of centroid: ?(?) = 1 |?| x
+x??
+
+where we use ? to denote a cluster. We try to ?nd the minimum average squared di?erence by iterating two steps:
+reassignment: assign each vector to its closest centroid
+
+Sch?tze: Flat clustering u
+
+36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means: Basic idea
+Each cluster in K -means is de?ned by a centroid. Objective/partitioning criterion: minimize the average squared di?erence from the centroid Recall de?nition of centroid: ?(?) = 1 |?| x
+x??
+
+where we use ? to denote a cluster. We try to ?nd the minimum average squared di?erence by iterating two steps:
+reassignment: assign each vector to its closest centroid recomputation: recompute each centroid as the average of the vectors that were assigned to it in reassignment
+Sch?tze: Flat clustering u 36 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means pseudocode (?k is centroid of ?k )
+
+Sch?tze: Flat clustering u
+
+37 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means pseudocode (?k is centroid of ?k )
+K -means({x1 , . . . , xN }, K ) 1 (s1 , s2 , . . . , sK ) ? SelectRandomSeeds({x1 , . . . , xN }, K ) 2 for k ? 1 to K 3 do ?k ? sk 4 while stopping criterion has not been met 5 do for k ? 1 to K 6 do ?k ? {} 7 for n ? 1 to N 8 do j ? arg minj ? |?j ? ? xn | 9 ?j ? ?j ? {xn } (reassignment of vectors) 10 for k ? 1 to K 1 11 do ?k ? |?k | x??k x (recomputation of centroids) 12 return {?1 , . . . , ?K }
+
+Sch?tze: Flat clustering u
+
+37 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Set of points to be clustered
+
+Sch?tze: Flat clustering u
+
+38 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example
+
+Exercise: (i) Guess what the optimal clustering into two clusters is in this case; (ii) compute the centroids of the clusters
+Sch?tze: Flat clustering u 38 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Random selection of initial centroids
+
+? ?
+
+Sch?tze: Flat clustering u
+
+39 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest center
+
+? ?
+
+Sch?tze: Flat clustering u
+
+40 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 ? 1 1 ? 1
+
+2 1 1 1 1 1 1
+
+222 1 1 1 1 1 1
+
+Sch?tze: Flat clustering u
+
+41 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+? 2
+
+2 1 1
+? 1
+
+?
+1
+
+222 1 1 1 1 1 1
+
+1 1 1
+
+?1 1
+
+Sch?tze: Flat clustering u
+
+42 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+? ?
+
+Sch?tze: Flat clustering u
+
+43 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 2 1 1 1 1 1
+
+?
+2
+
+222 1 1 1 1 1 1
+
+?1 1
+
+Sch?tze: Flat clustering u
+
+44 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 2 1 1 1 1 1
+
+??
+2
+?1
+
+222 1 1 1 1 1 1
+
+1 ?
+
+Sch?tze: Flat clustering u
+
+45 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+? ?
+
+Sch?tze: Flat clustering u
+
+46 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 2 2 1 1 1 1
+
+?
+2 1 ?1
+
+222 1 1 1 1 1 1
+
+Sch?tze: Flat clustering u
+
+47 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 2 2 1
+
+??2
+? 1
+
+222
+
+1 1 1
+
+?
+
+1
+
+1 1 1 1 1
+
+1
+
+Sch?tze: Flat clustering u
+
+48 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+? ?
+
+Sch?tze: Flat clustering u
+
+49 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 2 2 2
+
+?2
+1 1
+
+222
+
+1
+
+?
+
+1
+
+1 1 1 1 1
+
+1
+
+1
+
+Sch?tze: Flat clustering u
+
+50 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 2 2 2
+
+?? 2
+1 1 1? 1
+
+222
+
+? 11
+
+1 1
+
+1
+
+1
+
+1
+
+Sch?tze: Flat clustering u
+
+51 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+? ?
+
+Sch?tze: Flat clustering u
+
+52 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 2 2 2
+
+?
+2 1
+
+211 2 1 1
+
+? 11
+
+1 1
+
+1
+
+1
+
+1
+
+Sch?tze: Flat clustering u
+
+53 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 ? 2
+?
+
+211 2 1 1?1 1 1
+
+2 2
+
+2 1 1
+
+?
+
+1 1
+
+1
+
+Sch?tze: Flat clustering u
+
+54 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+? ?
+
+Sch?tze: Flat clustering u
+
+55 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 ? 2 2 2 1 1 1 1 111
+
+2 2
+
+?1
+
+1 1
+
+1
+
+1 1
+
+Sch?tze: Flat clustering u
+
+56 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 2 2
+
+?
+
+? 2
+
+111 2 1? 1 1 1
+
+2 1 1 1
+
+?
+
+1 1
+
+1
+
+Sch?tze: Flat clustering u
+
+57 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assign points to closest centroid
+
+?
+
+?
+
+Sch?tze: Flat clustering u
+
+58 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Assignment
+
+2 2 2 2
+
+?2
+2 1 1
+
+111 1 1 1
+
+? 1
+
+1 1
+
+1
+
+1 1
+
+Sch?tze: Flat clustering u
+
+59 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Example: Recompute cluster centroids
+
+2 2 2 2
+
+?? 2
+2 1 1
+
+111 1 1 1 1? 1 1 1 1
+
+?
+
+1
+
+Sch?tze: Flat clustering u
+
+60 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Worked Ex.: Centroids and assignments after convergence
+
+2 2 2 2
+
+?2
+2 1 1
+
+111 1 1 1
+
+?1
+
+1 1
+
+1
+
+1 1
+
+Sch?tze: Flat clustering u
+
+61 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+see next slide
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+see next slide
+
+There is only a ?nite number of clusterings.
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+see next slide
+
+There is only a ?nite number of clusterings. Thus: We must reach a ?xed point.
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+see next slide
+
+There is only a ?nite number of clusterings. Thus: We must reach a ?xed point. Assumption: Ties are broken consistently.
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge: Proof
+
+RSS = sum of all squared distances between document vector and closest centroid RSS decreases during each reassignment step.
+because each vector is moved to a closer centroid
+
+RSS decreases during each recomputation step.
+see next slide
+
+There is only a ?nite number of clusterings. Thus: We must reach a ?xed point. Assumption: Ties are broken consistently. Finite set & monotonically decreasing ? convergence
+
+Sch?tze: Flat clustering u
+
+62 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Recomputation decreases average distance
+
+Sch?tze: Flat clustering u
+
+63 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Recomputation decreases average distance
+RSS = measure)
+K k=1
+
+RSSk ? the residual sum of squares (the ?goodness?
+
+M
+
+RSSk (v ) =
+x??k
+
+v ?x
+
+2
+
+=
+
+(vm ? xm )2
+x??k m=1
+
+?RSSk (v ) ?vm
+
+=
+x??k
+
+2(vm ? xm ) = 0
+
+vm =
+
+1 |?k |
+
+xm
+x??k
+
+The last line is the componentwise de?nition of the centroid!
+
+Sch?tze: Flat clustering u
+
+63 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Recomputation decreases average distance
+RSS = measure)
+K k=1
+
+RSSk ? the residual sum of squares (the ?goodness?
+
+M
+
+RSSk (v ) =
+x??k
+
+v ?x
+
+2
+
+=
+
+(vm ? xm )2
+x??k m=1
+
+?RSSk (v ) ?vm
+
+=
+x??k
+
+2(vm ? xm ) = 0
+
+vm =
+
+1 |?k |
+
+xm
+x??k
+
+The last line is the componentwise de?nition of the centroid! We minimize RSSk when the old centroid is replaced with the new centroid.
+Sch?tze: Flat clustering u 63 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Recomputation decreases average distance
+RSS = measure)
+K k=1
+
+RSSk ? the residual sum of squares (the ?goodness?
+
+M
+
+RSSk (v ) =
+x??k
+
+v ?x
+
+2
+
+=
+
+(vm ? xm )2
+x??k m=1
+
+?RSSk (v ) ?vm
+
+=
+x??k
+
+2(vm ? xm ) = 0
+
+vm =
+
+1 |?k |
+
+xm
+x??k
+
+The last line is the componentwise de?nition of the centroid! We minimize RSSk when the old centroid is replaced with the new centroid. RSS, the sum of the RSSk , must then also decrease during recomputation.
+Sch?tze: Flat clustering u 63 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge
+
+Sch?tze: Flat clustering u
+
+64 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge
+
+But we don?t know how long convergence will take!
+
+Sch?tze: Flat clustering u
+
+64 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge
+
+But we don?t know how long convergence will take! If we don?t care about a few docs switching back and forth, then convergence is usually fast (< 10-20 iterations).
+
+Sch?tze: Flat clustering u
+
+64 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+K -means is guaranteed to converge
+
+But we don?t know how long convergence will take! If we don?t care about a few docs switching back and forth, then convergence is usually fast (< 10-20 iterations). However, complete convergence can take many more iterations.
+
+Sch?tze: Flat clustering u
+
+64 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Optimality of K -means
+
+Convergence = optimality
+
+Sch?tze: Flat clustering u
+
+65 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Optimality of K -means
+
+Convergence = optimality Convergence does not mean that we converge to the optimal clustering!
+
+Sch?tze: Flat clustering u
+
+65 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Optimality of K -means
+
+Convergence = optimality Convergence does not mean that we converge to the optimal clustering! This is the great weakness of K -means.
+
+Sch?tze: Flat clustering u
+
+65 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Optimality of K -means
+
+Convergence = optimality Convergence does not mean that we converge to the optimal clustering! This is the great weakness of K -means. If we start with a bad set of seeds, the resulting clustering can be horrible.
+
+Sch?tze: Flat clustering u
+
+65 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise: Suboptimal clustering
+
+Sch?tze: Flat clustering u
+
+66 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise: Suboptimal clustering
+
+3 2 1 0 0
+
+d1
+? ?
+
+d2
+? ?
+
+d3
+? ?
+
+d4 1
+
+d5 2 3
+
+d6 4
+
+What is the optimal clustering for K = 2? Do we converge on this clustering for arbitrary seeds di , dj ?
+
+Sch?tze: Flat clustering u
+
+66 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized.
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering.
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better ways of computing initial centroids:
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better ways of computing initial centroids:
+Select seeds not randomly, but using some heuristic (e.g., ?lter out outliers or ?nd a set of seeds that has ?good coverage? of the document space)
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better ways of computing initial centroids:
+Select seeds not randomly, but using some heuristic (e.g., ?lter out outliers or ?nd a set of seeds that has ?good coverage? of the document space) Use hierarchical clustering to ?nd good seeds
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Initialization of K -means
+
+Random seed selection is just one of many ways K -means can be initialized. Random seed selection is not very robust: It?s easy to get a suboptimal clustering. Better ways of computing initial centroids:
+Select seeds not randomly, but using some heuristic (e.g., ?lter out outliers or ?nd a set of seeds that has ?good coverage? of the document space) Use hierarchical clustering to ?nd good seeds Select i (e.g., i = 10) di?erent random sets of seeds, do a K -means clustering for each, select the clustering with lowest RSS
+
+Sch?tze: Flat clustering u
+
+67 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M).
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances)
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances) Recomputation step: O(NM) (we need to add each of the document?s < M values to one of the centroids)
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances) Recomputation step: O(NM) (we need to add each of the document?s < M values to one of the centroids) Assume number of iterations bounded by I
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances) Recomputation step: O(NM) (we need to add each of the document?s < M values to one of the centroids) Assume number of iterations bounded by I Overall complexity: O(IKNM) ? linear in all important dimensions
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances) Recomputation step: O(NM) (we need to add each of the document?s < M values to one of the centroids) Assume number of iterations bounded by I Overall complexity: O(IKNM) ? linear in all important dimensions However: This is not a real worst-case analysis.
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Time complexity of K -means
+
+Computing one distance of two vectors is O(M). Reassignment step: O(KNM) (we need to compute KN document-centroid distances) Recomputation step: O(NM) (we need to add each of the document?s < M values to one of the centroids) Assume number of iterations bounded by I Overall complexity: O(IKNM) ? linear in all important dimensions However: This is not a real worst-case analysis. In pathological cases, complexity can be worse than linear.
+
+Sch?tze: Flat clustering u
+
+68 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+69 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Internal criteria
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Internal criteria
+Example of an internal criterion: RSS in K -means
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Internal criteria
+Example of an internal criterion: RSS in K -means
+
+But an internal criterion often does not evaluate the actual utility of a clustering in the application.
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Internal criteria
+Example of an internal criterion: RSS in K -means
+
+But an internal criterion often does not evaluate the actual utility of a clustering in the application. Alternative: External criteria
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+What is a good clustering?
+
+Internal criteria
+Example of an internal criterion: RSS in K -means
+
+But an internal criterion often does not evaluate the actual utility of a clustering in the application. Alternative: External criteria
+Evaluate with respect to a human-de?ned classi?cation
+
+Sch?tze: Flat clustering u
+
+70 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criteria for clustering quality
+
+Sch?tze: Flat clustering u
+
+71 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criteria for clustering quality
+
+Based on a gold standard data set, e.g., the Reuters collection we also used for the evaluation of classi?cation
+
+Sch?tze: Flat clustering u
+
+71 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criteria for clustering quality
+
+Based on a gold standard data set, e.g., the Reuters collection we also used for the evaluation of classi?cation Goal: Clustering should reproduce the classes in the gold standard
+
+Sch?tze: Flat clustering u
+
+71 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criteria for clustering quality
+
+Based on a gold standard data set, e.g., the Reuters collection we also used for the evaluation of classi?cation Goal: Clustering should reproduce the classes in the gold standard (But we only want to reproduce how documents are divided into groups, not the class labels.)
+
+Sch?tze: Flat clustering u
+
+71 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criteria for clustering quality
+
+Based on a gold standard data set, e.g., the Reuters collection we also used for the evaluation of classi?cation Goal: Clustering should reproduce the classes in the gold standard (But we only want to reproduce how documents are divided into groups, not the class labels.) First measure for how well we were able to reproduce the classes: purity
+
+Sch?tze: Flat clustering u
+
+71 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criterion: Purity
+
+Sch?tze: Flat clustering u
+
+72 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criterion: Purity
+
+purity(?, C ) =
+
+1 N
+
+max |?k ? cj |
+k j
+
+? = {?1 , ?2 , . . . , ?K } is the set of clusters and C = {c1 , c2 , . . . , cJ } is the set of classes.
+
+Sch?tze: Flat clustering u
+
+72 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criterion: Purity
+
+purity(?, C ) =
+
+1 N
+
+max |?k ? cj |
+k j
+
+? = {?1 , ?2 , . . . , ?K } is the set of clusters and C = {c1 , c2 , . . . , cJ } is the set of classes. For each cluster ?k : ?nd class cj with most members nkj in ?k
+
+Sch?tze: Flat clustering u
+
+72 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+External criterion: Purity
+
+purity(?, C ) =
+
+1 N
+
+max |?k ? cj |
+k j
+
+? = {?1 , ?2 , . . . , ?K } is the set of clusters and C = {c1 , c2 , . . . , cJ } is the set of classes. For each cluster ?k : ?nd class cj with most members nkj in ?k Sum all nkj and divide by total number of points
+
+Sch?tze: Flat clustering u
+
+72 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Example for computing purity
+
+Sch?tze: Flat clustering u
+
+73 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Example for computing purity
+cluster 1 cluster 2 cluster 3
+
+x o
+
+x x
+
+x o
+
+o o? o
+
+x x
+
+? ??
+
+xx
+
+To compute purity: 5 = maxj |?1 ? cj | (class x, cluster 1); 4 = maxj |?2 ? cj | (class o, cluster 2); and 3 = maxj |?3 ? cj | (class ?, cluster 3). Purity is (1/17) ? (5 + 4 + 3) ? 0.71.
+
+Sch?tze: Flat clustering u
+
+73 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index.
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN)
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN) TP+FN+FP+TN is the total number of pairs.
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN) TP+FN+FP+TN is the total number of pairs. TP+FN+FP+TN = N for N documents. 2
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN) TP+FN+FP+TN is the total number of pairs. TP+FN+FP+TN = N for N documents. 2 Example:
+17 2
+
+= 136 in o/?/x example
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN) TP+FN+FP+TN is the total number of pairs. TP+FN+FP+TN = N for N documents. 2 Example: 17 = 136 in o/?/x example 2 Each pair is either positive or negative (the clustering puts the two documents in the same or in di?erent clusters) . . .
+
+Sch?tze: Flat clustering u
+
+74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Another external criterion: Rand index
+Purity can be increased easily by increasing K ? a measure that does not have this problem: Rand index. TP+TN De?nition: RI = TP+FP+FN+TN Based on 2x2 contingency table of all pairs of documents: same cluster di?erent clusters same class true positives (TP) false negatives (FN) di?erent classes false positives (FP) true negatives (TN) TP+FN+FP+TN is the total number of pairs. TP+FN+FP+TN = N for N documents. 2 Example: 17 = 136 in o/?/x example 2 Each pair is either positive or negative (the clustering puts the two documents in the same or in di?erent clusters) . . . . . . and either ?true? (correct) or ?false? (incorrect): the clustering decision is correct or incorrect.
+Sch?tze: Flat clustering u 74 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Rand Index: Example
+
+Sch?tze: Flat clustering u
+
+75 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Rand Index: Example
+As an example, we compute RI for the o/?/x example. We ?rst compute TP + FP. The three clusters contain 6, 6, and 5 points, respectively, so the total number of ?positives? or pairs of documents that are in the same cluster is: TP + FP = 6 2 + 6 2 + 5 2 = 40
+
+Of these, the x pairs in cluster 1, the o pairs in cluster 2, the ? pairs in cluster 3, and the x pair in cluster 3 are true positives: TP = 5 2 + 4 2 + 3 2 + 2 2 = 20
+
+Thus, FP = 40 ? 20 = 20. FN and TN are computed similarly.
+Sch?tze: Flat clustering u 75 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Rand measure for the o/?/x example
+
+Sch?tze: Flat clustering u
+
+76 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Rand measure for the o/?/x example
+
+same class di?erent classes
+
+same cluster TP = 20 FP = 20
+
+di?erent clusters FN = 24 TN = 72
+
+RI is then (20 + 72)/(20 + 20 + 24 + 72) ? 0.68.
+
+Sch?tze: Flat clustering u
+
+76 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+How much information does the clustering contain about the classi?cation?
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+How much information does the clustering contain about the classi?cation? Singleton clusters (number of clusters = number of docs) have maximum MI
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+How much information does the clustering contain about the classi?cation? Singleton clusters (number of clusters = number of docs) have maximum MI Therefore: normalize by entropy of clusters and classes
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+How much information does the clustering contain about the classi?cation? Singleton clusters (number of clusters = number of docs) have maximum MI Therefore: normalize by entropy of clusters and classes
+
+F measure
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Two other external evaluation measures
+
+Two other measures Normalized mutual information (NMI)
+How much information does the clustering contain about the classi?cation? Singleton clusters (number of clusters = number of docs) have maximum MI Therefore: normalize by entropy of clusters and classes
+
+F measure
+Like Rand, but ?precision? and ?recall? can be weighted
+
+Sch?tze: Flat clustering u
+
+77 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Evaluation results for the o/?/x example
+
+Sch?tze: Flat clustering u
+
+78 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Evaluation results for the o/?/x example
+
+lower bound maximum value for example
+
+purity 0.0 1.0 0.71
+
+NMI 0.0 1.0 0.36
+
+RI 0.0 1.0 0.68
+
+F5 0.0 1.0 0.46
+
+All four measures range from 0 (really bad clustering) to 1 (perfect clustering).
+
+Sch?tze: Flat clustering u
+
+78 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Outline
+
+1
+
+Recap Clustering: Introduction Clustering in IR K -means Evaluation How many clusters?
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Sch?tze: Flat clustering u
+
+79 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+What if there is no external constraint? Is there a ?right? number of clusters?
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+What if there is no external constraint? Is there a ?right? number of clusters? One way to go: de?ne an optimization criterion
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+What if there is no external constraint? Is there a ?right? number of clusters? One way to go: de?ne an optimization criterion
+Given docs, ?nd K for which the optimum is reached.
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+What if there is no external constraint? Is there a ?right? number of clusters? One way to go: de?ne an optimization criterion
+Given docs, ?nd K for which the optimum is reached. What optimization criterion can we use?
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+How many clusters?
+
+Number of clusters K is given in many applications.
+E.g., there may be an external constraint on K . Example: In the case of Scatter-Gather, it was hard to show more than 10?20 clusters on a monitor in the 90s.
+
+What if there is no external constraint? Is there a ?right? number of clusters? One way to go: de?ne an optimization criterion
+Given docs, ?nd K for which the optimum is reached. What optimization criterion can we use? We can?t use RSS or average squared distance from centroid as criterion: always chooses K = N clusters.
+
+Sch?tze: Flat clustering u
+
+80 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise
+
+Sch?tze: Flat clustering u
+
+81 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise
+
+Your job is to develop the clustering algorithms for a competitor to news.google.com
+
+Sch?tze: Flat clustering u
+
+81 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise
+
+Your job is to develop the clustering algorithms for a competitor to news.google.com You want to use K -means clustering.
+
+Sch?tze: Flat clustering u
+
+81 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Exercise
+
+Your job is to develop the clustering algorithms for a competitor to news.google.com You want to use K -means clustering. How would you determine K ?
+
+Sch?tze: Flat clustering u
+
+81 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Start with 1 cluster (K = 1)
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Start with 1 cluster (K = 1) Keep adding clusters (= keep increasing K )
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Start with 1 cluster (K = 1) Keep adding clusters (= keep increasing K ) Add a penalty for each new cluster
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Start with 1 cluster (K = 1) Keep adding clusters (= keep increasing K ) Add a penalty for each new cluster Then trade o? cluster penalties against average squared distance from centroid
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Basic idea
+
+Start with 1 cluster (K = 1) Keep adding clusters (= keep increasing K ) Add a penalty for each new cluster Then trade o? cluster penalties against average squared distance from centroid Choose the value of K with the best tradeo?
+
+Sch?tze: Flat clustering u
+
+82 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance)
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance) Then: penalize each cluster with a cost ?
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance) Then: penalize each cluster with a cost ? Thus for a clustering with K clusters, total cluster penalty is K?
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance) Then: penalize each cluster with a cost ? Thus for a clustering with K clusters, total cluster penalty is K? De?ne the total cost of a clustering as distortion plus total cluster penalty: RSS(K) + K ?
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance) Then: penalize each cluster with a cost ? Thus for a clustering with K clusters, total cluster penalty is K? De?ne the total cost of a clustering as distortion plus total cluster penalty: RSS(K) + K ? Select K that minimizes (RSS(K) + K ?)
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Simple objective function for K : Formalization
+Given a clustering, de?ne the cost for a document as (squared) distance to centroid De?ne total distortion RSS(K) as sum of all individual document costs (corresponds to average distance) Then: penalize each cluster with a cost ? Thus for a clustering with K clusters, total cluster penalty is K? De?ne the total cost of a clustering as distortion plus total cluster penalty: RSS(K) + K ? Select K that minimizes (RSS(K) + K ?) Still need to determine good value for ? . . .
+
+Sch?tze: Flat clustering u
+
+83 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Finding the ?knee? in the curve
+
+Sch?tze: Flat clustering u
+
+84 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Finding the ?knee? in the curve
+
+residual sum of squares
+
+1750 2
+
+1800
+
+1850
+
+1900
+
+1950
+
+4
+
+6 number of clusters
+
+8
+
+10
+
+Pick the number of clusters where curve ??attens?. Here: 4 or 9.
+
+Sch?tze: Flat clustering u
+
+84 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Take-away today
+
+What is clustering? Applications of clustering in information retrieval K -means algorithm Evaluation of clustering How many clusters?
+
+Sch?tze: Flat clustering u
+
+85 / 86
+
+Recap
+
+Clustering: Introduction
+
+Clustering in IR
+
+K -means
+
+Evaluation
+
+How many clusters?
+
+Resources
+
+Chapter 16 of IIR Resources at http://cislmu.org
+Keith van Rijsbergen on the cluster hypothesis (he was one of the originators) Bing/Carrot2/Clusty: search result clustering systems Stirling number: the number of distinct k-clusterings of n items
+
+Sch?tze: Flat clustering u
+
+86 / 86
+
+

@@ -1,0 +1,216 @@
+Context File Organizations and Indexing
+Query Optimization and Execution Relational Operators Files and Access Methods Buffer Management
+
+R&G Chapter 8
+"If you don't find it in the index, look very carefully through the entire catalogue." -- Sears, Roebuck, and Co., Consumer's Guide, 1897
+
+Disk Space Management
+
+DB
+
+Alternative File Organizations
+Many alternatives exist, each good for some situations, and not so good in others:
+? Heap files: Suitable when typical access is a file scan retrieving all records. ? Sorted Files: Best for retrieval in search key order, or only a `range? of records is needed. ? Clustered Files (with Indexes): Coming soon?
+
+Cost Model for Analysis
+We ignore CPU costs, for simplicity:
+? ? ? ? B: The number of data blocks R: Number of records per block D: (Average) time to read or write disk block Measuring number of block I/O?s ignores gains of pre-fetching and sequential access; thus, even I/O cost is only loosely approximated. ? Average-case analysis; based on several simplistic assumptions. ? Good enough to show the overall trends!
+
+Some Assumptions in the Analysis
+? Single record insert and delete. ? Equality selection - exactly one match (what if more or less???). ? Heap Files:
+? Insert always appends to end of file.
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Sorted File
+
+Clustered File
+
+? Sorted Files:
+? Files compacted after deletions. ? Selections on search key.
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD 0.5 BD
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Sorted File BD
+
+Clustered File
+
+Sorted File BD (log2 B) * D
+
+Clustered File
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD 0.5 BD BD
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD 0.5 BD BD 2D
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Sorted File BD (log2 B) * D [(log2 B) + #match pg]*D
+
+Clustered File
+
+Sorted File BD (log2 B) * D [(log2 B) + #match pg]*D ((log2B)+B)D (because R,W 0.5)
+
+Clustered File
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD 0.5 BD BD 2D 0.5BD + D
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Indexes
+? Sometimes, we want to retrieve records by specifying the values in one or more fields, e.g., ? Find all students in the ?CS? department ? Find all students with a gpa > 3 ? An index on a file is a disk-based data structure that speeds up selections on the search key fields for the index. ? Any subset of the fields of a relation can be the search key for an index on the relation. ? Search key is not the same as key (e.g. doesn?t have to be unique ID). ? Can have multiple (different) indexes per file. ? E.g. sort by age, with an index on salary and name.
+
+Sorted File BD (log2 B) * D [(log2 B) + #match pg]*D ((log2B)+B)D ((log2B)+B)D (because R,W 0.5)
+
+Clustered File
+
+Index Breakdown
+? Index Data Structure
+? Tree-based, hash-based, other ? What can the index speed up, and how much?
+
+Data structures
+? What kinds of selections do they support?
+? Selections of form field <op> constant ? Equality selections (op is =) ? Range selections (op is one of <, >, <=, >=, BETWEEN)
+
+? Associating index entries with records
+? primary vs. secondary indexes, handling duplicates ? what kind of info is the index actually storing?
+
+? Hash-based structures (how to grow/shrink)
+? Key problem on disk is handling growth ? Extendible/Linear Hashing (Chap 11)
+
+? Clustered vs. Unclustered Indexes ? Single Part vs. Multi-Part Keys
+? Multi-part key = ?Composite Indexes?
+
+? Tree based structures
+? Why not binary tree? Estimate log2(1M) * D ? B-Tree, B+-Tree (Chap 10)
+
+Wide World of Index Structures
+? 2-dimensional ranges (?east of Berkeley and west of Truckee and North of Fresno and South of Eureka?)
+? Or distances (?within 2 miles of Soda Hall?) ? Or n-dimensional ? One common n-dimensional index: R-tree
+? Supported in Oracle and Informix
+
+Primary vs. Secondary Index
+? Primary index search key must contain a ?real? key, usually primary key
+? e.g., social security #, ISBN, etc. ? No duplicate support ? Store record in the index?
+
+? See http://gist.cs.berkeley.edu for research on this topic
+
+? Nearest neighbor (?closest BMW dealer?) ? Ranking queries (?10 best Berkeley Thai restaurants on price and atmosphere?)
+? these are hard to support!
+
+? Secondary index
+? e.g., ?eye color?, ?year of birth?, etc. ? Duplicate support required ? Use RID or primary key to refer to record?
+
+? Regular expression matches
+? Suffix Trees
+
+? XML path matches
+? DataGuide, 1-Index
+
+Alternatives for Data Entry k* in Index ? Three alternatives: ? Actual data record (primary index only) ? <k, rid of matching data record> ? <k, list of rids of matching data records> ? Choice is orthogonal to the indexing technique.
+
+Alternatives for Data Entries (Contd.)
+? Alternative 1:
+
+Actual data record
+
+? Use index structure as the file structure ? Saves pointer lookups for primary index searches ? Adds a primary index lookup for secondary index access!
+Index nodes have all the issues of record management
+
+Alternatives for Data Entries (Contd.)
+Alternative 2
+
+Index Classification
+
+<k, rid of matching data record>
+and Alternative 3
+
+<k, list of rids of matching data records>
+? If heap file is used (no alt 1 indexes), then physical rid can be used instead of primary key to refer to records ? Alternative 3 more compact than Alternative 2, but leads to variable sized data entries even if search keys are of fixed length. ? Even worse, for large rid lists the data entry would have to span multiple blocks! (how many?) ? Typical solution: add primary key or rid to end of secondary keys, and use Alternative 2!
+
+? Clustered vs. unclustered: If order of data records is the same as, or `close to?, order of index data entries, then called clustered index.
+? A file can be clustered on at most one search key. ? Cost of range scans through index varies greatly based on whether index is clustered or not! ? ?Alternative 1-light?
+? Alternative 1 implies clustered, but not vice-versa. ? Use Physical RID in secondary index (why is this good?)
+
+Clustered vs. Unclustered Index
+? Suppose that Alternative (2) is used for data entries, and that the data records are stored in a Heap file.
+? To build clustered index, first sort the Heap file (with some free space on each block for future inserts). ? Overflow blocks may be needed for inserts. (Thus, order of data recs is `close to?, but not identical to, the sort order.)
+
+Unclustered vs. Clustered Indexes
+? What are the tradeoffs???? ? Clustered Pros
+? Efficient for range searches ? May be able to do some types of compression ? Possible locality benefits (related data?) ? ???
+
+CLUSTERED
+
+Index entries direct search for data entries
+
+UNCLUSTERED
+
+? Clustered Cons
+Data entries Data entries (Index File) (Data file)
+
+Data Records
+
+Data Records
+
+? Expensive to maintain (on the fly or sloppy with reorganization) ? Pages tend to be only 2/3 full!
+
+Cost of Operations
+Heap File Scan all records Equality Search Range Search Insert Delete BD 0.5 BD BD 2D 0.5BD + D
+
+B: The number of data pages R: Number of records per page D: (Average) time to read or write disk page
+
+Composite Search Keys
+? Search on a combination of fields.
+? Equality query: Every field value is equal to a constant value. E.g. wrt <age,sal> index:
+? age=20 and sal =75 Examples of composite key indexes using lexicographic order.
+11,80 12,10 12,20 13,75 <age, sal> 10,12 20,12 75,13 80,11 <sal, age> name age sal bob 12 cal 11 joe 12 sue 13 10 80 20 75 10 20 75 80 <sal> 11 12 12 13 <age>
+
+Sorted File BD (log2 B) * D [(log2 B) + #match pg]*D ((log2B)+B)D ((log2B)+B)D (because R,W 0.5)
+
+Clustered File 1.5 BD (logF 1.5B) * D [(logF 1.5B) + #match pg]*D ((logF 1.5B)+1) * D ((logF 1.5B)+1) * D
+
+? Range query: Some field value is not a constant. E.g.:
+? age > 20; or age=20 and sal > 10
+
+? Data entries in index sorted by search key to support range queries.
+? Lexicographic order ? Like the dictionary, but on fields, not letters!
+
+Data records sorted by name
+
+Data entries in index sorted by <sal,age>
+
+Data entries sorted by <sal>
+
+Summary
+? File Layer manages access to records in pages.
+? Record and page formats depend on fixed vs. variablelength. ? Free space management an important issue. ? Slotted page format supports variable length records and allows records to move on page.
+
+Summary (Contd.)
+? Data entries in index can be actual data records, <key, rid> pairs, or <key, rid-list> pairs.
+? Choice orthogonal to indexing structure (i.e., tree, hash, etc.).
+
+? Many alternative file organizations exist, each appropriate in some situation. ? If selection queries are frequent, sorting the file or building an index is important.
+? Hash-based indexes only good for equality search. ? Sorted files and tree-based indexes best for range search; also good for equality search. (Files rarely kept sorted in practice; B+ tree index is better.)
+
+? Usually have several indexes on a given file of data records, each with a different search key. ? Indexes can be classified as clustered vs. unclustered ? Differences have important consequences for utility/performance. ? Catalog relations store information about relations, indexes and views.
+
+? Index is a collection of data entries plus a way to quickly find entries with given key values.
+
+

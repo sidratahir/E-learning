@@ -1,0 +1,170 @@
+Introduction	to Information	Retrieval
+CS276 Information	Retrieval	and	Web	Search Chris	Manning	and	Pandu	Nayak Personalization
+Introduction	to	Information	Retrieval Ambiguity § Unlikely	that	a	short	query	can	unambiguously	describe	a	user’s	information	need
+§ For	example,	the	query	[chi]	can	mean § Calamos	Convertible	Opportunities	&	Income	Fund	quote § The	city	of	Chicago § Balancing	one’s	natural	energy	(or	ch’i) § Computer-human	interactions	
+2
+Introduction	to	Information	Retrieval Personalization § Ambiguity	means	that	a	single	ranking	is	unlikely	to	be	optimal	for	all	users § Personalized	ranking	is	the	only	way	to	bridge	the	gap § Personalization	can	use § Long	term	behavior	to	identify	user	interests,	e.g.,	a	long	term	interest	in	user	interface	research § Short	term	session	to	identify	current	task, e.g.,	checking	on	a	series	of	stock	tickers § User	location,	e.g.,	MTA	in	New	York	vs	Baltimore § Social	network § … 3
+Introduction	to	Information	Retrieval Potential	for	Personalization [Teevan,	Dumais,	Horvitz	2010] §How	much	can	personalization	improve	ranking?		How	can	we	measure	this?
+§Ask	raters	to	explicitly	rate	a	set	of	queries § But	rather	than	asking	them	to	guess	what	a	user’s	information	need	might	be	… § ...	ask	which	results	they	would	personally	consider	relevant § Use	self-generated	and	pre-generated	queries
+4
+Introduction	to	Information	Retrieval Computing	potential	for	personalization § For	each	query	q § Compute	average	rating	for	each	result § Let	Rq be	the	optimal	ranking	according	to	the	average	rating § Compute	the	NDCG	value	of	ranking	Rq for	the	ratings	of	each	rater	i § Let	Avgq be	the	average	of	the	NDCG	values	for	each	rater § Let	Avg	be	the	average	Avgq over	all	queries § Potential	for	personalization	is	(1	–Avg)
+5
+Introduction	to	Information	Retrieval Example:	NDCG	values	for	a	query
+Result Rater	A Rater	B Average	rating D1 1 0 0.5 D2 1 1 1 D3 0 1 0.5 D4 0 0 0 D5 0 0 0 D6 1 0 0.5 D7 1 2 1.5 D8 0 0 0 D9 0 0 0 D10 0 0 0 NDCG 0.88 0.65 6Average NDCG for raters: 0.77
+Introduction	to	Information	Retrieval Example:	NDCG	values	for	optimal	ranking	for	average	ratings
+Result Rater	A Rater	B Average	rating D7 1 2 1.5 D2 1 1 1 D1 1 0 0.5 D3 0 1 0.5 D6 1 0 0.5 D4 0 0 0 D5 0 0 0 D8 0 0 0 D9 0 0 0 D10 0 0 0 NDCG 0.98 0.96 7Average NDCG for raters: 0.97
+Introduction	to	Information	Retrieval Example:	Potential	for	personalization
+Result Rater	A Rater	B Average	rating D7 1 2 1.5 D2 1 1 1 D1 1 0 0.5 D3 0 1 0.5 D6 1 0 0.5 D4 0 0 0 D5 0 0 0 D8 0 0 0 D9 0 0 0 D10 0 0 0 NDCG 0.98 0.96 8Potential for personalization: 0.03
+Introduction	to	Information	Retrieval Potential	for	personalization	graph
+9
+Number of raters
+NDCG
+Potential for personalization
+Introduction	to	Information	Retrieval
+PERSONALIZING	SEARCH
+10
+Introduction	to	Information	Retrieval Personalizing	search [Pitkow	et	al.	2002] §Two	general	ways	of	personalizing	search § Query	expansion § Modify	or	augment	user	query § E.g.,	query	term	“IR”can	be	augmented	with	either	“information	retrieval”or	“Ingersoll-Rand”depending	on	user	interest § Ensures	that	there	are	enough	personalized	results
+§ Reranking § Issue	the	same	query	and	fetch	the	same	results	… § …	but	rerank	the	results	based	on	a	user	profile § Allows	both	personalized	and	globally	relevant	results
+11
+Introduction	to	Information	Retrieval User	interests § Explicitly	provided	by	the	user § Sometimes	useful,	particularly	for	new	users § …	but	generally	doesn’t	work	well
+§ Inferred	from	user	behavior	and	content § Previously	issued	search	queries § Previously	visited	Web	pages § Personal	documents § Emails
+§ Ensuring	privacy	and	user	control	is	very	important 12
+Introduction	to	Information	Retrieval Relevance	feedback	perspective [Teevan,	Dumais,	Horvitz	2005]
+13
+Query
+Search EnginePersonalized	reranking Results
+User model (source of relevant documents)
+Personalized Results
+Introduction	to	Information	Retrieval Binary	Independence	Model
+•Estimating	RSV	coefficients	in	theory •For	each	term	ilook	at	this	table	of	document	counts: Documents  Relevant Non-Relevant Total 
+xi=1 si ni-si ni xi=0 S-si N-ni-S+si N-ni Total S N-S N   pi ˜ si S r i ˜ (ni -si) (N-S) ci ˜K(N,ni,S,si)=log si (S-si) (ni -si) (N-ni -S+si) •Estimates: For now, assume no zero terms. See later lecture.
+)1( )1(log ii ii i p r rpc =
+Introduction	to	Information	Retrieval Personalization	as	relevance	feedback
+15
+N
+ni S si User content
+Documents containing term i Relevant documents
+N
+ni
+S
+si
+'N =N+S 'n i =ni +si
+All documents
+Introduction	to	Information	Retrieval Reranking § BM25	scoring
+§ Use	updated	weight	ci in	BM25 ??"=log(??"+0.5) (??-??"+0.5)(??-??"+0.5) (??"+0.5) ˜log(??"+0.5) (??-??"+0.5)+??????" where	we	have	used
+16
+ci? ×tfi
+'N =N+S 'n i =ni +si
+Introduction	to	Information	Retrieval Corpus	representation § Estimating	Nand	ni
+§ Many	possibilities § N:	All	documents,	query	relevant	documents,	result	set § ni:	Full	text,	only	titles	and	snippets
+§ Practical	strategy § Approximate	corpus	statistics	from	result	set § …	and	just	the	title	and	snippets § Empirically	seems	to	work	the	best!
+17
+Introduction	to	Information	Retrieval User	representation § Estimating	Sand	si
+§ Estimated	from	a	local	search	index	containing § Web	pages	the	user	has	viewed § Email	messages	that	were	viewed	or	sent § Calendar	items § Documents	stored	on	the	client	machine
+§ Best	performance	when § Sis	the	number	of	local	documents	matching	the	query § si is	the	number	that	also	contains	term	i 18
+Introduction	to	Information	Retrieval Document	and	query	representation § Document	represented	by	the	title	and	snippets
+§ Query	is	expanded	to	contain	words	near	query	terms	(in	titles	and	snippets) § For	the	query	[cancer]	add	underlined	terms
+The	AmericanCancerSocietyis	dedicated	to	eliminatingcanceras	a	majorhealth	problem	by	preventingcancer,	savinglives,	and	diminishing	suffering	through	…
+§ This	combination	of	corpus,	user,	document,	and	query	representations	seem	to	work	well 19
+Introduction	to	Information	Retrieval
+LOCATION
+20
+Introduction	to	Information	Retrieval User	location § User	location	is	one	of	the	most	important	features	for	personalization § Country § Query	[football]	in	the	US	vs	the	UK § State/Metro/City § Queries	like	[zoo],	[craigslist],	[giants] § Fine-grained	location § Queries	like	[pizza],	[restaurants],	[coffee	shops]
+21
+Introduction	to	Information	Retrieval Challenges § Not	all	queries	are	location	sensitive § [facebook]	is	not	asking	for	the	closest	Facebook	office § [seaworld]	is	not	necessarily	asking	for	the	closest	SeaWorld
+§ Different	parts	of	a	site	may	be	more	or	less	location	sensitive § NYTimes	home	page	vs	NYTimes	Local	section
+§ Addresses	on	a	page	don’t	always	tell	us	how	location	sensitive	the	page	is § Stanford	home	page	has	address,	but	not	location	sensitive 22
+Introduction	to	Information	Retrieval Key	idea [Bennett	et	al.	2011] § Usage	statistics,	rather	than	locations	mentioned	in	a	document,	best	represent	where	it	is	relevant § I.e.,	if	users	in	a	location	tend	to	click	on	that	document,	then	it	is	relevant	in	that	location
+§ User	location	data	is	acquired	from	anonymizedlogs	(with	user	consent,	e.g.,	from	a	widely	distributed	browser	extension) § User	IP	addresses	are	resolved	into	geographic	location	information 23
+Introduction	to	Information	Retrieval Location	interest	model § Use	the	logs	data	to	estimate	the	probability	of	the	location	of	the	user	given	they	viewed	this	URL
+24
+P(location=x|URL)
+Introduction	to	Information	Retrieval Location	interest	model § Use	the	logs	data	to	estimate	the	probability	of	the	location	of	the	user	given	they	viewed	this	URL
+25
+P(location=x|URL)
+Introduction	to	Information	Retrieval Learning	the	location	interest	model § For	compactness,	represent	location	interest	model	as	a	mixture	of	5-25	2-d	Gaussians	(xis	[lat,	long])
+§ Learn	Gaussian	mixture	model	using	EM § Expectation	step:	Estimate	probability	that	each	point	belongs	to	each	Gaussian § Maximization	step:	Estimate	most	likely	mean,	covariance,	weight 26
+P(location=x|URL)= wiN(x;
+µ i,?i
+i=1
+n ? )
+= wi (2 p )2 |Si |1/2i =1 n ? e-
+1 2(x- µ i)T Si-1(x- µ i)
+Introduction	to	Information	Retrieval
+§ Learn	a	location-interest	model	for	queries § Using	location	of	users	who	issued	the	query § Learn	a	background	model	showing	the	overall	density	of	users More	location	interest	models
+27
+Introduction	to	Information	Retrieval Topics	in	URLs	with	high	P(user	location	|	URL)
+28
+Introduction	to	Information	Retrieval Location	sensitive	features § Non-contextual	features	(user-independent) § Is	the	query	location	sensitive?		What	about	the	URLs? § Feature:	Entropy	of	the	location	distribution § Low	entropy	means	distribution	is	peaked	and	location	is	important § Feature:	KL-divergence	between	location	model	and	background	model § High	KL-divergence	suggests	that	it	is	location	sensitive § Feature:	KL-divergence	between	query	and	URL	models § Low	KL-divergence	suggests	URL	is	more	likely	to	be	relevant	to	users	issuing	the	query
+29
+Introduction	to	Information	Retrieval More	location	sensitive	features § Contextual	features	(user-dependent) § Feature:	User’s	location	(naturally!) § Feature:	Probability	of	the	user’s	location	given	the	URL § Computed	by	evaluating	URL’s	location	model	at	user	location § Feature	is	high	when	user	is	at	a	location	where	URL	is	popular § Downside:	large	population	centers	tend	to	higher	probabilities	for	all	URLs § Feature:	Use	Bayes	rule	to	compute	P(URL	|	user	location) § Feature:	Also	create	a	normalized	version	of	the	above	feature	by	normalizing	with	the	background	model § Features:	Versions	of	the	above	with	query	instead	of	URL
+30
+Introduction	to	Information	Retrieval Learning	to	rank § Add	location	features	(in	addition	to	standard	features)	for	machine	learned	ranking § Training	data	derived	from	logs § P(URL	|	user	location)	turns	out	to	be	an	important	feature § KL	divergence	of	the	URL	model	from	the	background	model	also	plays	an	important	role
+31
+Introduction	to	Information	Retrieval Query	model	for	[rta	bus	schedule]
+32
+User in New Orleans
+Introduction	to	Information	Retrieval URL	model	for	top	original	result
+33
+User in New Orleans
+Introduction	to	Information	Retrieval URL	model	for	promoted	URL
+34
+User in New Orleans
+Introduction	to	Information	Retrieval
+PERSONALIZED	PAGERANK
+35
+Introduction	to	Information	Retrieval Pagerank	review § Let	Abe	the	stochastic	matrix	corresponding	to	the	Web	graph	Gover	nnodes § No	teleportation	links	(but	assume	no	deadends	in	G) § If	node	ihas	oi outlinks,	and	there	is	an	edge	from	node	i to	node	j,	then	Aij =	1/oi § Let	pbe	the	teleportation	probabilities § (nx	1)	column	vector	with	each	entry	being	1/n
+§ Pagerank	vector	ris	defined	by	the	following
+36
+r=(1-
+a )Ar+
+a p
+Introduction	to	Information	Retrieval Personalized	pagerank [Haveliwala	2003]	[Jeh	and	Widom	2003] §In	the	basic	pagerank	computation,	teleportation	probability	vector	pis	uniform	over	all	pages §But	if	the	user	has	preferences	on	which	pages	to	teleport	to,	that	preference	can	be	represented	in	p § pcould	be	uniform	over	user’s	bookmarks § Or	it	could	be	non-zero	on	just	pages	on	topics	of	interest	to	the	user §Pagerank	would	be	personalized	to	user’s	interests
+§But	computing	personalized	pagerank	is	expensive 37
+Introduction	to	Information	Retrieval Linearity	theorem § For	any	preference	vectors	u1 and	u2,	if	v1 and	v2 are	the	corresponding	personalized	pagerank	vectors,	then	for	any	non-negative	constants	a1 and	a2 such	that	a1+	a2 =	1,	we	have
+§ Proof
+38
+a1v1+a2v2 =(1-
+a )A(a1v1+a2v2)+
+a (a1u1+a2u2)
+=a1((1-
+a )Av1+
+a u1)+a2((1-
+a )Av2 +
+a u2)
+=a1(1-
+a )Av1+a1 a u1+a2(1-
+a )Av2 +a2 a u2
+=(1-
+a )A(a1v1+a2v2)+
+a (a1u1+a2u2)
+a1v1+a2v2
+Introduction	to	Information	Retrieval Topic-sensitive	pagerank § Compute	personalized	pagerank	vector	per	topic § 16	top-level	topics	from	the	Open	Directory	Project § Each	ODP	topic	has	a	set	of	pages	(hand-)classified	into	that	topic § Preference	vector	for	the	topic	is	uniform	over	pages	in	that	topic,	and	0	elsewhere
+§ Note:	[Jeh	and	Widom	2003]	provide	a	more	general	treatment
+39
+Introduction	to	Information	Retrieval Query-time	processing § Construct	a	distribution	over	topics	for	the	query § User	profile	can	provide	a	distribution	over	topics § Query	can	be	classified	into	the	different	topics § Any	other	context	information	can	be	used	to	inform	topic	distributions
+§ Use	the	topic	preferences	to	compute	a	weighted	linear	combination	of	topic	pagerank	vectors	to	use	in	place	of	pagerank
+40
+Introduction	to	Information	Retrieval
+SOCIAL	NETWORKS
+41
+Introduction	to	Information	Retrieval Unicorn [Curtiss	et	al	2013] §Primary	backend	for	Facebook	Graph	Search
+§Facebook	social	graph § Nodes	represent	people	and	things	(entities) § Each	entity	has	a	unique	64-bit	id § Edges	represent	relationships	between	nodes § There	are	many	thousands	of	edge-types § Examples:	friend,	likes,	likers,	…
+42
+Introduction	to	Information	Retrieval Data	model § Billions	of	nodes,	but	graph	is	sparse § Represent	graph	using	adjacency	list § Postings	sorted	by	sort-key(importance)	and	then	id § Index	sharded	by	result-id
+43
+Introduction	to	Information	Retrieval Basic	set	operations § Query	language	includes	basic	set	operations § and, or, difference
+§ Friends	of	either	Jon	Jones	(id5)	and	Lea	Lin	(id6) (or(friend:5 friend:6))
+§ Female	friends	of	Jon	Jones	who	are	not	friend	of	Lea	Lin (difference (and friend:5 gender:1) friend:6)
+44
+Introduction	to	Information	Retrieval Typeahead § Find	users	by	typing	first	few	characters	of	their	name § Index	servers	contain	postings	lists	for	every	name	prefix	up	to	a	predefined	character	limit § Simple	typeahead	implementation	would	simply	return	ids	in	the	corresponding	postings	lists
+§ Simple	solution	doesn’t	ensure	social	relevance § Alternate	solution:	Use	a	conjunctive	query (and mel* friend:3) § Misses	people	who	are	not	friends § Issuing	two	queries	is	expensive 45
+Introduction	to	Information	Retrieval
+§ Provides	a	mechanism	for	some	fraction	of	results	to	possess	a	trait	without	requiring	trait	for	all	results § WeakAndallows	missing	terms	from	some	results § These	optional	terms	can	have	an	optional	count	or	weight § Once	the	optional	count	is	met,	the	term	is	required WeakAndoperator
+46
+(weak-and (term friend:3 :optional-hits 2) (term melanie) (term mars*))
+Introduction	to	Information	Retrieval Graph	Search § Graph	Search	results	are	often	more	than	one	edge	away	from	source	nodes § Example:	Pages	liked	by	friends	of	Melanie	who	like	Emacs
+§ Unicorn	provides	additional	operators	to	support	Graph	Search § Apply (apply likes: (and friend:7 likers:42)) § Extract § Extract	and	return	(denormalized)	ids	stored	in	HitData
+47
+Introduction	to	Information	Retrieval References § J.	Teevan,	S.	Dumais,	E.	Horvitz.	Potential	for	personalization.	2010 § J.	Pitkow	et	al.	Personalized	search.	2002 § J.	Teevan,	S.	Dumais,	E.	Horvitz.	Personalizing	search	via	automated	analysis	of	interests	and	activities.	2005 § P.	Bennett	et	al.	Inferring	and	using	location	metadata	to	personalize	Web	search.	2011 § T.	Haveliwala.	Topic-sensitive	pagerank.	2002. § G.	Jeh	and	J.	Widom.	Scaling	personalized	Web	search.	2003 § M.	Curtiss	et	al.	Unicorn:	A	system	for	searching	the	social	graph.	2013
+48

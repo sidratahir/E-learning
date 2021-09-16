@@ -1,0 +1,241 @@
+Introduction	to Information	Retrieval
+CS276:	Information	Retrieval	and	Web	Search Christopher	Manning	and	Pandu	Nayak
+Lecture	13:	Distributed	Word	Representations	for	Information	Retrieval
+Introduction	to	Information	Retrieval How	can	we	more	robustly	match	a	user’s	search	intent? We	want	to	understand	the	query,	not	just	do	String	equals() § If	user	searches	for	[Dell	notebook	battery	size],	we	would	like	to	match	documents	discussing	“Dell	laptop	battery	capacity” § If	user	searches	for	[Seattle	motel],	we	would	like	to	match	documents	containing	“Seattle	hotel”
+A	naïve	information	retrieval	system	does	nothing	to	help Simple	facilities	that	we	have	already	discussed	do	a	bit	to	help § Spelling	correction § Stemming	/	case	folding But	we’d	like	to	better	understandwhen	query/document	match
+Sec. 9.2.2
+Introduction	to	Information	Retrieval How	can	we	more	robustly	match	a	user’s	search	intent? § Use	of	anchor	text	may	solve	this	by	providing	human	authored	synonyms,	but	not	for	new	or	less	popular	web	pages,	or	non-hyperlinked	collections § Relevance	feedback	could	allow	us	to	capture	this	if	we	get	near	enough	to	matching	documents	with	these	words § We	can	also	fix	this	with	information	on	word	similarities: § A	manual	thesaurusof	synonyms § A	measure	of	word	similarity § Calculated	from	a	big	document	collection § Calculated	by	query	log	mining	(common	on	the	web) Sec. 9.2.2
+Introduction	to	Information	Retrieval Example	of	manual	thesaurus	
+Sec. 9.2.2
+Introduction	to	Information	Retrieval Search	log	query	expansion § Context-free	query	expansion	ends	up	problematic § [light	hair]	˜	[fair	hair]										At	least	in	U.K./Australia?	˜	blonde § So	expand	[light]	?[light	fair] § But	[outdoor	light	price]	?	[outdoor	fair	price] § You	can	learn	query	context-specific	rewritings	from	search	logs	by	attempting	to	identify	the	same	user	making	a	second	attempt	at	the	same	user	need § [Hinton	word	vector] § [Hinton	word	embedding] § In	this	context,	[vector]	˜	[embedding] § But	not	when	talking	about	a	disease	vector	or	C++!
+Introduction	to	Information	Retrieval Automatic	Thesaurus	Generation § Attempt	to	generate	a	thesaurus	automatically	by	analyzing	a	collection	of	documents § Fundamental	notion:	similarity	between	two	words § Definition	1:	Two	words	are	similar	if	they	co-occur	with	similar	words. § Definition	2:	Two	words	are	similar	if	they	occur	in	a	given	grammatical	relation	with	the	same	words. § You	can	harvest,	peel,	eat,	prepare,	etc.	apples	and	pears,	so	apples	and	pears	must	be	similar. § Co-occurrence	based	is	more	robust,	grammatical	relations	are	more	accurate. Why? Sec. 9.2.3
+Introduction	to	Information	Retrieval Simple	Co-occurrence	Thesaurus
+§ Simplest	way	to	compute	one	is	based	on	term-term	similarities	in	C	=	AAT	where	Ais	term-document	matrix. § wi,j =	(normalized)	weight	for	(ti,dj)
+§ For	each	ti,	pick	terms	with	high	values	in	C
+ti
+dj N
+M
+What does C contain if A is a term-doc incidence (0/1) matrix?
+Sec. 9.2.3
+A
+Introduction	to	Information	Retrieval Automatic	thesaurus	generation	example	…sort	of	works
+Word Nearest	neighbors absolutely absurd,	whatsoever,	totally,	exactly,	nothing bottomed dip,	copper,	drops,	topped,	slide,	trimmed captivating shimmer,	stunningly,	superbly,plucky,	witty doghouse dog,	porch,	crawling,	beside,	downstairs makeup repellent,	lotion,	glossy,	sunscreen,	skin,	gel mediating reconciliation,negotiate,	cease,	conciliation keeping hoping,	bring,	wiping,	could,some,	would lithographs drawings,Picasso,	Dali,	sculptures,	Gauguin pathogens toxins,	bacteria,	organisms,bacterial,	parasites senses grasp,	psyche,truly,	clumsy,	naïve,	innate	
+But data is  too sparse in this form 100,000 words = 1010 entries in C. 
+Introduction	to	Information	Retrieval How	can	we	represent	term	relations? § With	the	standard	symbolic	encoding	of	terms,	each	term	is	a	dimension § Different	terms	have	no	inherent	similarity § motel [0 0 0 0 0 0 0 0 0 0 1 0 0 0 0]T hotel  [0 0 0 0 0 0 0 3 0 0 0 0 0 0 0] = 0 § If	query	on	hoteland	document	has	motel,	then	our	query	and	document	vectors	are	orthogonal Sec. 9.2.2
+Introduction	to	Information	Retrieval Can	you	directly	learn	term	relations? § Basic	IR	is	scoring	on	qTd § No	treatment	of	synonyms;	no	machine	learning § Can	we	learn	parameters	Wto	rank	via	qTWd ?
+§ Problem	is	again	sparsity–Wis	huge	>	1010
+Introduction	to	Information	Retrieval Is	there	a	better	way? § Idea: § Can	we	learn	a	dense	low-dimensional	representation	of	a	word	in	R d such	that	dot	productsuTvexpress	word	similarity? § We	could	still	if	we	want	to	include	a	“translation”	matrix	between	vocabularies	(e.g.,	cross-language):	uTWv § But	now	Wis	small! § Supervised	Semantic	Indexing	(Baiet	al.	Journal	of	Information	Retrieval	2009)	shows	successful	use	of	learning	W	for	information	retrieval
+§ But	we’ll	develop	direct	similarity	in	this	class
+Introduction	to	Information	Retrieval Distributional	similarity	based	representations § You	can	get	a	lot	of	value	by	representing	a	word	by	means	of	its	neighbors § “You	shall	know	a	word	by	the	company	it	keeps” § (J.	R.	Firth	1957:	11) § One	of	the	most	successful	ideas	of	modern	statistical	NLP
+government debt problems turning into banking crises as has happened in saying that Europe needs unified banking regulation to replace the hodgepodge ëThese	words	will	represent	banking	ì
+12
+Introduction	to	Information	Retrieval Solution:	Low	dimensional	vectors § The	number	of	topics	that	people	talk	about	is	small	(in	some	sense) § Clothes,	movies,	politics,	… • Idea:	store	“most”	of	the	important	information	in	a	fixed,	small	number	of	dimensions:	a	dense	vector • Usually	25	–1000	dimensions
+• How	to	reduce	the	dimensionality? • Go	from	big,	sparse	co-occurrence	count	vector	to	low	dimensional	“word	embedding”	
+13
+Introduction	to	Information	Retrieval Traditional	Way: Latent	Semantic	Indexing/Analysis § Use	Singular	Value	Decomposition	(SVD)	–kind	of	like	Principal	Components	Analysis	(PCA)	for	an	arbitrary	rectangular	matrix	–or	just	random	projection	to	find	a	lowdimensional	basis	or	orthogonal	vectors § Theory	is	that	similarity	is	preserved	as	much	as	possible § You	can	actually	gain	in	IR	(slightly)	by	doing	LSA,		as	“noise”	of	term	variation	gets	replaced	by	semantic	“concepts” § Popular	in	the	1990s	[Deerwesteret	al.	1990,	etc.] § Results	were	always	somewhat	iffy	(…	it	worked	sometimes) § Hard	to	implement	efficiently	in	an	IR	system	(dense	vectors!) § Discussed	in	IIRchapter	18,	but	not	discussed	further	here § And	not	on	the	exam	(!!!) Sec. 18.2
+Introduction	to	Information	Retrieval
+“NEURAL	EMBEDDINGS”
+Introduction	to	Information	Retrieval Word	meaning	is	defined	in	terms	of	vectors § We	will	build	a	dense	vector	for	each	word	type,	chosen	so	that	it	is	good	at	predicting	other	words	appearing	in	its	context …those	other	words	also	being	represented	by	vectors	…it	all	gets	a	bit	recursive
+linguistics =
+0.286 0.792 -0.177 -0.107 0.109 -0.542 0.349 0.271
+Introduction	to	Information	Retrieval
+Neural	word	embeddings	-visualization
+17
+Introduction	to	Information	Retrieval Basic	idea	of	learning	neural	network	word	embeddings
+We	define	a	model	that	aims	to	predict	between	a	center	word	wt and	context	words	in	terms	of	word	vectors p(context|wt)	=	… which	has	a	loss	function,	e.g., J=	1	-	p(w-t	|wt)	We	look	at	many	positions	t	in	a	big	language	corpus We	keep	adjusting	the	vector	representations	of	words	to	minimize	this	loss
+Introduction	to	Information	Retrieval Idea:	Directly	learn	low-dimensional	word	vectors	based	on	ability	to	predict • Old	idea.	Relevant	for	this	lecture	&	deep	learning: • Learning	representations	by	back-propagating	errors.	(Rumelhartet	al.,	1986) • A	neural	probabilistic	language	model	(Bengioet	al.,	2003)		• NLP	(almost)	from	Scratch	(Collobert&	Weston,	2008) • A	recent,	even	simpler	and	faster	model:	word2vec	(Mikolovet	al.	2013)	àintro	now • The	GloVe	model	from	Stanford	(Pennington,	Socher,	and	Manning	2014)	connects	back	to	matrix	factorization • Initial	models	were	quite	non-linear	and	slow;	recent	work	has	used	fast,	bilinear	models 19
+Introduction	to	Information	Retrieval Word2vec	is	a	family	of	algorithms [Mikolovet	al.	2013] Predict	between	every	word	and	its	context	words! Two	algorithms 1. Skip-grams	(SG) Predict	context	words	given	target	(position	independent) 2. Continuous	Bag	of	Words	(CBOW) Predict	target	word	from	bag-of-words	context Two	(moderately	efficient)	training	methods 1. Hierarchical	softmax 2. Negative	sampling Naïve	softmax
+Introduction	to	Information	Retrieval Skip-gram	prediction
+Introduction	to	Information	Retrieval Details	of	word2vec For	each	word	t=	1	…T,	predict	surrounding	words	in	a	window	of	“radius”	mof	every	word. Objective	function:	Maximize	the	probability	of	any	context	word	given	the	current	center	word:
+Where	?represents	all	variables	we	will	optimize
+Introduction	to	Information	Retrieval Details	of	Word2Vec Predict	surrounding	words	in	a	window	of	radius	mof	every	word For																						the	simplest	first	formulation	is	
+where	ois	the	outside	(or	output)	word	index,	cis	the	center	word	index,	vc and	uo are	“center”	and	“outside”	vectors	of	indices	cand	o Softmaxusing	word	cto	obtain	probability	of	word	o
+trainingtime.ThebasicSkip-gramformulationde?nesp(wt+j|wt)usingthesoftmaxfunction:
+p
+( w O
+|
+w I
+)=
+exp!v'wO ?vwI" #W w=1 exp!v'w?vwI"
+(2)
+where
+v w
+and
+v
+' w are the “input” and “output” vector representations of w, andW is the number of words in the vocabulary. This formulation is impractical because the cost of computing ? log p ( w O | w I ) isproportionalto W,whichisoftenlarge(105–107 terms). 2.1 HierarchicalSoftmax Acomputationallyef?cientapproximationof thefullsoftmaxis thehierarchicalsoftmax. In the contextofneuralnetworklanguagemodels,itwas?rstintroducedbyMorinandBengio[12]. The main advantageis thatinstead of evaluating W outputnodesin theneuralnetworkto obtain the probabilitydistribution,itisneededtoevaluateonlyaboutlog2(W)nodes. ThehierarchicalsoftmaxusesabinarytreerepresentationoftheoutputlayerwiththeW wordsas itsleavesand,foreachnode,explicitlyrepresentstherelativeprobabilitiesofitschildnodes.These de?nearandomwalkthatassignsprobabilitiestowords. Moreprecisely,eachword w canbereachedbyanappropriatepathfromtherootofthetree. Let n ( w,j ) bethe j-thnodeonthepathfromtheroottow,andletL(w) bethelengthofthispath,so n ( w, 1) = root and n ( w,L ( w )) = w. Inaddition,foranyinnernoden,letch(n) beanarbitrary ?xedchildof n andlet [[ x ]] be1if xistrueand-1otherwise.Thenthehierarchicalsoftmaxde?nes p ( w O | w I ) asfollows:
+p
+( w
+|
+w I
+)=
+L
+(
+w
+)
+-
+1
+$ j =1
+s
+! [[
+n
+( w,j + 1) = ch(n(w,j))]] · v'n(w,j)?vwI" (3)
+where
+s
+( x )=1 /
+(1 + exp( -
+x )). Itcanbeveri?edthat#Ww=1 p(w|wI)=1. Thisimpliesthatthecostofcomputinglogp(wO|wI) and?logp(wO|wI)isproportionalto L(wO),whichonaverageisnogreaterthan logW. Also, unlikethestandardsoftmaxformulationoftheSkip-gramwhich assignstwo representations v w and v ' w toeach word w, thehierarchicalsoftmaxformulationhas one representation v w for each word w and one representation v'n for every inner node n of the binarytree. Thestructureofthetreeusedbythehierarchicalsoftmaxhasaconsiderableeffectontheperformance. MnihandHintonexploredanumberofmethodsforconstructingthetreestructureandthe effectonboththetrainingtimeandtheresultingmodelaccuracy[10].Inourworkweuseabinary Huffmantree,asitassignsshortcodestothefrequentwordswhichresultsinfasttraining. Ithas beenobservedbeforethatgroupingwordstogetherbytheirfrequencyworkswellasaverysimple speeduptechniquefortheneuralnetworkbasedlanguagemodels[5,8]. 2.2 NegativeSampling An alternativeto thehierarchicalsoftmaxis NoiseContrastiveEstimation (NCE),which was introducedbyGutmannandHyvarinen[4]andappliedtolanguagemodelingbyMnihandTeh[11]. NCEpositsthatagoodmodelshouldbeabletodifferentiatedatafromnoisebymeansoflogistic regression. ThisissimilartohingelossusedbyCollobertandWeston[2]whotrainedthemodels byrankingthedataabovenoise. WhileNCEcanbeshowntoapproximatelymaximizethelogprobabilityofthesoftmax,theSkipgrammodelisonlyconcernedwithlearninghigh-qualityvectorrepresentations,sowearefreeto simplifyNCEaslongasthevectorrepresentationsretaintheirquality.Wede?neNegativesampling (NEG)bytheobjective
+log
+s
+( v
+' w O
+?
+v w I
+)+
+k % i =1
+Ewi~Pn(w)&logs(-v'wi?vwI)' (4) 3
+Introduction	to	Information	Retrieval Softmax	function:	Standard	map from	RV to	a	probability	distribution
+Exponentiate	to make	positive
+Normalize	to give	probability
+Introduction	to	Information	Retrieval Skip	gram	model	structure
+Introduction	to	Information	Retrieval To	learn	good	word	vectors: Compute	allvector	gradients! § We	often	define	the	set	of	allparameters	in	a	model	in	terms	of	one	long	vector	§ In	our	case	with	d-dimensional	vectors and Vmany	words:
+§ We	then	optimize these	parameters
+Note: Every word has two vectors! Makes it simpler!
+Introduction	to	Information	Retrieval Intuition	of	how	to	minimize	loss	for	a	simple	function	over	two	parameters
+We	start	at	a	random	point	and	walk	in	the	steepest	direction,	which	is	given	by	the	derivative	of	the	function
+Contour	lines	show	points	of	equal	value	of	objective	function
+Introduction	to	Information	Retrieval Descending	by	using	derivatives We	will	minimize	a	cost	function	by gradient	descent
+Trivial	example:	(from	Wikipedia) Find	a	local	minimum	of	the	function	f(x)	=	x4-3x3+2,	with	derivative	f'(x)	=	4x3-9x2
+Subtracting	a	fraction	of	the	gradient	moves	you	towards	the	minimum!
+Introduction	to	Information	Retrieval Vanilla	Gradient	Descent	Code
+Introduction	to	Information	Retrieval Stochastic	Gradient	Descent § But	Corpus	may	have	40B	tokens	and	windows § You	would	wait	a	very	long	time	before	making	a	single	update! § Very bad	idea	for	pretty	much	all	neural	nets! § Instead:	We	will	update	parameters	after	each	window	t	àStochastic	gradient	descent	(SGD)
+Introduction	to	Information	Retrieval Working	out	how	to	optimize	a	neural	network	is	really	all	the	chain	rule!
+Chain	rule!	If	y=	f(u)	and	u=	g(x),	i.e.	y	=	f(g(x)),	then:
+Simple	example:	
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval
+36
+Introduction	to	Information	Retrieval Linear	Relationships	in	word2vec These	representations	are	very	good	at	encoding	similarityand	dimensions	of	similarity! § Analogies	testing	dimensions	of	similarity	can	be	solved	quite	well	just	by	doing	vector	subtraction	in	the	embedding	space Syntactically § xapple -	xapples ˜	xcar -	xcars ˜xfamily -	xfamilies § Similarly	for	verb	and	adjective	morphological	forms Semantically	(Semeval2012	task	2) § xshirt -	xclothing ˜xchair -	xfurniture § xking -	xman ˜	xqueen -	xwoman
+37
+Introduction	to	Information	Retrieval
+king
+man
+woman
+Test for linear relationships, examined by Mikolov et al.
+a:b :: c:?
+man woman
+[ 0.20 0.20 ] [ 0.60 0.30 ] king [ 0.30 0.70 ]
+[ 0.70 0.80 ]
+-
++
++
+queen
+queen
+man:woman :: king:?
+a:b :: c:?
+Word	Analogies
+Introduction	to	Information	Retrieval GloVeVisualizations
+39
+http://nlp.stanford.edu/projects/glove/
+Introduction	to	Information	Retrieval Glove	Visualizations:	Company	-CEO
+40
+Introduction	to	Information	Retrieval Glove	Visualizations:	Superlatives
+5/21/17 41
+Introduction	to	Information	Retrieval Application	to	Information	Retrieval Application	is	just	beginning	–there’s	little	to	go	on § Google’s	RankBrain–almost	nothing	is	publicly	known § Bloomberg	article	by	Jack	Clark	(Oct	26,	2015):	http://www.bloomberg.com/news/articles/2015-10-26/google-turning-itslucrative-web-search-over-to-ai-machines § A	result	reranking	system § Even	though	more	of	the	value	is	in	the	tail? § New	SIGIR	Neu-IR	workshop	series	(2016	and	2017)
+Introduction	to	Information	Retrieval
+2011														2013										2015											2017 speech							vision						NLP										IR
+Final	Thoughts from	Chris	Manning	SIGIR	2016	keynote
+You	are here
+Introduction	to	Information	Retrieval An	application	to	information	retrieval Nalisnick,	Mitra,	Craswell&	Caruana.	2016.	Improving	Document	Ranking	with	Dual	Word	Embeddings.	WWW	2016	Companion.	http://research.microsoft.com/pubs/260867/pp1291-Nalisnick.pdf Mitra,	Nalisnick,	Craswell&	Caruana.	2016.	A	Dual	Embedding	Space	Model	for	Document	Ranking.	arXiv:1602.01137[cs.IR]
+Builds	on	BM25	model	idea	of	“aboutness” § Not	just	term	repetition	indicating	aboutness § Relationship	between	query	terms	and	all	terms	in	the	document	indicates	aboutness	(BM25	uses	only	query	terms) Makes	clever	argument	for	different	use	of	word	and	context	vectors	in	word2vec’s	CBOW/SGNS	or	GloVe
+Introduction	to	Information	Retrieval Modeling	document	aboutness:	Results	from	a	search	for	Albuquerque d1
+d2
+Introduction	to	Information	Retrieval Using	2	word	embeddings
+word2vec model with 1 word of context
+Focus word
+Context word
+WIN Embeddings for focus words
+WOUT Embeddings for context words
+We can gain by using these two embeddings differently
+Introduction	to	Information	Retrieval Using	2	word	embeddings
+Introduction	to	Information	Retrieval Dual	Embedding	Space	Model	(DESM) § Simple	model § A	document	is	represented	by	the	centroid	of	its	word	vectors
+§ Query-document	similarity	is	average	over	query	words	of	cosine	similarity
+Introduction	to	Information	Retrieval Dual	Embedding	Space	Model	(DESM) § What	works	best	is	to	use	the	OUT	vectors	for	the	document	and	the	IN	vectors	for	the	query
+§ This	way	similarity	measures	aboutness–words	that	appear	with	this	word	–which	is	more	useful	in	this	context	than	(distributional)	semantic	similarity
+Introduction	to	Information	Retrieval Experiments § Train	word2vec	from	either § 600	million	Bing	queries § 342	million	web	document	sentences § Test	on	7,741	randomly	sampled	Bing	queries § 5	level	eval(Perfect,	Excellent,	Good,	Fair,	Bad) § Two	approaches 1. Use	DESM	model	to	reranktop	results	from	BM25 2. Use	DESM	alone	or	a	mixture	model	of	it	and	BM25
+Introduction	to	Information	Retrieval Results	–reranking	k-best	list	
+Pretty	decent	gains	–e.g.,	2%	for	NDCG@3 Gains	are	bigger	for	model	trained	on	queries	than	docs
+Introduction	to	Information	Retrieval Results	–whole	ranking	system
+Introduction	to	Information	Retrieval A	possible	explanation
+IN-OUT	has	some	ability	to	prefer	Relevant	to	close-by	(judged)	non-relevant,	but	it’s	scores	induce	too	much	noise	vs.	BM25	to	be	usable	alone
+Introduction	to	Information	Retrieval DESM	conclusions § DESM	is	a	weak	ranker	but	effective	at	finding	subtler	similarities/aboutness § It	is	effective	at,	but	only	at,	ranking	at	least	somewhat	relevant	documents
+§ For	example,	DESM	can	confuse	Oxford	and	Cambridge § Bing	rarely	makes	the	Oxford-Cambridge	mistake
+Introduction	to	Information	Retrieval Global	vs.	local	embedding	[Diaz	2016]
+Introduction	to	Information	Retrieval Global	vs.	local	embedding	[Diaz	2016]
+Train w2v on documents from first round of retrieval
+Fine-grained word sense disambiguation
+Introduction	to	Information	Retrieval Ad-hoc	retrieval	using	local	and	distributed	representation	[Mitraet	al.	2017] § Argues	both	“lexical”	and	“semantic”	matching	is	important	for	document	ranking § Duet	model	is	a	linear	combination	of	two	DNNs	using	local	and	distributed	representations	of	query/	document	as	inputs,	and	jointly	trained	on	labelled	data
+Introduction	to	Information	Retrieval Summary:	Embed	all	the	things! Word	embeddings	are	the	hot	new	technology	(again!)
+Lots	of	applications	wherever	knowing	word	context	or	similarity	helps	prediction: § Synonym	handling	in	search § Document	aboutness § Ad	serving § Language	models:	from	spelling	correction	to	email	response § Machine	translation § Sentiment	analysis § …
+Introduction	to	Information	Retrieval
+Introduction	to	Information	Retrieval Thesaurus-based	query	expansion
+§ For	each	term	tin	a	query,	expand	the	query	with	synonyms	and	related	words	of	tfrom	the	thesaurus § feline	?	feline	cat § May	weight	added	terms	less	than	original	query	terms. § Generally	increases	recall § Widely	used	in	many	science/engineering	fields § May	significantly	decrease	precision,	particularly	with	ambiguous	terms. § “interest	rate”	®“interest	rate	fascinate	evaluate” § There	is	a	high	cost	of	manually	producing	a	thesaurus § And	for	updating	it	for	scientific	changes
+Sec. 9.2.2
+Introduction	to	Information	Retrieval
+Automatic	Thesaurus	Generation	Issues
+n Quality of associations is usually a problem n Sparsity
+n Term ambiguity may introduce irrelevant statistically correlated terms. n “planet earth facts” ® “planet earth soil ground facts” n Since terms are highly correlated anyway, expansion may not retrieve many additional documents.
+Sec. 9.2.3
+C
+1010 entries
+100,000
+100,000
+Introduction	to	Information	Retrieval COALS	model	(count-modified	LSA) [Rohde,	Gonnerman&	Plaut,	ms.,	2005]
+Introduction	to	Information	Retrieval Count	based	vs.	direct	prediction
+63
+LSA, HAL (Lund & Burgess), COALS (Rohde et al), Hellinger-PCA (Lebret& Collobert)
+•Fast training •Efficient usage of statistics •Primarily used to capture word similarity •Disproportionate importance given to small counts
+•NNLM, HLBL, RNN, word2vec Skip-gram/CBOW, (Bengio et al; Collobert& Weston; Huang et al; Mnih& Hinton; Mikolovet al; Mnih& Kavukcuoglu)
+•Scales with corpus size •Inefficient usage of statistics
+•Can capture complex patterns beyond word similarity 
+•Generate improved performance on other tasks
+Introduction	to	Information	Retrieval
+Ratios	of	co-occurrence	probabilities	can	encode	meaning	components
+Crucial	insight:	
+x=	solid x=	water			
+large
+x=	gas
+small
+x=	random			
+smalllarge
+small large large small
+~1 ~1large small
+Encoding	meaning	in	vector	differences [Pennington,	Socher,	and	Manning,	EMNLP	2014]
+Introduction	to	Information	Retrieval
+Ratios	of	co-occurrence	probabilities	can	encode	meaning	components
+Crucial	insight:	
+x=	solid x=	water			
+1.9	x	10-4
+x=	gas x=	fashion
+2.2	x	10-5
+1.36 0.96
+Encoding	meaning	in	vector	differences [Pennington,	Socher,	and	Manning,	EMNLP	2014]
+8.9
+7.8	x	10-4 2.2	x	10-3
+3.0	x	10-3 1.7	x	10-5
+1.8	x	10-5
+6.6	x	10-5
+8.5	x	10-2
+Introduction	to	Information	Retrieval GloVe:	A	new	model	for	learning	word	representations [Pennington,	Socher,	and	Manning,	EMNLP	2014]
+Introduction	to	Information	Retrieval
+Nearest	words	tofrog:
+1.	frogs 2.	toad 3.	litoria 4.	leptodactylidae 5.	rana 6.	lizard 7.	eleutherodactylus
+Word	similarities
+litoria leptodactylidae
+rana eleutherodactylus
+http://nlp.stanford.edu/projects/glove/
+Introduction	to	Information	Retrieval
+Model Dimensions Corpus	size Performance (Syn+	Sem)
+CBOW(Mikolovet	al.	2013b) 300 1.6	billion 36.1 GloVe(this	work) 300 1.6	billion 70.3 CBOW	(M	et	al.	2013b,	by	us) 300 6	billion 65.7 GloVe(this	work) 300 6	billion 71.7 CBOW(Mikolovet	al.	2013b) 1000 6	billion 63.7 GloVe(this	work) 300 42	billion 75.0
